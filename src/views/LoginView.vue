@@ -9,7 +9,7 @@
     <div class="relative z-10 text-center space-y-6 px-6">
       <div class="space-y-2">
         <p class="text-sm uppercase tracking-[0.4em] text-white/70">Koios Digital</p>
-        <h1 class="text-4xl font-semibold">Set up your devices</h1>
+        <h1 class="text-4xl font-semibold">{{ t('hello') }}</h1>
         <p class="text-white/70">Connect smart matricies, lamps, speakers, sensors, and more.</p>
       </div>
       <UButton
@@ -33,6 +33,10 @@ import FullPageLayout from '@/layouts/FullPageLayout.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { LOGIN_DEFAULT_REDIRECT, LOGIN_REDIRECT_STORAGE_KEY } from '@/stores/auth/constants'
 import loginBgImage from '@/assets/images/login-bg.jpg'
+
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
+
 
 useHead({
   title: 'Sign In | Koios Digital',

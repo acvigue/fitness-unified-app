@@ -8,15 +8,19 @@ import { createPinia } from 'pinia'
 import { createHead } from '@unhead/vue/client'
 import { App as CapacitorApp } from '@capacitor/app'
 import { Capacitor } from '@capacitor/core'
+import { setupI18n } from './i18n.ts'
 
 import App from './App.vue'
 import router from './router'
 
 import ui from '@nuxt/ui/vue-plugin'
 
+export const i18n = setupI18n()
+
 const app = createApp(App)
 const head = createHead()
 
+app.use(i18n)
 app.use(ui)
 app.use(createPinia())
 app.use(router)

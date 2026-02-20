@@ -5,6 +5,8 @@ import LoginCallbackView from '@/views/LoginCallbackView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 import OAuthCallbackView from '@/views/OAuthCallbackView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
+import { SUPPORT_LOCALES, setupI18n, setI18nLanguage, loadLocaleMessages } from '@/i18n.ts'
+import { i18n } from '@/main.ts'
 
 const router = createRouter({
   history: createWebHistory('/'),
@@ -42,7 +44,24 @@ let authInitialized = false
 
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
+  const paramsLocale = to.params.locale
+  let finalLocale = 'en';
+  if (!SUPPORT_LOCALES.includes(paramsLocale)) {
+	finalLocale = 'en'
+  }
+  else {
+	finalLocale = paramsLocale
+  }
 
+
+  // load locale messages
+  if (!i18n.global.availableLocales.includes(paramsLocale)) {
+    await loadLocaleMessages(i18n, finalLocale)
+  }
+  
+  // set i18n language
+  setI18nLanguage(i18n, finalLocale)
+  
   if (!authInitialized) {
     await authStore.initialize()
     authInitialized = true
