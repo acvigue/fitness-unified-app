@@ -90,8 +90,9 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Initiate OAuth login flow
    */
-  async function beginAuthentication() {
-    await KoiosOidcClient.beginAuthentication()
+  async function beginAuthentication(provider?: string) {
+    // await KoiosOidcClient.beginAuthentication()
+    await KoiosOidcClient.login(provider)
   }
 
   /**

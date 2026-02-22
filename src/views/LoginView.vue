@@ -25,8 +25,8 @@
       <div class="flex flex-col gap-3">
         <UButton @click="startLogin()">Login with Email</UButton>
         <div class="divider">or</div>
-        <UButton icon="i-fa6-brands:google" @click="startLogin('google')">Google</UButton>
-        <UButton icon="i-fa6-solid:building" @click="startLogin('institutional')">SSO</UButton>
+        <UButton icon="i-logos-google-icon" @click="startLogin('google-oauth2')">Google</UButton>
+        <UButton icon="i-heroicons-building-office" @click="startLogin('my-uni-sso')">SSO</UButton>
       </div>
 
     </div>
@@ -73,11 +73,11 @@ const persistRedirectTarget = () => {
   sessionStorage.setItem(LOGIN_REDIRECT_STORAGE_KEY, redirectTarget.value)
 }
 
-const startLogin = async () => {
+const startLogin = async (provider?: string) => {
   if (isAuthorizing.value) return
   isAuthorizing.value = true
   persistRedirectTarget()
-  await authStore.beginAuthentication()
+  await authStore.beginAuthentication(provider)
   isAuthorizing.value = false
 }
 

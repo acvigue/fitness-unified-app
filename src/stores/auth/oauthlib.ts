@@ -168,39 +168,44 @@ export class KoiosOidcClient {
    * On native: Opens in-app browser, deep link brings user back
    * On web: Standard redirect flow
    */
-  static async beginAuthentication() {
-    if (Capacitor.isNativePlatform()) {
-      // Native: Build authorization URL manually with PKCE and open in-app browser
-      const { oauth } = ENV
-      const baseUrl = resolveBaseUrl()
-      const redirectUri = `${baseUrl}${oauth.redirectPath}`
+    static async login(idpHint?: string) {
+      if (Capacitor.isNativePlatform()) {
+        // Native: Build authorization URL manually with PKCE and open in-app browser
+        const { oauth } = ENV
+        const baseUrl = resolveBaseUrl()
+        const redirectUri = `${baseUrl}${oauth.redirectPath}`
+        
+        // Generate PKCE values
+        const pkce = await generatePKCE()
+        const state = generateRandomString(16)
+  
+        sessionStorage.setItem(PKCE_VERIFIER_KEY, pkce.verifier)
+        sessionStorage.setItem(OIDC_STATE_KEY, state)
 
-      // Generate PKCE values
-      const pkce = await generatePKCE()
-      const state = generateRandomString(16)
+        // Build authorization URL
+        const authUrl = new URL(`${oauth.authority}/protocol/openid-connect/auth`)
+        authUrl.searchParams.set('client_id', oauth.clientId)
+        authUrl.searchParams.set('redirect_uri', redirectUri)
+        authUrl.searchParams.set('response_type', 'code')
+        authUrl.searchParams.set('scope', oauth.scope)
+        authUrl.searchParams.set('state', state)
+        authUrl.searchParams.set('code_challenge', pkce.challenge)
+        authUrl.searchParams.set('code_challenge_method', 'S256')
+  
+        if (idpHint) authUrl.searchParams.set('kc_idp_hint', idpHint)
 
-      // Store PKCE verifier and state for callback
-      sessionStorage.setItem(PKCE_VERIFIER_KEY, pkce.verifier)
-      sessionStorage.setItem(OIDC_STATE_KEY, state)
-
-      // Build authorization URL
-      const authUrl = new URL(`${oauth.authority}/protocol/openid-connect/auth`)
-      authUrl.searchParams.set('client_id', oauth.clientId)
-      authUrl.searchParams.set('redirect_uri', redirectUri)
-      authUrl.searchParams.set('response_type', 'code')
-      authUrl.searchParams.set('scope', oauth.scope)
-      authUrl.searchParams.set('state', state)
-      authUrl.searchParams.set('code_challenge', pkce.challenge)
-      authUrl.searchParams.set('code_challenge_method', 'S256')
-
-      // Open in external browser (Safari) so universal links work on redirect
-      await InAppBrowser.openInExternalBrowser({ url: authUrl.toString() })
-      // Universal link will handle the callback via appUrlOpen listener in main.ts
-    } else {
-      // Web: Standard redirect using oidc-client-ts
-      return getUserManager().signinRedirect()
+        // Open in external browser (Safari) so universal links work on redirect
+        await InAppBrowser.openInExternalBrowser({ url: authUrl.toString() })
+        // Universal link will handle the callback via appUrlOpen listener in main.ts
+      } else {
+        // Web: Standard redirect using oidc-client-ts
+        return getUserManager().signinRedirect({
+          extraQueryParams: idpHint ? { kc_idp_hint: idpHint } : {},
+        })
+      }
     }
-  }
+  
+  
 
   /**
    * Completes the OIDC authentication callback
