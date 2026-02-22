@@ -12,7 +12,7 @@
         <h1 class="text-4xl font-semibold">{{ t('hello') }}</h1>
         <p class="text-white/70">Description here</p>
       </div>
-      <UButton
+      <!-- <UButton
         size="lg"
         color="primary"
         trailing-icon="i-fa6-solid:arrow-right"
@@ -20,7 +20,15 @@
         @click="startLogin"
       >
         Get Started
-      </UButton>
+      </UButton> -->
+
+      <div class="flex flex-col gap-3">
+        <UButton @click="startLogin()">Login with Email</UButton>
+        <div class="divider">or</div>
+        <UButton icon="i-fa6-brands:google" @click="startLogin('google')">Google</UButton>
+        <UButton icon="i-fa6-solid:building" @click="startLogin('institutional')">SSO</UButton>
+      </div>
+
     </div>
   </FullPageLayout>
 </template>
