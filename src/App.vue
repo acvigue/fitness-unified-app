@@ -4,6 +4,7 @@ import { onMounted } from 'vue'
 
 import AppLayout from './layouts/AppLayout.vue'
 import { useAuthStore } from '@/stores/auth/auth'
+import { useHead } from '@unhead/vue/dist'
 
 const authStore = useAuthStore()
 
@@ -15,6 +16,14 @@ const hydrateAuth = async () => {
 
 onMounted(async () => {
   await hydrateAuth()
+})
+
+useHead({
+  titleTemplate: '%s | FitTime',
+  meta: [
+    { name: 'description', content: 'Manage your FitTime' },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+  ],
 })
 </script>
 

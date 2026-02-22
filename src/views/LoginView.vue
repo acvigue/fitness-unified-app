@@ -8,9 +8,9 @@
     <div class="absolute inset-0 bg-zinc-900/80"></div>
     <div class="relative z-10 text-center space-y-6 px-6">
       <div class="space-y-2">
-        <p class="text-sm uppercase tracking-[0.4em] text-white/70">Koios Digital</p>
+        <p class="text-sm uppercase tracking-[0.4em] text-white/70">FitTime</p>
         <h1 class="text-4xl font-semibold">{{ t('hello') }}</h1>
-        <p class="text-white/70">Connect smart matricies, lamps, speakers, sensors, and more.</p>
+        <p class="text-white/70">Description here</p>
       </div>
       <UButton
         size="lg"
@@ -39,8 +39,7 @@ const { t } = useI18n()
 
 
 useHead({
-  title: 'Sign In | Koios Digital',
-  meta: [{ name: 'description', content: 'Sign in to manage your Koios Digital devices' }],
+  title: 'Sign In',
 })
 
 const authStore = useAuthStore()
