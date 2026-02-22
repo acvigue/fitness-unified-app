@@ -14,7 +14,8 @@
     "format": "prettier --write \"src/**/*.{ts,vue,js,json,css}\"",
     "format:check": "prettier --check \"src/**/*.{ts,vue,js,json,css}\"",
     "typecheck": "vue-tsc -p ./tsconfig.app.json",
-    "generate:api": "openapi-typescript YOUR_API_URL/openapi.json -o src/types/api.d.ts",
+    "generate:api": "openapi-typescript http://localhost:3000/openapi.json -o src/types/api.d.ts",
+    "generate:api:prod": "openapi-typescript https://fittime.api.koiosdigital.net/openapi.json -o src/types/api.d.ts",
     "prepare": "husky"
   },
   "dependencies": {
