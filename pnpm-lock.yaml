@@ -39,7 +39,7 @@ importers:
         specifier: ^4.3.0
         version: 4.4.0(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(@tiptap/extensions@3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))(@tiptap/pm@3.20.0))(@tiptap/y-tiptap@3.0.2(prosemirror-model@1.25.4)(prosemirror-state@1.4.4)(prosemirror-view@1.41.6)(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(change-case@5.4.4)(embla-carousel@8.6.0)(jwt-decode@4.0.0)(tailwindcss@4.2.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.0)(jiti@2.6.1)(lightningcss@1.31.1))(vue-router@4.6.4(vue@3.5.28(typescript@5.9.3)))(vue@3.5.28(typescript@5.9.3))(yjs@13.6.29)
       '@unhead/vue':
-        specifier: ^2.1.1
+        specifier: ^2.1.4
         version: 2.1.4(vue@3.5.28(typescript@5.9.3))
       jwt-decode:
         specifier: ^4.0.0

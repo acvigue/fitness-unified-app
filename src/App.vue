@@ -4,7 +4,7 @@ import { onMounted } from 'vue'
 
 import AppLayout from './layouts/AppLayout.vue'
 import { useAuthStore } from '@/stores/auth/auth'
-import { useHead } from '@unhead/vue/dist'
+import { useHead } from '@unhead/vue'
 
 const authStore = useAuthStore()
 
