@@ -1,5 +1,43 @@
 {
-	
-		"hello": "hello world!"
-	
+	"hello": "Hello World!",
+	"home" : {
+		"welcome": "Welcome to Your App"
+	},
+	"login" : {
+		"loginemail": "Login with Email",
+		"or": "or",
+		"finish": "Finishing sign-in…",
+		"error" : {
+			"notfinish": "We could not finish the redirect.",
+			"wait": "Hang tight while we verify your account."
+		},
+		"tryagain": "Try again",
+		"authprocessing": "Processing authentication...",
+		"connectedsuccess": "Connected successfully!",
+		"canclose": "You can close this window.",
+		"authfailed": "Authentication failed"
+	},
+	"settings" : {
+		"account": "Account",
+		"logout": "Log out",
+		"danger": "Danger Zone",
+		"manageordel": "Manage your account status or request permanent deletion.",
+		"deactivate": "Deactivate Account",
+		"delete": "Delete Account",
+		"about": "About",
+		"version": "Version",
+		"buildchannel": "Build channel",
+		"confirmpw": "Confirm Password",
+		"enterpw": "Enter your password to proceed",
+		"settings": "Settings",
+		"manage": "Manage your account settings",
+		"signedin": "Signed in",
+		"nsignedin": "Not signed in",
+		"deactivate?": "Deactivate Account?",
+		"profilehidden": "Your profile will be hidden. You can reactivate by logging back in.",
+		"delete?": "Delete Account?",
+		"graceinit": "This will initiate a 30-day grace period. After that, your data is gone forever.",
+		"pwrequired": "Password is required",
+		"princorrect": "Incorrect password or action failed"
+	}
 }

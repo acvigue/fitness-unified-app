@@ -23,8 +23,8 @@
       </UButton> -->
 
       <div class="flex flex-col gap-3">
-        <UButton @click="startLogin()">Login with Email</UButton>
-        <div class="divider">or</div>
+        <UButton @click="startLogin()">{{t('login.loginemail')}}</UButton>
+        <div class="divider">{{t('login.or')}}</div>
         <UButton icon="i-logos-google-icon" @click="startLogin('google-oauth2')">Google</UButton>
         <UButton icon="i-heroicons-building-office" @click="startLogin('my-uni-sso')">SSO</UButton>
       </div>

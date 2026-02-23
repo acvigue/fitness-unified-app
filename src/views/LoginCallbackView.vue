@@ -2,12 +2,12 @@
   <FullPageLayout>
     <div class="space-y-2 text-center">
       <p class="text-xs uppercase tracking-[0.35em] text-white/60">KDID login</p>
-      <h1 class="text-2xl font-semibold">Finishing sign-in…</h1>
+      <h1 class="text-2xl font-semibold">{{t('login.finish')}}</h1>
       <p class="text-sm text-white/70">
         {{
           errorMessage
-            ? 'We could not finish the redirect.'
-            : 'Hang tight while we verify your account.'
+            ? t('login.error.notfinish')
+            : t('login.error.wait')
         }}
       </p>
     </div>
@@ -15,7 +15,7 @@
     <div v-if="errorMessage" class="space-y-4 text-center">
       <p class="text-sm text-rose-300">{{ errorMessage }}</p>
       <UButton color="primary" icon="i-fa6-solid:right-to-bracket" @click="retry"
-        >Try again</UButton
+        >{{t('login.tryagain')}}</UButton
       >
     </div>
 
@@ -30,6 +30,9 @@ import { useHead } from '@unhead/vue'
 import FullPageLayout from '@/layouts/FullPageLayout.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { LOGIN_DEFAULT_REDIRECT, LOGIN_REDIRECT_STORAGE_KEY } from '@/stores/auth/constants'
+
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 useHead({
   title: 'Signing In... | Koios Digital',

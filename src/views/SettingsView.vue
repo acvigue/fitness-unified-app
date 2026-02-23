@@ -5,7 +5,7 @@
       <UCard class="bg-white/5">
         <div class="flex flex-col gap-4">
           <div>
-            <p class="text-xs uppercase tracking-[0.3em] text-white/60">Account</p>
+            <p class="text-xs uppercase tracking-[0.3em] text-white/60">{{t('settings.account')}}</p>
             <p class="text-lg font-medium">{{ accountLabel }}</p>
           </div>
           <UButton
@@ -14,7 +14,7 @@
             icon="i-fa6-solid:right-from-bracket"
             @click="handleLogout"
           >
-            Log out
+            {{t('settings.logout')}}
           </UButton>
         </div>
       </UCard>
@@ -23,15 +23,15 @@
       <UCard class="bg-red-900/10 border-red-900/20">
         <div class="flex flex-col gap-4">
           <div>
-            <p class="text-xs uppercase font-medium tracking-[0.3em] text-red-400">Danger Zone</p>
-            <p class="text-sm text-white/60">Manage your account status or request permanent deletion.</p>
+            <p class="text-xs uppercase font-medium tracking-[0.3em] text-red-400">{{t('settings.danger')}}</p>
+            <p class="text-sm text-white/60">{{t('settings.manageordel')}}</p>
           </div>
           <div class="flex flex-wrap gap-3">
             <UButton color="orange" variant="soft" @click="openDeactivateModal">
-              Deactivate Account
+              {{t('settings.deactivate')}}
             </UButton>
             <UButton color="red" variant="soft" @click="openDeleteModal">
-              Delete Account
+              {{t('settings.delete')}}
             </UButton>
           </div>
         </div>
@@ -41,16 +41,16 @@
       <UCard class="bg-white/5">
         <div class="space-y-3">
           <div>
-            <p class="text-xs uppercase tracking-[0.3em] text-white/60">About</p>
+            <p class="text-xs uppercase tracking-[0.3em] text-white/60">{{t('settings.about')}}</p>
             <p class="text-lg font-medium">{{ appName }}</p>
           </div>
           <ul class="space-y-2 text-sm text-white/70">
             <li class="flex items-center justify-between">
-              <span>Version</span>
+              <span>{{t('settings.version')}}</span>
               <span>{{ appVersion }}</span>
             </li>
             <li class="flex items-center justify-between">
-              <span>Build channel</span>
+              <span>{{t('settings.buildchannel')}}</span>
               <span class="capitalize">{{ appChannel }}</span>
             </li>
           </ul>
@@ -87,11 +87,11 @@
             <p class="text-sm text-white/70">{{ confirmModal.description }}</p>
             
             <div class="space-y-2">
-              <label class="text-xs text-white/50 uppercase tracking-wider">Confirm Password</label>
+              <label class="text-xs text-white/50 uppercase tracking-wider">{{t('settings.confirmpw')}}</label>
               <UInput 
                 v-model="confirmModal.password" 
                 type="password" 
-                placeholder="Enter your password to proceed"
+                placeholder="{{t('settings.enterpw')}}"
                 :class="{ 'border-red-500': passwordError }"
                 autofocus
                 @keyup.enter="handleAccountAction"
@@ -136,17 +136,19 @@ import { useAuthStore } from '@/stores/auth/auth'
 import { ENV } from '@/config/environment'
 import { userApi } from '@/stores/api/user'
 
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 useHead({
-  title: 'Settings',
-  meta: [{ name: 'description', content: 'Manage your account settings' }],
+  title: t('settings.settings'),
+  meta: [{ name: 'description', content: t('settings.manage') }],
 })
 
 const authStore = useAuthStore()
 const router = useRouter()
 const { setHeader } = usePageHeader()
 
-const accountLabel = computed(() => (authStore.isLoggedIn ? 'Signed in' : 'Not signed in'))
+const accountLabel = computed(() => (authStore.isLoggedIn ? t('settings.signedin') : t('settings.nsignedin')))
 
 const appName = 'My App'
 const appVersion = ENV.appVersion
@@ -154,7 +156,7 @@ const appChannel = ENV.appChannel
 
 onMounted(() => {
   setHeader({
-    title: 'Settings',
+    title: t('settings.settings'),
     backRoute: '/',
   })
 })
@@ -180,8 +182,8 @@ const openDeactivateModal = () => {
   confirmModal.value = {
     isOpen: true,
     isDelete: false,
-    title: 'Deactivate Account?',
-    description: 'Your profile will be hidden. You can reactivate by logging back in.',
+    title: t('settings.deactivate?'),
+    description: t('settings.profilehidden'),
     password: '',
     loading: false
   }
@@ -192,8 +194,8 @@ const openDeleteModal = () => {
   confirmModal.value = {
     isOpen: true,
     isDelete: true,
-    title: 'Delete Account?',
-    description: 'This will initiate a 30-day grace period. After that, your data is gone forever.',
+    title: t('settings.delete?'),
+    description: t('settings.grace'),
     password: '',
     loading: false
   }
@@ -207,7 +209,7 @@ const closeModal = () => {
 
 const handleAccountAction = async () => {
   if (!confirmModal.value.password) {
-    passwordError.value = 'Password is required'
+    passwordError.value = t('settings.pwrequired')
     return
   }
 
@@ -227,7 +229,7 @@ const handleAccountAction = async () => {
     router.replace('/login')
   } catch (err: any) {
     console.error('Action failed', err)
-    passwordError.value = err.message || 'Incorrect password or action failed'
+    passwordError.value = err.message || t('settings.pwincorrect')
     confirmModal.value.loading = false
     // Keep modal open so user can retry
   }
