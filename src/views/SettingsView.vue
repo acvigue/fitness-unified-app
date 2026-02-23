@@ -37,7 +37,7 @@
         </div>
       </UCard>
 
-      <!-- About Section (unchanged) -->
+      <!-- About Section  -->
       <UCard class="bg-white/5">
         <div class="space-y-3">
           <div>
@@ -64,9 +64,7 @@
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="closeModal"></div>
         
-        <!-- Modal Card -->
         <UCard class="relative w-full max-w-md mx-4 shadow-xl" :ui="{ divide: 'divide-y divide-white/10' }">
-          <!-- Header with close button -->
           <template #header>
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
@@ -85,8 +83,6 @@
               />
             </div>
           </template>
-
-          <!-- Body -->
           <div class="p-4 space-y-4">
             <p class="text-sm text-white/70">{{ confirmModal.description }}</p>
             
@@ -103,8 +99,6 @@
               <p v-if="passwordError" class="text-xs text-red-400">{{ passwordError }}</p>
             </div>
           </div>
-
-          <!-- Footer -->
           <template #footer>
             <div class="flex justify-end gap-3">
               <UButton 
@@ -128,6 +122,7 @@
         </UCard>
       </div>
     </Teleport>
+
   </PageLayout>
 </template>
 
@@ -139,6 +134,8 @@ import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useAuthStore } from '@/stores/auth/auth'
 import { ENV } from '@/config/environment'
+import { userApi } from '@/stores/api/user'
+
 
 useHead({
   title: 'Settings',
@@ -218,24 +215,21 @@ const handleAccountAction = async () => {
   passwordError.value = ''
 
   try {
-    // Replace with actual API calls to your NestJS backend
     if (confirmModal.value.isDelete) {
-      // await authStore.deleteAccount(confirmModal.value.password)
-      console.log('Deleting account with password:', confirmModal.value.password)
+      await userApi.deleteAccount(confirmModal.value.password)
     } else {
-      // await authStore.deactivateAccount(confirmModal.value.password)
-      console.log('Deactivating account with password:', confirmModal.value.password)
+      await userApi.deactivateAccount(confirmModal.value.password)
     }
 
+    // Success: logout and redirect to login
     await authStore.logout()
     closeModal()
     router.replace('/login')
-    
-    // useToast().add({ title: 'Account action successful', color: 'green' })
   } catch (err: any) {
     console.error('Action failed', err)
-    passwordError.value = err.response?.data?.message || 'Incorrect password or action failed'
+    passwordError.value = err.message || 'Incorrect password or action failed'
     confirmModal.value.loading = false
+    // Keep modal open so user can retry
   }
 }
 </script>
