@@ -145,4 +145,7 @@ export default defineConfig({
       ],
     },
   },
+  define: {
+    'process.env.ES_BUILD': process.env.ES_BUILD,
+  },
 })
