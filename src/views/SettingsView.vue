@@ -23,6 +23,7 @@
 
 
       <!--  Profile Section  -->
+      <p v-if="profileError" class="text-sm text-red-400">{{ profileError }}</p>
       <UCard class="bg-white/5">
         <div class="flex flex-col gap-4">
           <div>
@@ -67,7 +68,7 @@
           </div>
 
           <!-- Profile Pictures -->
-          <div v-if="profile.pictures.length" class="space-y-2">
+          <!-- <div v-if="profile.pictures.length" class="space-y-2">
             <label class="text-sm text-white/70">{{ t('settings.profilePictures') }}</label>
             <div class="flex gap-2">
               <div
@@ -79,7 +80,7 @@
                 <img :src="pic.url" :alt="pic.alt" class="w-full h-full object-cover" />
               </div>
             </div>
-          </div>
+          </div> -->
 
           <!-- Save Button -->
           <div class="flex justify-end">
@@ -228,9 +229,11 @@ const { setHeader } = usePageHeader()
 
 const accountLabel = computed(() => (authStore.isLoggedIn ? t('settings.signedin') : t('settings.nsignedin')))
 
-const appName = 'My App'
+const appName = 'FitTime'
 const appVersion = ENV.appVersion
 const appChannel = ENV.appChannel
+
+const profileError = ref('')
 
 onMounted(() => {
   setHeader({
@@ -349,6 +352,7 @@ function removeSport(sport: string) {
 
 async function saveProfile() {
   saving.value = true
+  profileError.value = ''
   try {
     const updated = await userApi.updateProfile({
       bio: profileForm.bio,
@@ -360,6 +364,7 @@ async function saveProfile() {
   } catch (error: any) {
     console.error('Update failed', error)
     // Show error
+    profileError.value = error.message || 'Failed to update profile'
     alert(error.message || 'Failed to update profile')
   } finally {
     saving.value = false

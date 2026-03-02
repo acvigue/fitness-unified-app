@@ -76,11 +76,11 @@ export const userApi = {
 
 
   async getProfile(): Promise<UserProfile> {
-    return authFetch('/user/profile', { method: 'GET' });
+    return authFetch('/v1/user/profile', { method: 'GET' });
   },
 
   async updateProfile(data: { bio?: string; favoriteSports?: string[] }): Promise<UserProfile> {
-    return authFetch('/user/profile', {
+    return authFetch('/v1/user/profile', {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
