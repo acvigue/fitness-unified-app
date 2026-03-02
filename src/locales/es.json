@@ -1,3 +1,20 @@
 {
-	"hello": "hola!"
+	"hello": "hola!",
+	"login": {
+		"tagline": "Tu compañero personal de fitness",
+		"description": "Registra entrenamientos, monitorea tu progreso y alcanza tus metas fitness.",
+		"getstarted": "Comenzar",
+		"loginemail": "Iniciar sesión con correo",
+		"or": "o",
+		"finish": "Finalizando inicio de sesión…",
+		"error": {
+			"notfinish": "No pudimos completar la redirección.",
+			"wait": "Espera mientras verificamos tu cuenta."
+		},
+		"tryagain": "Intentar de nuevo",
+		"authprocessing": "Procesando autenticación...",
+		"connectedsuccess": "¡Conectado exitosamente!",
+		"canclose": "Puedes cerrar esta ventana.",
+		"authfailed": "La autenticación falló"
+	}
 }

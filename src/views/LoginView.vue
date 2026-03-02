@@ -6,29 +6,38 @@
       class="absolute inset-0 h-full w-full object-cover opacity-40"
     />
     <div class="absolute inset-0 bg-zinc-900/80"></div>
-    <div class="relative z-10 text-center space-y-6 px-6">
-      <div class="space-y-2">
-        <p class="text-sm uppercase tracking-[0.4em] text-white/70">FitTime</p>
-        <h1 class="text-4xl font-semibold">{{ t('hello') }}</h1>
-        <p class="text-white/70">Description here</p>
-      </div>
-      <!-- <UButton
-        size="lg"
-        color="primary"
-        trailing-icon="i-fa6-solid:arrow-right"
-        :loading="isAuthorizing"
-        @click="startLogin"
-      >
-        Get Started
-      </UButton> -->
 
-      <div class="flex flex-col gap-3">
-        <UButton @click="startLogin()">{{t('login.loginemail')}}</UButton>
-        <div class="divider">{{t('login.or')}}</div>
-        <UButton icon="i-logos-google-icon" @click="startLogin('google-oauth2')">Google</UButton>
-        <UButton icon="i-heroicons-building-office" @click="startLogin('my-uni-sso')">SSO</UButton>
+    <div class="relative z-10 flex flex-col items-center justify-between h-full w-full px-6 py-12">
+      <!-- Top spacer -->
+      <div />
+
+      <!-- Center: Logo + Branding -->
+      <div class="flex flex-col items-center text-center space-y-6">
+        <img
+          src="https://sso.koiosdigital.net/resources/9n6e1/login/keycloakify-fittime/dist/assets/logo_dark-YUdQcCEt.png"
+          alt="FitTime"
+          class="w-40 h-40 object-contain drop-shadow-xl"
+        />
+        <div class="space-y-2">
+          <h1 class="text-4xl font-bold tracking-tight">FitTime</h1>
+          <p class="text-lg text-white/80 font-medium">{{ t('login.tagline') }}</p>
+          <p class="text-sm text-white/50 max-w-xs">{{ t('login.description') }}</p>
+        </div>
       </div>
 
+      <!-- Bottom: Get Started button -->
+      <div class="w-full max-w-xs">
+        <UButton
+          size="xl"
+          color="primary"
+          block
+          trailing-icon="i-fa6-solid-arrow-right"
+          :loading="isAuthorizing"
+          @click="startLogin"
+        >
+          {{ t('login.getstarted') }}
+        </UButton>
+      </div>
     </div>
   </FullPageLayout>
 </template>
@@ -40,7 +49,7 @@ import { useHead } from '@unhead/vue'
 import FullPageLayout from '@/layouts/FullPageLayout.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { LOGIN_DEFAULT_REDIRECT, LOGIN_REDIRECT_STORAGE_KEY } from '@/stores/auth/constants'
-import loginBgImage from '@/assets/images/login-bg.jpg'
+const loginBgImage = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1080&q=80'
 
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()

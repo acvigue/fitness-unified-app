@@ -1,36 +1,35 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth/auth'
+import AppSidebar from '@/components/navigation/AppSidebar.vue'
+import AppBottomTabBar from '@/components/navigation/AppBottomTabBar.vue'
+
+const route = useRoute()
+const authStore = useAuthStore()
+
+const PUBLIC_PATHS = new Set(['/login', '/login/callback', '/oauth/callback'])
+
+const showNavigation = computed(() => {
+  return authStore.isLoggedIn && !PUBLIC_PATHS.has(route.path)
+})
+</script>
+
 <template>
   <UApp>
-    <div class="app-container">
-      <slot />
+    <div class="h-full flex flex-row">
+      <!-- Desktop sidebar (lg+) -->
+      <AppSidebar v-if="showNavigation" class="hidden lg:flex" />
+
+      <!-- Main content area -->
+      <div class="flex-1 min-w-0 flex flex-col h-full">
+        <div class="flex-1 min-h-0 flex flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)]" :class="showNavigation ? 'lg:pl-0 pl-[env(safe-area-inset-left)]' : 'pl-[env(safe-area-inset-left)]'">
+          <slot />
+        </div>
+
+        <!-- Mobile bottom tab bar (below lg) -->
+        <AppBottomTabBar v-if="showNavigation" class="shrink-0 lg:hidden" />
+      </div>
     </div>
-    <div id="app-footer"></div>
   </UApp>
 </template>
-
-<style scoped>
-.app-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding-top: env(safe-area-inset-top);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-</style>
-
-<style>
-#app-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-}
-
-#app-footer > * {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  padding-left: calc(1.5rem + env(safe-area-inset-left));
-  padding-right: calc(1.5rem + env(safe-area-inset-right));
-}
-</style>

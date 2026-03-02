@@ -4,6 +4,9 @@
 		"welcome": "Welcome to Your App"
 	},
 	"login" : {
+		"tagline": "Your personal fitness companion",
+		"description": "Track workouts, monitor progress, and reach your fitness goals.",
+		"getstarted": "Get Started",
 		"loginemail": "Login with Email",
 		"or": "or",
 		"finish": "Finishing sign-in…",

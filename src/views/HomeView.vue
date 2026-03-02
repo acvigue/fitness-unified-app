@@ -59,7 +59,6 @@ const openSettings = () => {
 onMounted(() => {
   setHeader({
     title: 'Home',
-    actions: [{ icon: 'i-fa6-solid:gear', onClick: () => router.push('/settings') }],
   });
   tour.addStep({
 	attachTo: { element: testref.value, on: 'bottom' },
