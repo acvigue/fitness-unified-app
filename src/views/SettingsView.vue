@@ -19,6 +19,83 @@
         </div>
       </UCard>
 
+
+
+
+      <!--  Profile Section  -->
+      <UCard class="bg-white/5">
+        <div class="flex flex-col gap-4">
+          <div>
+            <p class="text-xs uppercase tracking-[0.3em] text-white/60">
+              {{ t('settings.profile') }}
+            </p>
+          </div>
+
+          <!-- Bio -->
+          <div class="space-y-1">
+            <label class="text-sm text-white/70">{{ t('settings.bio') }}</label>
+            <UTextarea
+              v-model="profileForm.bio"
+              :placeholder="t('settings.bioPlaceholder')"
+              :rows="3"
+            />
+          </div>
+
+          <!-- Favorite Sports -->
+          <div class="space-y-1">
+            <label class="text-sm text-white/70">{{ t('settings.favoriteSports') }}</label>
+            <div class="flex flex-wrap gap-2">
+              <UBadge
+                v-for="sport in profileForm.favoriteSports"
+                :key="sport"
+                color="primary"
+                variant="soft"
+                class="px-3 py-1"
+              >
+                {{ sport }}
+                <button @click="removeSport(sport)" class="ml-2 text-white/50 hover:text-white">
+                  &times;
+                </button>
+              </UBadge>
+              <UInput
+                v-model="newSport"
+                :placeholder="t('settings.addSport')"
+                size="sm"
+                @keyup.enter="addSport"
+              />
+            </div>
+          </div>
+
+          <!-- Profile Pictures -->
+          <div v-if="profile.pictures.length" class="space-y-2">
+            <label class="text-sm text-white/70">{{ t('settings.profilePictures') }}</label>
+            <div class="flex gap-2">
+              <div
+                v-for="pic in profile.pictures"
+                :key="pic.id"
+                class="relative w-16 h-16 rounded-lg overflow-hidden border-2"
+                :class="pic.isPrimary ? 'border-primary' : 'border-transparent'"
+              >
+                <img :src="pic.url" :alt="pic.alt" class="w-full h-full object-cover" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Button -->
+          <div class="flex justify-end">
+            <UButton
+              color="primary"
+              :loading="saving"
+              :disabled="!hasChanges"
+              @click="saveProfile"
+            >
+              {{ t('settings.saveProfile') }}
+            </UButton>
+          </div>
+        </div>
+      </UCard>
+
+
       <!-- Danger Zone Section -->
       <UCard class="bg-red-900/10 border-red-900/20">
         <div class="flex flex-col gap-4">
@@ -57,6 +134,8 @@
         </div>
       </UCard>
     </section>
+
+
 
     <!-- Custom Modal -->
     <Teleport to="body">
@@ -127,15 +206,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useAuthStore } from '@/stores/auth/auth'
 import { ENV } from '@/config/environment'
-import { userApi } from '@/stores/api/user'
-
+import { userApi, UserProfile } from '@/stores/api/user'
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
@@ -234,4 +312,60 @@ const handleAccountAction = async () => {
     // Keep modal open so user can retry
   }
 }
+
+const profile = ref<UserProfile>({ userId: '', bio: '', favoriteSports: [], pictures: [] })
+const profileForm = reactive({ bio: '', favoriteSports: [] as string[] })
+const newSport = ref('')
+const saving = ref(false)
+const originalProfile = ref('')
+
+onMounted(async () => {
+  setHeader({ title: t('settings.settings'), backRoute: '/' })
+  try {
+    const data = await userApi.getProfile()
+    profile.value = data
+    profileForm.bio = data.bio || ''
+    profileForm.favoriteSports = [...data.favoriteSports]
+    originalProfile.value = JSON.stringify(profileForm)
+  } catch (error) {
+    console.error('Failed to load profile', error)
+  }
+})
+
+const hasChanges = computed(() => {
+  return JSON.stringify(profileForm) !== originalProfile.value
+})
+
+function addSport() {
+  const trimmed = newSport.value.trim()
+  if (trimmed && !profileForm.favoriteSports.includes(trimmed)) {
+    profileForm.favoriteSports.push(trimmed)
+    newSport.value = ''
+  }
+}
+function removeSport(sport: string) {
+  profileForm.favoriteSports = profileForm.favoriteSports.filter(s => s !== sport)
+}
+
+async function saveProfile() {
+  saving.value = true
+  try {
+    const updated = await userApi.updateProfile({
+      bio: profileForm.bio,
+      favoriteSports: profileForm.favoriteSports,
+    })
+    profile.value = updated
+    originalProfile.value = JSON.stringify(profileForm)
+    // show success message
+  } catch (error: any) {
+    console.error('Update failed', error)
+    // Show error
+    alert(error.message || 'Failed to update profile')
+  } finally {
+    saving.value = false
+  }
+}
+
+
+
 </script>

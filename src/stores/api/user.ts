@@ -44,6 +44,21 @@ async function authFetch(endpoint: string, options: RequestInit = {}) {
   return responseData
 }
 
+export interface ProfilePicture {
+  id: string;
+  url: string;
+  alt?: string;
+  isPrimary: boolean;
+}
+
+export interface UserProfile {
+  userId: string;
+  bio?: string;
+  favoriteSports: string[];
+  pictures: ProfilePicture[];
+}
+
+
 export const userApi = {
   deactivateAccount(password: string) {
     return authFetch('/users/deactivate', {
@@ -58,4 +73,17 @@ export const userApi = {
       body: JSON.stringify({ password }),
     })
   },
+
+
+  async getProfile(): Promise<UserProfile> {
+    return authFetch('/user/profile', { method: 'GET' });
+  },
+
+  async updateProfile(data: { bio?: string; favoriteSports?: string[] }): Promise<UserProfile> {
+    return authFetch('/user/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
 }

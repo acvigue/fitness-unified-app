@@ -34,3 +34,6 @@ tsconfig.node.tsbuildinfo
 
 #Generated proto files
 *_pb.ts
+
+# report
+report_generator.py
