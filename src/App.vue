@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 
 import AppLayout from './layouts/AppLayout.vue'
+import OrganizationSetupModal from '@/components/organization/OrganizationSetupModal.vue'
 import { useAuthStore } from '@/stores/auth/auth'
+import { useOrganizationStore } from '@/stores/organization'
 import { useHead } from '@unhead/vue'
 
 const authStore = useAuthStore()
+const orgStore = useOrganizationStore()
+
+const showOrgSetup = computed(() => {
+  return authStore.isLoggedIn && orgStore.initialized && !orgStore.hasMembership
+})
 
 const hydrateAuth = async () => {
   if (!authStore.isLoggedIn) {
@@ -33,4 +40,5 @@ useHead({
       <RouterView />
     </Suspense>
   </AppLayout>
+  <OrganizationSetupModal v-if="showOrgSetup" />
 </template>

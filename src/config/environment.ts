@@ -10,7 +10,7 @@ export const ENV = {
   appNativeUrl: 'capacitor://localhost',
 
   /** API Configuration */
-  apiBaseUrl: isDev ? 'http://localhost:5173' : 'https://fittime.api.koiosdigital.net',
+  apiBaseUrl: isDev ? 'http://localhost:3000' : 'https://fittime.api.koiosdigital.net',
 
   /** External URLs */
   accountPortalUrl: 'https://sso.koiosdigital.net/realms/fittime/account',

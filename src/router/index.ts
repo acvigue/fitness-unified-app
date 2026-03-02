@@ -4,10 +4,11 @@ import LoginView from '@/views/LoginView.vue'
 import LoginCallbackView from '@/views/LoginCallbackView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 import OAuthCallbackView from '@/views/OAuthCallbackView.vue'
-import MessengerView from '@/views/MessengerView.vue'
+import MessengerView from '@/views/messenger/MessengerView.vue'
 import WorkoutsView from '@/views/WorkoutsView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
+import { useOrganizationStore } from '@/stores/organization'
 import { SUPPORT_LOCALES, setupI18n, setI18nLanguage, loadLocaleMessages } from '@/i18n.ts'
 import { i18n } from '@/main.ts'
 
@@ -38,6 +39,13 @@ const router = createRouter({
       path: '/messenger',
       name: 'messenger',
       component: MessengerView,
+      children: [
+        {
+          path: ':id',
+          name: 'messenger-chat',
+          component: () => import('@/views/messenger/MessengerChatView.vue'),
+        },
+      ],
     },
     {
       path: '/workouts',
@@ -94,6 +102,12 @@ router.beforeEach(async (to) => {
       path: '/login',
       query: to.fullPath && to.fullPath !== '/' ? { redirect: to.fullPath } : undefined,
     }
+  }
+
+  // Fetch organization memberships if not yet loaded
+  const orgStore = useOrganizationStore()
+  if (!orgStore.initialized) {
+    await orgStore.fetchMemberships()
   }
 
   return true
