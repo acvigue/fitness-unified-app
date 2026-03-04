@@ -83,6 +83,15 @@
   "messenger": {
     "typemessage": "Type a message...",
     "messenger": "Messenger",
-    "selectconversation": "Select a conversation to start chatting"
+    "selectconversation": "Select a conversation to start chatting",
+    "newchat": "New Chat",
+    "selectrecipients": "Recipients",
+    "searchusers": "Search users...",
+    "groupchatnote": "Group chats are automatically named \"Group Chat\"",
+    "creategroup": "Create Group Chat",
+    "startchat": "Start Chat",
+    "noconversations": "No conversations yet",
+    "createerror": "Failed to create chat. Please try again.",
+    "noresults": "No users found"
   }
 }

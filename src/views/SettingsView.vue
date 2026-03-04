@@ -299,8 +299,7 @@ import { ENV } from '@/config/environment'
 import { userApi, type Session } from '@/stores/api/user'
 import type { UserProfile } from '@/stores/api/user'
 import { useI18n } from 'vue-i18n'
-import { SUPPORT_LOCALES, loadLocaleMessages, setI18nLanguage } from '@/i18n'
-import { i18n } from '@/main'
+import { SUPPORT_LOCALES } from '@/i18n'
 const { t, locale } = useI18n()
 
 useHead({
@@ -446,9 +445,9 @@ const localeLabels: Record<string, string> = {
 const localeOptions = SUPPORT_LOCALES.map((l) => ({ label: localeLabels[l] || l, value: l }))
 const selectedLocale = ref(localeOptions.find((o) => o.value === locale.value) || localeOptions[0])
 
-async function changeLocale(option: { label: string; value: string }) {
-  await loadLocaleMessages(i18n, option.value)
-  setI18nLanguage(i18n, option.value)
+function changeLocale(value: string) {
+  locale.value = value
+  document.querySelector('html')?.setAttribute('lang', value)
   setHeader({ title: t('settings.settings'), backRoute: '/' })
 }
 

@@ -83,6 +83,15 @@
   "messenger": {
     "typemessage": "Escribe un mensaje...",
     "messenger": "Mensajería",
-    "selectconversation": "Selecciona una conversación para comenzar a chatear"
+    "selectconversation": "Selecciona una conversación para comenzar a chatear",
+    "newchat": "Nuevo Chat",
+    "selectrecipients": "Destinatarios",
+    "searchusers": "Buscar usuarios...",
+    "groupchatnote": "Los chats grupales se nombran automáticamente \"Group Chat\"",
+    "creategroup": "Crear Chat Grupal",
+    "startchat": "Iniciar Chat",
+    "noconversations": "No hay conversaciones aún",
+    "createerror": "Error al crear el chat. Inténtalo de nuevo.",
+    "noresults": "No se encontraron usuarios"
   }
 }

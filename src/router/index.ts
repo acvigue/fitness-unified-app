@@ -9,8 +9,6 @@ import WorkoutsView from '@/views/WorkoutsView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
-import { SUPPORT_LOCALES, setI18nLanguage, loadLocaleMessages } from '@/i18n.ts'
-import { i18n } from '@/main.ts'
 
 const router = createRouter({
   history: createWebHistory('/'),
@@ -70,21 +68,6 @@ let authInitialized = false
 
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
-  const paramsLocale = Array.isArray(to.params.locale) ? to.params.locale[0] : to.params.locale
-  let finalLocale = 'en'
-  if (!paramsLocale || !SUPPORT_LOCALES.includes(paramsLocale)) {
-    finalLocale = 'en'
-  } else {
-    finalLocale = paramsLocale
-  }
-
-  // load locale messages
-  if (!i18n.global.availableLocales.includes(finalLocale)) {
-    await loadLocaleMessages(i18n, finalLocale)
-  }
-
-  // set i18n language
-  setI18nLanguage(i18n, finalLocale)
 
   if (!authInitialized) {
     await authStore.initialize()

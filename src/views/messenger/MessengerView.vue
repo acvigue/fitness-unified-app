@@ -1,16 +1,24 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHead } from '@unhead/vue'
-import ConversationList from '@/components/messenger/ConversationList.vue'
 import { useI18n } from 'vue-i18n'
-const { t } = useI18n()
+import ConversationList from '@/components/messenger/ConversationList.vue'
+import NewChatModal from '@/components/messenger/NewChatModal.vue'
+import { useMessengerStore } from '@/stores/messenger'
 
+const { t } = useI18n()
 const route = useRoute()
+const messengerStore = useMessengerStore()
 
 useHead({ title: 'Messenger' })
 
 const hasChatSelected = computed(() => !!route.params.id)
+const showNewChatModal = ref(false)
+
+onMounted(() => {
+  messengerStore.initialize()
+})
 </script>
 
 <template>
@@ -33,6 +41,7 @@ const hasChatSelected = computed(() => !!route.params.id)
           color="neutral"
           size="sm"
           square
+          @click="showNewChatModal = true"
         />
       </div>
 
@@ -54,5 +63,7 @@ const hasChatSelected = computed(() => !!route.params.id)
         </div>
       </div>
     </div>
+
+    <NewChatModal v-model:open="showNewChatModal" />
   </div>
 </template>
