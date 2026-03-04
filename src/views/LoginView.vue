@@ -14,7 +14,7 @@
       <!-- Center: Logo + Branding -->
       <div class="flex flex-col items-center text-center space-y-6">
         <img
-          src="https://sso.koiosdigital.net/resources/9n6e1/login/keycloakify-fittime/dist/assets/logo_dark-YUdQcCEt.png"
+          :src="logoUrl"
           alt="FitTime"
           class="w-40 h-40 object-contain drop-shadow-xl"
         />
@@ -49,6 +49,7 @@ import { useHead } from '@unhead/vue'
 import FullPageLayout from '@/layouts/FullPageLayout.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { LOGIN_DEFAULT_REDIRECT, LOGIN_REDIRECT_STORAGE_KEY } from '@/stores/auth/constants'
+import logoUrl from '@/assets/images/logo_dark.png'
 const loginBgImage = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1080&q=80'
 
 import { useI18n } from 'vue-i18n'

@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useNavigationItems } from '@/composables/useNavigationItems'
+import logoUrl from '@/assets/images/logo_dark.png'
 
 const route = useRoute()
 const { sidebarItems } = useNavigationItems()
@@ -20,7 +21,7 @@ const footerItems = computed(() => [
   <aside class="flex flex-col w-64 min-w-64 h-full bg-[rgba(9,9,11,0.95)] border-r border-white/10 pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)]">
     <div class="flex items-center gap-3 px-4 py-5 border-b border-white/5">
       <img
-        src="https://sso.koiosdigital.net/resources/9n6e1/login/keycloakify-fittime/dist/assets/logo_dark-YUdQcCEt.png"
+        :src="logoUrl"
         alt="FitTime"
         class="h-7"
       />
