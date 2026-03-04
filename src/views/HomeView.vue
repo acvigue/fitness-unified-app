@@ -3,7 +3,7 @@
     <section class="flex flex-col gap-6 px-5 py-6">
       <div class="rounded-lg border border-dashed border-white/20 p-12 text-center">
         <div class="mx-auto max-w-md space-y-4" ref="testref">
-          <h2 class="text-2xl font-semibold">{{t('home.welcome')}}</h2>
+          <h2 class="text-2xl font-semibold">{{ t('home.welcome') }}</h2>
           <p class="text-white/70">
             This is a generic Vue 3 + TypeScript template with OAuth authentication and OpenAPI
             integration. Start building your app by modifying this home view.
@@ -33,11 +33,11 @@ import { useShepherd } from 'vue-shepherd'
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
-const testref = ref(null);
+const testref = ref(null)
 
 const tour = useShepherd({
-	useModalOverlay: true
-});
+  useModalOverlay: true,
+})
 
 useHead({
   title: t('home.home'),
@@ -59,21 +59,21 @@ const openSettings = () => {
 onMounted(() => {
   setHeader({
     title: 'Home',
-  });
+  })
   tour.addStep({
-	attachTo: { element: testref.value, on: 'bottom' },
-		buttons: [
-			{
-				action: function () {
-					return this.cancel();
-				},
-				secondary: true,
-				text: 'Exit',
-			}
-		],
-	text: 'Test step'
-  });
-  
+    attachTo: { element: testref.value, on: 'bottom' },
+    buttons: [
+      {
+        action() {
+          return tour.cancel()
+        },
+        secondary: true,
+        text: 'Exit',
+      },
+    ],
+    text: 'Test step',
+  })
+
   //tour.start();
 })
 </script>

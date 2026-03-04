@@ -72,7 +72,10 @@ onMounted(() => {
     <template #content>
       <div class="p-6">
         <div class="text-center mb-6">
-          <UIcon name="i-fa6-solid:building" class="text-3xl text-[var(--ui-color-primary-500)] mb-2" />
+          <UIcon
+            name="i-fa6-solid:building"
+            class="text-3xl text-[var(--ui-color-primary-500)] mb-2"
+          />
           <h2 class="text-lg font-semibold">Welcome to FitTime</h2>
           <p class="text-sm text-white/50 mt-1">Join or create an organization to get started.</p>
         </div>
@@ -81,14 +84,22 @@ onMounted(() => {
         <div class="flex gap-1 mb-5 rounded-lg bg-white/5 p-1">
           <button
             class="flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors"
-            :class="activeTab === 'create' ? 'bg-[var(--ui-color-primary-500)] text-white' : 'text-white/60 hover:text-white'"
+            :class="
+              activeTab === 'create'
+                ? 'bg-[var(--ui-color-primary-500)] text-white'
+                : 'text-white/60 hover:text-white'
+            "
             @click="activeTab = 'create'"
           >
             Create New
           </button>
           <button
             class="flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors"
-            :class="activeTab === 'join' ? 'bg-[var(--ui-color-primary-500)] text-white' : 'text-white/60 hover:text-white'"
+            :class="
+              activeTab === 'join'
+                ? 'bg-[var(--ui-color-primary-500)] text-white'
+                : 'text-white/60 hover:text-white'
+            "
             @click="activeTab = 'join'"
           >
             Join Existing
@@ -121,7 +132,10 @@ onMounted(() => {
             <UIcon name="i-fa6-solid:spinner" class="text-xl text-white/40 animate-spin" />
           </div>
 
-          <div v-else-if="organizations.length === 0" class="text-center py-8 text-white/40 text-sm">
+          <div
+            v-else-if="organizations.length === 0"
+            class="text-center py-8 text-white/40 text-sm"
+          >
             No organizations available to join.
           </div>
 
@@ -133,7 +147,9 @@ onMounted(() => {
             >
               <div class="min-w-0">
                 <p class="text-sm font-medium truncate">{{ org.name }}</p>
-                <p class="text-xs text-white/40">{{ org.memberCount }} {{ org.memberCount === 1 ? 'member' : 'members' }}</p>
+                <p class="text-xs text-white/40">
+                  {{ org.memberCount }} {{ org.memberCount === 1 ? 'member' : 'members' }}
+                </p>
               </div>
               <UButton
                 size="sm"

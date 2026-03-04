@@ -1,20 +1,88 @@
 {
-	"hello": "hola!",
-	"login": {
-		"tagline": "Tu compañero personal de fitness",
-		"description": "Registra entrenamientos, monitorea tu progreso y alcanza tus metas fitness.",
-		"getstarted": "Comenzar",
-		"loginemail": "Iniciar sesión con correo",
-		"or": "o",
-		"finish": "Finalizando inicio de sesión…",
-		"error": {
-			"notfinish": "No pudimos completar la redirección.",
-			"wait": "Espera mientras verificamos tu cuenta."
-		},
-		"tryagain": "Intentar de nuevo",
-		"authprocessing": "Procesando autenticación...",
-		"connectedsuccess": "¡Conectado exitosamente!",
-		"canclose": "Puedes cerrar esta ventana.",
-		"authfailed": "La autenticación falló"
-	}
+  "hello": "hola!",
+  "home": {
+    "home": "Inicio",
+    "welcome": "Bienvenido a tu app"
+  },
+  "login": {
+    "tagline": "Tu compañero personal de fitness",
+    "description": "Registra entrenamientos, monitorea tu progreso y alcanza tus metas fitness.",
+    "getstarted": "Comenzar",
+    "loginemail": "Iniciar sesión con correo",
+    "or": "o",
+    "finish": "Finalizando inicio de sesión…",
+    "error": {
+      "notfinish": "No pudimos completar la redirección.",
+      "wait": "Espera mientras verificamos tu cuenta."
+    },
+    "tryagain": "Intentar de nuevo",
+    "authprocessing": "Procesando autenticación...",
+    "connectedsuccess": "¡Conectado exitosamente!",
+    "canclose": "Puedes cerrar esta ventana.",
+    "authfailed": "La autenticación falló"
+  },
+  "settings": {
+    "account": "Cuenta",
+    "logout": "Cerrar sesión",
+    "danger": "Zona de Peligro",
+    "manageordel": "Administra el estado de tu cuenta o solicita la eliminación permanente.",
+    "deactivate": "Desactivar Cuenta",
+    "delete": "Eliminar Cuenta",
+    "about": "Acerca de",
+    "version": "Versión",
+    "buildchannel": "Canal de compilación",
+    "confirmpw": "Confirmar Contraseña",
+    "enterpw": "Ingresa tu contraseña para continuar",
+    "settings": "Configuración",
+    "manage": "Administra la configuración de tu cuenta",
+    "signedin": "Sesión iniciada",
+    "nsignedin": "Sin sesión",
+    "deactivate?": "¿Desactivar Cuenta?",
+    "profilehidden": "Tu perfil será ocultado. Puedes reactivarlo iniciando sesión nuevamente.",
+    "delete?": "¿Eliminar Cuenta?",
+    "graceinit": "Esto iniciará un período de gracia de 30 días. Después de eso, tus datos se perderán para siempre.",
+    "pwrequired": "La contraseña es obligatoria",
+    "princorrect": "Contraseña incorrecta o la acción falló",
+    "profile": "Perfil",
+    "bio": "Biografía",
+    "bioPlaceholder": "Escribe tu biografía aquí...",
+    "favoriteSports": "Deportes Favoritos",
+    "addSport": "Agregar un Deporte",
+    "saveProfile": "Guardar Perfil",
+    "sessions": "Sesiones",
+    "sessionsDesc": "Administra tus sesiones activas en todos los dispositivos.",
+    "ipAddress": "Dirección IP",
+    "startedAt": "Iniciada",
+    "lastAccessed": "Último acceso",
+    "rememberMe": "Recordarme",
+    "revokeSession": "Revocar",
+    "revokeAllSessions": "Revocar Todas las Sesiones",
+    "noSessions": "No se encontraron sesiones activas.",
+    "loadingSessions": "Cargando sesiones…",
+    "language": "Idioma",
+    "languageDesc": "Elige tu idioma preferido.",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  },
+  "profile": {
+    "profile": "Perfil"
+  },
+  "report": {
+    "report": "Reporte",
+    "whichuser": "¿A qué usuario estás reportando?",
+    "whyreporting": "¿Por qué estás reportando a este usuario?",
+    "submit": "Enviar Reporte",
+    "reporter": "Reportador",
+    "reporteduser": "Usuario Reportado",
+    "reason": "Razón",
+    "result": "Resultado"
+  },
+  "workouts": {
+    "workouts": "Entrenamientos"
+  },
+  "messenger": {
+    "typemessage": "Escribe un mensaje...",
+    "messenger": "Mensajería",
+    "selectconversation": "Selecciona una conversación para comenzar a chatear"
+  }
 }

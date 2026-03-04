@@ -157,7 +157,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-
   async function clearLocalSession() {
     await persistTokens(undefined, undefined)
     // Optionally clear any other user-specific cached data here

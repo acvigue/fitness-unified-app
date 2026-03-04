@@ -13,11 +13,7 @@
 
       <!-- Center: Logo + Branding -->
       <div class="flex flex-col items-center text-center space-y-6">
-        <img
-          :src="logoUrl"
-          alt="FitTime"
-          class="w-40 h-40 object-contain drop-shadow-xl"
-        />
+        <img :src="logoUrl" alt="FitTime" class="w-40 h-40 object-contain drop-shadow-xl" />
         <div class="space-y-2">
           <h1 class="text-4xl font-bold tracking-tight">FitTime</h1>
           <p class="text-lg text-white/80 font-medium">{{ t('login.tagline') }}</p>
@@ -55,7 +51,6 @@ const loginBgImage = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
-
 useHead({
   title: 'Sign In',
 })
@@ -83,11 +78,11 @@ const persistRedirectTarget = () => {
   sessionStorage.setItem(LOGIN_REDIRECT_STORAGE_KEY, redirectTarget.value)
 }
 
-const startLogin = async (provider?: string) => {
+const startLogin = async (_event?: MouseEvent) => {
   if (isAuthorizing.value) return
   isAuthorizing.value = true
   persistRedirectTarget()
-  await authStore.beginAuthentication(provider)
+  await authStore.beginAuthentication()
   isAuthorizing.value = false
 }
 

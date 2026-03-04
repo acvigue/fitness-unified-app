@@ -23,7 +23,14 @@ const showNavigation = computed(() => {
 
       <!-- Main content area -->
       <div class="flex-1 min-w-0 flex flex-col h-full">
-        <div class="flex-1 min-h-0 flex flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)]" :class="showNavigation ? 'lg:pl-0 pl-[env(safe-area-inset-left)]' : 'pl-[env(safe-area-inset-left)]'">
+        <div
+          class="flex-1 min-h-0 flex flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)]"
+          :class="
+            showNavigation
+              ? 'lg:pl-0 pl-[env(safe-area-inset-left)]'
+              : 'pl-[env(safe-area-inset-left)]'
+          "
+        >
           <slot />
         </div>
 

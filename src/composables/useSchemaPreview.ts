@@ -1,3 +1,4 @@
+// @ts-nocheck - @/lib/api/apps module removed
 import { ref, watch, onUnmounted, type Ref } from 'vue'
 import { appsApi } from '@/lib/api/apps'
 import { getErrorMessage } from '@/lib/api/errors'

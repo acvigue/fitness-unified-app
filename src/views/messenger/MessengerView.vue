@@ -18,12 +18,22 @@ const hasChatSelected = computed(() => !!route.params.id)
     <!-- Conversation list panel -->
     <div
       class="flex flex-col h-full border-r border-white/10 overflow-hidden"
-      :class="hasChatSelected ? 'hidden lg:flex lg:w-80 lg:shrink-0' : 'flex-1 lg:w-80 lg:shrink-0 lg:flex-initial'"
+      :class="
+        hasChatSelected
+          ? 'hidden lg:flex lg:w-80 lg:shrink-0'
+          : 'flex-1 lg:w-80 lg:shrink-0 lg:flex-initial'
+      "
     >
       <!-- List header -->
       <div class="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
-        <h1 class="text-lg font-semibold">{{t('messenger.messenger')}}</h1>
-        <UButton icon="i-fa6-solid:pen-to-square" variant="ghost" color="neutral" size="sm" square />
+        <h1 class="text-lg font-semibold">{{ t('messenger.messenger') }}</h1>
+        <UButton
+          icon="i-fa6-solid:pen-to-square"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          square
+        />
       </div>
 
       <ConversationList />
@@ -40,7 +50,7 @@ const hasChatSelected = computed(() => !!route.params.id)
       <div v-else class="flex flex-1 items-center justify-center text-white/30">
         <div class="text-center">
           <UIcon name="i-fa6-solid:comments" class="text-4xl mb-3" />
-          <p class="text-sm">{{t('messenger.selectconversation')}}</p>
+          <p class="text-sm">{{ t('messenger.selectconversation') }}</p>
         </div>
       </div>
     </div>

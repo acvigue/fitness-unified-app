@@ -1,73 +1,88 @@
 {
-	"hello": "Hello World!",
-	"home" : {
-		"home" : "Home",
-		"welcome": "Welcome to Your App"
-	},
-	"login" : {
-		"tagline": "Your personal fitness companion",
-		"description": "Track workouts, monitor progress, and reach your fitness goals.",
-		"getstarted": "Get Started",
-		"loginemail": "Login with Email",
-		"or": "or",
-		"finish": "Finishing sign-in…",
-		"error" : {
-			"notfinish": "We could not finish the redirect.",
-			"wait": "Hang tight while we verify your account."
-		},
-		"tryagain": "Try again",
-		"authprocessing": "Processing authentication...",
-		"connectedsuccess": "Connected successfully!",
-		"canclose": "You can close this window.",
-		"authfailed": "Authentication failed"
-	},
-	"settings" : {
-		"account": "Account",
-		"logout": "Log out",
-		"danger": "Danger Zone",
-		"manageordel": "Manage your account status or request permanent deletion.",
-		"deactivate": "Deactivate Account",
-		"delete": "Delete Account",
-		"about": "About",
-		"version": "Version",
-		"buildchannel": "Build channel",
-		"confirmpw": "Confirm Password",
-		"enterpw": "Enter your password to proceed",
-		"settings": "Settings",
-		"manage": "Manage your account settings",
-		"signedin": "Signed in",
-		"nsignedin": "Not signed in",
-		"deactivate?": "Deactivate Account?",
-		"profilehidden": "Your profile will be hidden. You can reactivate by logging back in.",
-		"delete?": "Delete Account?",
-		"graceinit": "This will initiate a 30-day grace period. After that, your data is gone forever.",
-		"pwrequired": "Password is required",
-		"princorrect": "Incorrect password or action failed",
-		"profile" : "Profile",
-		"bio" : "Bio",
-		"bioPlaceholder" : "Type your bio here...",
-		"favoriteSports" : "Favorite Sports",
-		"addSport" : "Add a Sport"
-	},
-	"profile" : {
-		"profile" : "Profile"
-	},
-	"report" : {
-		"report" : "Report",
-		"whichuser" : "Which User are you reporting?",
-		"whyreporting" : "Why are you reporting this user?",
-		"submit" : "Submit Report",
-		"reporter" : "Reporter",
-		"reporteduser" : "Reported User",
-		"reason" : "Reason",
-		"result" : "Result"
-	},
-	"workouts" : {
-		"workouts" : "Workouts"
-	},
-	"messenger" : {
-		"typemessage" : "Type a message...",
-		"messenger" : "Messenger",
-		"selectconversation" : "Select a conversation to start chatting"
-	}
+  "hello": "Hello World!",
+  "home": {
+    "home": "Home",
+    "welcome": "Welcome to Your App"
+  },
+  "login": {
+    "tagline": "Your personal fitness companion",
+    "description": "Track workouts, monitor progress, and reach your fitness goals.",
+    "getstarted": "Get Started",
+    "loginemail": "Login with Email",
+    "or": "or",
+    "finish": "Finishing sign-in…",
+    "error": {
+      "notfinish": "We could not finish the redirect.",
+      "wait": "Hang tight while we verify your account."
+    },
+    "tryagain": "Try again",
+    "authprocessing": "Processing authentication...",
+    "connectedsuccess": "Connected successfully!",
+    "canclose": "You can close this window.",
+    "authfailed": "Authentication failed"
+  },
+  "settings": {
+    "account": "Account",
+    "logout": "Log out",
+    "danger": "Danger Zone",
+    "manageordel": "Manage your account status or request permanent deletion.",
+    "deactivate": "Deactivate Account",
+    "delete": "Delete Account",
+    "about": "About",
+    "version": "Version",
+    "buildchannel": "Build channel",
+    "confirmpw": "Confirm Password",
+    "enterpw": "Enter your password to proceed",
+    "settings": "Settings",
+    "manage": "Manage your account settings",
+    "signedin": "Signed in",
+    "nsignedin": "Not signed in",
+    "deactivate?": "Deactivate Account?",
+    "profilehidden": "Your profile will be hidden. You can reactivate by logging back in.",
+    "delete?": "Delete Account?",
+    "graceinit": "This will initiate a 30-day grace period. After that, your data is gone forever.",
+    "pwrequired": "Password is required",
+    "princorrect": "Incorrect password or action failed",
+    "profile": "Profile",
+    "bio": "Bio",
+    "bioPlaceholder": "Type your bio here...",
+    "favoriteSports": "Favorite Sports",
+    "addSport": "Add a Sport",
+    "saveProfile": "Save Profile",
+    "sessions": "Sessions",
+    "sessionsDesc": "Manage your active sessions across devices.",
+    "ipAddress": "IP Address",
+    "startedAt": "Started",
+    "lastAccessed": "Last accessed",
+    "rememberMe": "Remember me",
+    "revokeSession": "Revoke",
+    "revokeAllSessions": "Revoke All Sessions",
+    "noSessions": "No active sessions found.",
+    "loadingSessions": "Loading sessions…",
+    "language": "Language",
+    "languageDesc": "Choose your preferred language.",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "profile": {
+    "profile": "Profile"
+  },
+  "report": {
+    "report": "Report",
+    "whichuser": "Which User are you reporting?",
+    "whyreporting": "Why are you reporting this user?",
+    "submit": "Submit Report",
+    "reporter": "Reporter",
+    "reporteduser": "Reported User",
+    "reason": "Reason",
+    "result": "Result"
+  },
+  "workouts": {
+    "workouts": "Workouts"
+  },
+  "messenger": {
+    "typemessage": "Type a message...",
+    "messenger": "Messenger",
+    "selectconversation": "Select a conversation to start chatting"
+  }
 }

@@ -2,21 +2,17 @@
   <FullPageLayout>
     <div class="space-y-2 text-center">
       <p class="text-xs uppercase tracking-[0.35em] text-white/60">KDID login</p>
-      <h1 class="text-2xl font-semibold">{{t('login.finish')}}</h1>
+      <h1 class="text-2xl font-semibold">{{ t('login.finish') }}</h1>
       <p class="text-sm text-white/70">
-        {{
-          errorMessage
-            ? t('login.error.notfinish')
-            : t('login.error.wait')
-        }}
+        {{ errorMessage ? t('login.error.notfinish') : t('login.error.wait') }}
       </p>
     </div>
 
     <div v-if="errorMessage" class="space-y-4 text-center">
       <p class="text-sm text-rose-300">{{ errorMessage }}</p>
-      <UButton color="primary" icon="i-fa6-solid:right-to-bracket" @click="retry"
-        >{{t('login.tryagain')}}</UButton
-      >
+      <UButton color="primary" icon="i-fa6-solid:right-to-bracket" @click="retry">{{
+        t('login.tryagain')
+      }}</UButton>
     </div>
 
     <USkeleton v-else class="h-1.5 w-48" animation="pulse" />

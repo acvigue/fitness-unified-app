@@ -4,7 +4,6 @@ import { apiClient } from '@/lib/api/client'
 import type { components } from '@/types/api'
 
 type UserMembershipResponseDto = components['schemas']['UserMembershipResponseDto']
-type OrganizationResponseDto = components['schemas']['OrganizationResponseDto']
 
 export const useOrganizationStore = defineStore('organization', () => {
   const memberships = ref<UserMembershipResponseDto[]>([])

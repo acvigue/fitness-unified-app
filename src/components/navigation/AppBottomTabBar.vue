@@ -5,7 +5,9 @@ const { items, isActive } = useNavigationItems()
 </script>
 
 <template>
-  <nav class="flex items-center justify-around bg-[rgba(9,9,11,0.95)] backdrop-blur-xl border-t border-white/10 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-[env(safe-area-inset-left)]">
+  <nav
+    class="flex items-center justify-around bg-[rgba(9,9,11,0.95)] backdrop-blur-xl border-t border-white/10 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-[env(safe-area-inset-left)]"
+  >
     <RouterLink
       v-for="item in items"
       :key="item.to"

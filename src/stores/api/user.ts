@@ -1,89 +1,80 @@
-import { useAuthStore } from '@/stores/auth/auth'
+import { apiClient } from '@/lib/api/client'
+import { getErrorMessage } from '@/lib/api/errors'
 import { ENV } from '@/config/environment'
+import { useAuthStore } from '@/stores/auth/auth'
+import type { components } from '@/types/api'
 
-const API_BASE = ENV.apiBaseUrl
-
-async function authFetch(endpoint: string, options: RequestInit = {}) {
-  const authStore = useAuthStore()
-  const token = await authStore.getAccessToken()
-  
-  const url = `${API_BASE}${endpoint}`
-  console.log(`[API Request] ${options.method || 'GET'} ${url}`)
-
-  const headers = new Headers(options.headers)
-  headers.set('Content-Type', 'application/json')
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`)
-  }
-
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  })
-
-  // Try to parse JSON error response
-  let responseData
-  const contentType = response.headers.get('content-type')
-  if (contentType?.includes('application/json')) {
-    responseData = await response.json()
-  } else {
-    responseData = await response.text()
-  }
-
-  if (!response.ok) {
-    // Extract error message from backend response
-    let message = `Request failed with status ${response.status}`
-    if (responseData && typeof responseData === 'object' && responseData.message) {
-      message = responseData.message
-    } else if (typeof responseData === 'string') {
-      message = responseData
-    }
-    throw new Error(message)
-  }
-
-  return responseData
-}
-
-export interface ProfilePicture {
-  id: string;
-  url: string;
-  alt?: string;
-  isPrimary: boolean;
-}
-
-export interface UserProfile {
-  userId: string;
-  bio?: string;
-  favoriteSports: string[];
-  pictures: ProfilePicture[];
-}
-
+// Re-export types from generated API types
+export type UserProfile = components['schemas']['UserProfileResponseDto']
+export type ProfilePicture = components['schemas']['UserProfilePictureDto']
+export type Session = components['schemas']['KeycloakSessionResponseDto']
+export type RevokeSessionsResponse = components['schemas']['RevokeSessionsResponseDto']
 
 export const userApi = {
-  deactivateAccount(password: string) {
-    return authFetch('/users/deactivate', {
-      method: 'POST',
-      body: JSON.stringify({ password }),
-    })
-  },
-
-  deleteAccount(password: string) {
-    return authFetch('/users/delete', {
-      method: 'POST',
-      body: JSON.stringify({ password }),
-    })
-  },
-
-
   async getProfile(): Promise<UserProfile> {
-    return authFetch('/v1/user/profile', { method: 'GET' });
+    const { data, error } = await apiClient.GET('/v1/user/profile')
+    if (error) throw new Error(getErrorMessage(error, 'Failed to load profile'))
+    return data
   },
 
-  async updateProfile(data: { bio?: string; favoriteSports?: string[] }): Promise<UserProfile> {
-    return authFetch('/v1/user/profile', {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
+  async updateProfile(body: { bio?: string; favoriteSports?: string[] }): Promise<UserProfile> {
+    const { data, error } = await apiClient.PATCH('/v1/user/profile', { body })
+    if (error) throw new Error(getErrorMessage(error, 'Failed to update profile'))
+    return data
   },
 
+  async getSessions(): Promise<Session[]> {
+    const { data, error } = await apiClient.GET('/v1/user/sessions')
+    if (error) throw new Error(getErrorMessage(error, 'Failed to load sessions'))
+    return data
+  },
+
+  async revokeSession(id: string): Promise<void> {
+    const { error } = await apiClient.DELETE('/v1/user/sessions/{id}', {
+      params: { path: { id } },
+    })
+    if (error) throw new Error(getErrorMessage(error, 'Failed to revoke session'))
+  },
+
+  async revokeAllSessions(): Promise<RevokeSessionsResponse> {
+    const { data, error } = await apiClient.POST('/v1/user/sessions/logout')
+    if (error) throw new Error(getErrorMessage(error, 'Failed to revoke all sessions'))
+    return data
+  },
+
+  // These endpoints are not in the OpenAPI spec (no /v1/ prefix).
+  // Use raw fetch with auth token until they are added to the spec.
+  async deactivateAccount(password: string): Promise<void> {
+    const authStore = useAuthStore()
+    const token = await authStore.getAccessToken()
+    const response = await fetch(`${ENV.apiBaseUrl}/users/deactivate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ password }),
+    })
+    if (!response.ok) {
+      const body = await response.json().catch(() => null)
+      throw new Error(getErrorMessage(body, 'Failed to deactivate account'))
+    }
+  },
+
+  async deleteAccount(password: string): Promise<void> {
+    const authStore = useAuthStore()
+    const token = await authStore.getAccessToken()
+    const response = await fetch(`${ENV.apiBaseUrl}/users/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ password }),
+    })
+    if (!response.ok) {
+      const body = await response.json().catch(() => null)
+      throw new Error(getErrorMessage(body, 'Failed to delete account'))
+    }
+  },
 }
