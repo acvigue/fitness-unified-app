@@ -2,11 +2,13 @@
 import { onMounted } from 'vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const { setHeader } = usePageHeader()
 
 onMounted(() => {
-  setHeader({ title: 'Report' })
+  setHeader({ title: t('report.report') })
 })
 </script>
 
@@ -14,17 +16,17 @@ onMounted(() => {
   <PageLayout>
     <div class="flex flex-1 items-center justify-center text-white/50">
       <div>
-        <label id="reportedUser">Which User are you reporting?<input type="text" id="reportedUserInput"></label><br>
-        <label id="reportreasonLabel">Why are you reporting this user?</label><br>
+        <label id="reportedUser">{{t('report.whichuser')}}<input type="text" id="reportedUserInput"></label><br>
+        <label id="reportreasonLabel">{{t('report.whyreporting')}}</label><br>
         <textarea id="reasonInput"></textarea><br>
-        <button id="reportSubmitButton">Submit Report</button>
+        <button id="reportSubmitButton">{{t('report.submit')}}</button>
       </div>
       <div>
-        <label id="reportReporterLabel">Reporter:Reporter User's Name</label><br>
-        <label id="reportReportedLabel">Reported User: Reported User's Name</label><br>
-        <label id="reportReason">Reason: Reason of Report </label><br>
+        <label id="reportReporterLabel">{{t('report.reporter')}}:Reporter User's Name</label><br>
+        <label id="reportReportedLabel">{{t('report.reporteduser')}}: Reported User's Name</label><br>
+        <label id="reportReason">{{t('report.reason')}}: Reason of Report </label><br>
         <label id="reportCreatedTime">TimeOfReportCreation: 1/1/2000</label><br>
-        <label id="reportResult">Result:<input id="reportResult"></label>
+        <label id="reportResult">{{t('report.result')}}:<input id="reportResult"></label>
       </div>
     </div>
   </PageLayout>

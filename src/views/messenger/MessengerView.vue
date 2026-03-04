@@ -3,6 +3,8 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import ConversationList from '@/components/messenger/ConversationList.vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const route = useRoute()
 
@@ -20,7 +22,7 @@ const hasChatSelected = computed(() => !!route.params.id)
     >
       <!-- List header -->
       <div class="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
-        <h1 class="text-lg font-semibold">Messenger</h1>
+        <h1 class="text-lg font-semibold">{{t('messenger.messenger')}}</h1>
         <UButton icon="i-fa6-solid:pen-to-square" variant="ghost" color="neutral" size="sm" square />
       </div>
 
@@ -38,7 +40,7 @@ const hasChatSelected = computed(() => !!route.params.id)
       <div v-else class="flex flex-1 items-center justify-center text-white/30">
         <div class="text-center">
           <UIcon name="i-fa6-solid:comments" class="text-4xl mb-3" />
-          <p class="text-sm">Select a conversation to start chatting</p>
+          <p class="text-sm">{{t('messenger.selectconversation')}}</p>
         </div>
       </div>
     </div>

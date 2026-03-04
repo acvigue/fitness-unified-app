@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const route = useRoute()
 const messageInput = ref('')
+
+const placeholderText = ref(t('messenger.typemessage'))
 
 const chatName = computed(() => {
   const names: Record<string, string> = {
@@ -144,7 +148,7 @@ function handleSubmit() {
     <div class="shrink-0 border-t border-white/10">
       <UChatPrompt
         v-model="messageInput"
-        placeholder="Type a message..."
+        :placeholder="placeholderText"
         :autofocus="false"
         @submit="handleSubmit"
       />

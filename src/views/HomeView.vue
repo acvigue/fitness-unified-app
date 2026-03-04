@@ -40,7 +40,7 @@ const tour = useShepherd({
 });
 
 useHead({
-  title: 'Home',
+  title: t('home.home'),
   meta: [{ name: 'description', content: 'Welcome to your app' }],
 })
 
@@ -74,6 +74,6 @@ onMounted(() => {
 	text: 'Test step'
   });
   
-  tour.start();
+  //tour.start();
 })
 </script>

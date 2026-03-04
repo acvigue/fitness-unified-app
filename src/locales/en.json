@@ -1,6 +1,7 @@
 {
 	"hello": "Hello World!",
 	"home" : {
+		"home" : "Home",
 		"welcome": "Welcome to Your App"
 	},
 	"login" : {
@@ -41,6 +42,32 @@
 		"delete?": "Delete Account?",
 		"graceinit": "This will initiate a 30-day grace period. After that, your data is gone forever.",
 		"pwrequired": "Password is required",
-		"princorrect": "Incorrect password or action failed"
+		"princorrect": "Incorrect password or action failed",
+		"profile" : "Profile",
+		"bio" : "Bio",
+		"bioPlaceholder" : "Type your bio here...",
+		"favoriteSports" : "Favorite Sports",
+		"addSport" : "Add a Sport"
+	},
+	"profile" : {
+		"profile" : "Profile"
+	},
+	"report" : {
+		"report" : "Report",
+		"whichuser" : "Which User are you reporting?",
+		"whyreporting" : "Why are you reporting this user?",
+		"submit" : "Submit Report",
+		"reporter" : "Reporter",
+		"reporteduser" : "Reported User",
+		"reason" : "Reason",
+		"result" : "Result"
+	},
+	"workouts" : {
+		"workouts" : "Workouts"
+	},
+	"messenger" : {
+		"typemessage" : "Type a message...",
+		"messenger" : "Messenger",
+		"selectconversation" : "Select a conversation to start chatting"
 	}
 }
