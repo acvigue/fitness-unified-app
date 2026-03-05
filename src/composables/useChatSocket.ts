@@ -60,8 +60,8 @@ export function useChatSocket() {
     connected.value = false
   }
 
-  function sendMessage(chatId: string, content: string) {
-    socket?.emit('send_message', { chatId, content })
+  function sendMessage(chatId: string, content: string, mediaIds?: string[]) {
+    socket?.emit('send_message', { chatId, content, ...(mediaIds?.length ? { mediaIds } : {}) })
   }
 
   function joinChat(chatId: string) {

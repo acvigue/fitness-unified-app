@@ -31,8 +31,6 @@
     "about": "Acerca de",
     "version": "Versión",
     "buildchannel": "Canal de compilación",
-    "confirmpw": "Confirmar Contraseña",
-    "enterpw": "Ingresa tu contraseña para continuar",
     "settings": "Configuración",
     "manage": "Administra la configuración de tu cuenta",
     "signedin": "Sesión iniciada",
@@ -40,9 +38,8 @@
     "deactivate?": "¿Desactivar Cuenta?",
     "profilehidden": "Tu perfil será ocultado. Puedes reactivarlo iniciando sesión nuevamente.",
     "delete?": "¿Eliminar Cuenta?",
-    "graceinit": "Esto iniciará un período de gracia de 30 días. Después de eso, tus datos se perderán para siempre.",
-    "pwrequired": "La contraseña es obligatoria",
-    "princorrect": "Contraseña incorrecta o la acción falló",
+    "grace": "Esto iniciará un período de gracia de 30 días. Después de eso, tus datos se perderán para siempre.",
+    "actionFailed": "La acción falló. Inténtalo de nuevo.",
     "profile": "Perfil",
     "bio": "Biografía",
     "bioPlaceholder": "Escribe tu biografía aquí...",
@@ -101,6 +98,9 @@
     "startchat": "Iniciar Chat",
     "noconversations": "No hay conversaciones aún",
     "createerror": "Error al crear el chat. Inténtalo de nuevo.",
-    "noresults": "No se encontraron usuarios"
+    "noresults": "No se encontraron usuarios",
+    "searchmessages": "Buscar Mensajes",
+    "searchplaceholder": "Buscar en la conversación...",
+    "nosearchresults": "No se encontraron mensajes"
   }
 }

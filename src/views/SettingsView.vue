@@ -42,7 +42,7 @@
 
           <!-- Profile Pictures -->
           <UFormField :label="t('settings.profilePictures')">
-            <div class="flex gap-3 items-center overflow-x-auto pb-2">
+            <div class="flex gap-3 items-center overflow-x-auto p-1">
               <button
                 v-for="pic in profile.pictures"
                 :key="pic.id"
@@ -56,25 +56,25 @@
                   size="3xl"
                 />
               </button>
-              <UFileUpload
-                accept="image/*"
-                @update:model-value="handleFileUpload"
+              <button
+                class="shrink-0 size-13 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-neutral-700 transition-colors"
+                :disabled="uploading"
+                @click="($refs.fileInput as HTMLInputElement).click()"
               >
-                <template #actions="{ open }">
-                  <button
-                    class="shrink-0 size-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center hover:border-white/40 transition-colors"
-                    :disabled="uploading"
-                    @click="open()"
-                  >
-                    <UIcon
-                      v-if="uploading"
-                      name="i-lucide-loader-2"
-                      class="size-5 animate-spin text-white/40"
-                    />
-                    <UIcon v-else name="i-lucide-plus" class="size-5 text-white/40" />
-                  </button>
-                </template>
-              </UFileUpload>
+                <UIcon
+                  v-if="uploading"
+                  name="i-lucide-loader-2"
+                  class="size-5 animate-spin text-white/40"
+                />
+                <UIcon v-else name="i-lucide-plus" class="size-5 text-white/40" />
+              </button>
+              <input
+                ref="fileInput"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                @change="onFileInputChange"
+              />
             </div>
           </UFormField>
 
@@ -258,75 +258,43 @@
       </UCard>
     </section>
 
-    <!-- Confirm Modal -->
-    <Teleport to="body">
-      <div v-if="confirmModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="closeModal"></div>
-
-        <UCard
-          class="relative w-full max-w-md mx-4 shadow-xl"
-          :ui="{ divide: 'divide-y divide-white/10' }"
-        >
-          <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <UIcon
-                  :name="confirmModal.isDelete ? 'i-lucide-trash-2' : 'i-lucide-user-minus'"
-                  :class="confirmModal.isDelete ? 'text-red-500' : 'text-orange-500'"
-                />
-                <span class="font-bold text-white">{{ confirmModal.title }}</span>
-              </div>
-              <UButton
-                color="gray"
-                variant="ghost"
-                icon="i-lucide-x"
-                @click="closeModal"
-                :disabled="confirmModal.loading"
-              />
-            </div>
-          </template>
-          <div class="p-4 space-y-4">
-            <p class="text-sm text-white/70">{{ confirmModal.description }}</p>
-
-            <div class="space-y-2">
-              <label class="text-xs text-white/50 uppercase tracking-wider">{{
-                t('settings.confirmpw')
-              }}</label>
-              <UInput
-                v-model="confirmModal.password"
-                type="password"
-                placeholder="{{t('settings.enterpw')}}"
-                :class="{ 'border-red-500': passwordError }"
-                autofocus
-                @keyup.enter="handleAccountAction"
-              />
-              <p v-if="passwordError" class="text-xs text-red-400">{{ passwordError }}</p>
-            </div>
+    <!-- Confirm Account Action Modal -->
+    <UModal v-model:open="confirmModal.isOpen">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="flex items-center gap-2">
+            <UIcon
+              :name="confirmModal.isDelete ? 'i-lucide-trash-2' : 'i-lucide-user-minus'"
+              class="size-5"
+              :class="confirmModal.isDelete ? 'text-red-500' : 'text-orange-500'"
+            />
+            <h2 class="text-lg font-semibold">{{ confirmModal.title }}</h2>
           </div>
-          <template #footer>
-            <div class="flex justify-end gap-3">
-              <UButton
-                variant="ghost"
-                color="gray"
-                @click="closeModal"
-                :disabled="confirmModal.loading"
-              >
-                {{ t('settings.cancel') }}
-              </UButton>
-              <UButton
-                :color="confirmModal.isDelete ? 'red' : 'orange'"
-                :loading="confirmModal.loading"
-                :disabled="!confirmModal.password || confirmModal.loading"
-                @click="handleAccountAction"
-              >
-                {{ t('settings.confirm') }}
-              </UButton>
-            </div>
-          </template>
-        </UCard>
-      </div>
-    </Teleport>
+
+          <p class="text-sm text-white/70">{{ confirmModal.description }}</p>
+
+          <p v-if="confirmModal.error" class="text-xs text-red-400">{{ confirmModal.error }}</p>
+
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              :disabled="confirmModal.loading"
+              @click="confirmModal.isOpen = false"
+            >
+              {{ t('settings.cancel') }}
+            </UButton>
+            <UButton
+              :color="confirmModal.isDelete ? 'error' : 'warning'"
+              :loading="confirmModal.loading"
+              @click="handleAccountAction"
+            >
+              {{ t('settings.confirm') }}
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
 
     <!-- Sports Picker Modal -->
     <SportsPickerModal
@@ -390,66 +358,50 @@ const confirmModal = ref({
   isDelete: false,
   title: '',
   description: '',
-  password: '',
+  error: '',
   loading: false,
 })
-const passwordError = ref('')
 
 const openDeactivateModal = () => {
-  passwordError.value = ''
   confirmModal.value = {
     isOpen: true,
     isDelete: false,
     title: t('settings.deactivate?'),
     description: t('settings.profilehidden'),
-    password: '',
+    error: '',
     loading: false,
   }
 }
 
 const openDeleteModal = () => {
-  passwordError.value = ''
   confirmModal.value = {
     isOpen: true,
     isDelete: true,
     title: t('settings.delete?'),
     description: t('settings.grace'),
-    password: '',
+    error: '',
     loading: false,
   }
 }
 
-const closeModal = () => {
-  confirmModal.value.isOpen = false
-  confirmModal.value.password = ''
-  passwordError.value = ''
-}
-
 const handleAccountAction = async () => {
-  if (!confirmModal.value.password) {
-    passwordError.value = t('settings.pwrequired')
-    return
-  }
-
   confirmModal.value.loading = true
-  passwordError.value = ''
+  confirmModal.value.error = ''
 
   try {
     if (confirmModal.value.isDelete) {
-      await userApi.deleteAccount(confirmModal.value.password)
+      await userApi.deleteAccount()
     } else {
-      await userApi.deactivateAccount(confirmModal.value.password)
+      await userApi.deactivateAccount()
     }
 
-    // Success: logout and redirect to login
+    confirmModal.value.isOpen = false
     await authStore.logout()
-    closeModal()
     router.replace('/login')
   } catch (err: any) {
     console.error('Action failed', err)
-    passwordError.value = err.message || t('settings.pwincorrect')
+    confirmModal.value.error = err.message || t('settings.actionFailed')
     confirmModal.value.loading = false
-    // Keep modal open so user can retry
   }
 }
 
@@ -481,9 +433,15 @@ function setPrimaryPicture(picId: string) {
   }))
 }
 
-async function handleFileUpload(value: File | null | undefined) {
-  if (!value) return
-  const file = value
+function onFileInputChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  input.value = ''
+  uploadFile(file)
+}
+
+async function uploadFile(file: File) {
 
   uploading.value = true
   profileError.value = ''

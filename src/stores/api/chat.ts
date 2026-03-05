@@ -9,6 +9,8 @@ export type MessageResponse = components['schemas']['MessageResponseDto']
 export type MessageSender = components['schemas']['MessageSenderDto']
 export type ChatHistory = components['schemas']['ChatHistoryResponseDto']
 export type UserLookupItem = components['schemas']['UserLookupItemDto']
+export type SearchMessageHit = components['schemas']['SearchMessageHitDto']
+export type SearchMessagesResponse = components['schemas']['SearchMessagesResponseDto']
 
 export const chatApi = {
   async getUserChats(): Promise<UserChat[]> {
@@ -36,11 +38,22 @@ export const chatApi = {
     return data
   },
 
-  async sendMessage(chatId: string, content: string): Promise<MessageResponse> {
+  async sendMessage(chatId: string, content: string, mediaIds?: string[]): Promise<MessageResponse> {
     const { data, error } = await apiClient.POST('/v1/chats/send-message', {
-      body: { chatId, content },
+      body: { chatId, content, ...(mediaIds?.length ? { mediaIds } : {}) },
     })
     if (error) throw new Error(getErrorMessage(error, 'Failed to send message'))
+    return data
+  },
+
+  async searchMessages(chatId: string, q: string, perPage = 50, limit = 20): Promise<SearchMessagesResponse> {
+    const { data, error } = await apiClient.GET('/v1/chats/search/{chatId}', {
+      params: {
+        path: { chatId },
+        query: { q, per_page: perPage, limit },
+      },
+    })
+    if (error) throw new Error(getErrorMessage(error, 'Failed to search messages'))
     return data
   },
 

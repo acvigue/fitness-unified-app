@@ -14,6 +14,7 @@ export const useMessengerStore = defineStore('messenger', () => {
   const conversations = ref<Map<string, ConversationSummary>>(new Map())
   const messages = ref<Map<string, MessageResponse[]>>(new Map())
   const activeChatId = ref<string | null>(null)
+  const highlightedMessageId = ref<string | null>(null)
   const loading = ref(false)
   const initialized = ref(false)
   const currentUserId = ref<string | null>(null)
@@ -88,6 +89,12 @@ export const useMessengerStore = defineStore('messenger', () => {
     return history.meta
   }
 
+  async function jumpToMessage(chatId: string, messageId: string, page: number) {
+    const history = await chatApi.getChatHistory(chatId, page)
+    messages.value.set(chatId, [...history.data].reverse())
+    highlightedMessageId.value = messageId
+  }
+
   function handleNewMessage(message: MessageResponse) {
     const chatMessages = messages.value.get(message.chatId) ?? []
     // Avoid duplicates
@@ -127,13 +134,12 @@ export const useMessengerStore = defineStore('messenger', () => {
     return chat
   }
 
-  async function sendMessage(content: string) {
-    if (!activeChatId.value || !content.trim()) return
+  async function sendMessage(content: string, mediaIds?: string[]) {
+    if (!activeChatId.value || (!content.trim() && !mediaIds?.length)) return
     if (connected.value) {
-      socketSendMessage(activeChatId.value, content)
+      socketSendMessage(activeChatId.value, content, mediaIds)
     } else {
-      // Fallback to REST
-      const message = await chatApi.sendMessage(activeChatId.value, content)
+      const message = await chatApi.sendMessage(activeChatId.value, content, mediaIds)
       handleNewMessage(message)
     }
   }
@@ -151,6 +157,7 @@ export const useMessengerStore = defineStore('messenger', () => {
     conversations.value.clear()
     messages.value.clear()
     activeChatId.value = null
+    highlightedMessageId.value = null
     loading.value = false
     initialized.value = false
     currentUserId.value = null
@@ -161,6 +168,7 @@ export const useMessengerStore = defineStore('messenger', () => {
     conversations,
     messages,
     activeChatId,
+    highlightedMessageId,
     loading,
     initialized,
     connected,
@@ -172,6 +180,7 @@ export const useMessengerStore = defineStore('messenger', () => {
     activeTypingUsers,
     initialize,
     loadChatHistory,
+    jumpToMessage,
     createChat,
     sendMessage,
     setActiveChat,

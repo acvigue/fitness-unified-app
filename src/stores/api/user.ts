@@ -4,6 +4,8 @@ import { ENV } from '@/config/environment'
 import { useAuthStore } from '@/stores/auth/auth'
 import type { components } from '@/types/api'
 
+// ENV and useAuthStore still needed for uploadMedia (raw fetch)
+
 // Re-export types from generated API types
 export type UserProfile = components['schemas']['UserProfileResponseDto']
 export type ProfilePicture = components['schemas']['UserProfilePictureDto']
@@ -70,39 +72,13 @@ export const userApi = {
     return data
   },
 
-  // These endpoints are not in the OpenAPI spec (no /v1/ prefix).
-  // Use raw fetch with auth token until they are added to the spec.
-  async deactivateAccount(password: string): Promise<void> {
-    const authStore = useAuthStore()
-    const token = await authStore.getAccessToken()
-    const response = await fetch(`${ENV.apiBaseUrl}/users/deactivate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({ password }),
-    })
-    if (!response.ok) {
-      const body = await response.json().catch(() => null)
-      throw new Error(getErrorMessage(body, 'Failed to deactivate account'))
-    }
+  async deactivateAccount(): Promise<void> {
+    const { error } = await apiClient.POST('/v1/user/me/deactivate')
+    if (error) throw new Error(getErrorMessage(error, 'Failed to deactivate account'))
   },
 
-  async deleteAccount(password: string): Promise<void> {
-    const authStore = useAuthStore()
-    const token = await authStore.getAccessToken()
-    const response = await fetch(`${ENV.apiBaseUrl}/users/delete`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({ password }),
-    })
-    if (!response.ok) {
-      const body = await response.json().catch(() => null)
-      throw new Error(getErrorMessage(body, 'Failed to delete account'))
-    }
+  async deleteAccount(): Promise<void> {
+    const { error } = await apiClient.DELETE('/v1/user/me')
+    if (error) throw new Error(getErrorMessage(error, 'Failed to delete account'))
   },
 }

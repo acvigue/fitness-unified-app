@@ -31,8 +31,6 @@
     "about": "About",
     "version": "Version",
     "buildchannel": "Build channel",
-    "confirmpw": "Confirm Password",
-    "enterpw": "Enter your password to proceed",
     "settings": "Settings",
     "manage": "Manage your account settings",
     "signedin": "Signed in",
@@ -40,9 +38,8 @@
     "deactivate?": "Deactivate Account?",
     "profilehidden": "Your profile will be hidden. You can reactivate by logging back in.",
     "delete?": "Delete Account?",
-    "graceinit": "This will initiate a 30-day grace period. After that, your data is gone forever.",
-    "pwrequired": "Password is required",
-    "princorrect": "Incorrect password or action failed",
+    "grace": "This will initiate a 30-day grace period. After that, your data is gone forever.",
+    "actionFailed": "Action failed. Please try again.",
     "profile": "Profile",
     "bio": "Bio",
     "bioPlaceholder": "Type your bio here...",
@@ -101,6 +98,9 @@
     "startchat": "Start Chat",
     "noconversations": "No conversations yet",
     "createerror": "Failed to create chat. Please try again.",
-    "noresults": "No users found"
+    "noresults": "No users found",
+    "searchmessages": "Search Messages",
+    "searchplaceholder": "Search in conversation...",
+    "nosearchresults": "No messages found"
   }
 }

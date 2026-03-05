@@ -256,7 +256,8 @@ export interface paths {
         get: operations["UserController_getCurrentUser_v1"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Permanently delete current user account */
+        delete: operations["UserController_deleteAccount_v1"];
         options?: never;
         head?: never;
         patch?: never;
@@ -359,6 +360,23 @@ export interface paths {
         put?: never;
         /** Revoke all of the current user's identity provider sessions */
         post: operations["UserController_revokeAllSessions_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/user/me/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Deactivate current user account */
+        post: operations["UserController_deactivateAccount_v1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1038,6 +1056,30 @@ export interface components {
             /**
              * @description Human-readable message
              * @example All sessions have been revoked
+             */
+            message: string;
+        };
+        DeactivateAccountResponseDto: {
+            /**
+             * @description Whether the deactivation was successful
+             * @example true
+             */
+            success: boolean;
+            /**
+             * @description Human-readable message
+             * @example Account has been deactivated
+             */
+            message: string;
+        };
+        DeleteAccountResponseDto: {
+            /**
+             * @description Whether the deletion was successful
+             * @example true
+             */
+            success: boolean;
+            /**
+             * @description Human-readable message
+             * @example Account has been permanently deleted
              */
             message: string;
         };
@@ -1875,6 +1917,43 @@ export interface operations {
             };
         };
     };
+    UserController_deleteAccount_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteAccountResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
     UserController_getMemberships_v1: {
         parameters: {
             query?: never;
@@ -2103,6 +2182,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RevokeSessionsResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UserController_deactivateAccount_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeactivateAccountResponseDto"];
                 };
             };
             /** @description Unauthorized - invalid or missing token */
