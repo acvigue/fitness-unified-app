@@ -263,6 +263,23 @@ export interface paths {
         patch: operations["UserController_updateProfile_v1"];
         trace?: never;
     };
+    "/v1/user/sessions/enrich": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Store refresh token for the current session to enable offline session revocation */
+        post: operations["UserController_enrichSession_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/user/sessions": {
         parameters: {
             query?: never;
@@ -318,21 +335,6 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        CreateChatDto: {
-            /**
-             * @description List of user IDs to include in the chat (excluding the creator, who is auto-added)
-             * @example [
-             *       "user-id-1",
-             *       "user-id-2"
-             *     ]
-             */
-            recipientIds: string[];
-            /**
-             * @description Chat name (required for group chats with 2+ recipients, ignored for 1-to-1)
-             * @example Gym Buddies
-             */
-            name?: string;
-        };
         ChatMemberDto: {
             /**
              * @description User ID
@@ -349,71 +351,6 @@ export interface components {
              * @example John Doe
              */
             name?: Record<string, never>;
-        };
-        ChatResponseDto: {
-            /**
-             * @description Chat ID
-             * @example clr1abc2d0000
-             */
-            id: string;
-            /**
-             * @description Chat type
-             * @example DIRECT
-             * @enum {string}
-             */
-            type: "DIRECT" | "GROUP";
-            /**
-             * @description Chat name (null for direct chats)
-             * @example Gym Buddies
-             */
-            name?: Record<string, never>;
-            /**
-             * @description Creator user ID
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            creatorId: string;
-            /** @description Chat members */
-            members: components["schemas"]["ChatMemberDto"][];
-            /**
-             * Format: date-time
-             * @description Created timestamp
-             */
-            createdAt: string;
-        };
-        ErrorResponseDto: {
-            /**
-             * @description HTTP status code
-             * @example 400
-             */
-            statusCode: number;
-            /**
-             * @description Error type/code
-             * @example BAD_REQUEST
-             */
-            error: string;
-            /**
-             * @description Human-readable error message
-             * @example Invalid request parameters
-             */
-            message: string;
-            /**
-             * @description Detailed validation errors or additional context
-             * @example [
-             *       "field must be a string",
-             *       "value is required"
-             *     ]
-             */
-            details?: string[];
-            /**
-             * @description Request path that caused the error
-             * @example /v1/resource/abc123
-             */
-            path?: string;
-            /**
-             * @description Timestamp when the error occurred
-             * @example 2025-12-26T12:00:00.000Z
-             */
-            timestamp?: string;
         };
         MessageSenderDto: {
             /**
@@ -472,6 +409,118 @@ export interface components {
              */
             createdAt: string;
         };
+        UserChatResponseDto: {
+            /**
+             * @description Chat ID
+             * @example clr1abc2d0000
+             */
+            id: string;
+            /**
+             * @description Chat type
+             * @example DIRECT
+             * @enum {string}
+             */
+            type: "DIRECT" | "GROUP";
+            /**
+             * @description Chat name (null for direct chats)
+             * @example Gym Buddies
+             */
+            name?: Record<string, never>;
+            /**
+             * @description Creator user ID
+             * @example auth0|507f1f77bcf86cd799439011
+             */
+            creatorId: string;
+            /** @description Chat members */
+            members: components["schemas"]["ChatMemberDto"][];
+            /**
+             * Format: date-time
+             * @description Created timestamp
+             */
+            createdAt: string;
+            /** @description Most recent message in the chat */
+            lastMessage?: components["schemas"]["MessageResponseDto"];
+        };
+        ErrorResponseDto: {
+            /**
+             * @description HTTP status code
+             * @example 400
+             */
+            statusCode: number;
+            /**
+             * @description Error type/code
+             * @example BAD_REQUEST
+             */
+            error: string;
+            /**
+             * @description Human-readable error message
+             * @example Invalid request parameters
+             */
+            message: string;
+            /**
+             * @description Detailed validation errors or additional context
+             * @example [
+             *       "field must be a string",
+             *       "value is required"
+             *     ]
+             */
+            details?: string[];
+            /**
+             * @description Request path that caused the error
+             * @example /v1/resource/abc123
+             */
+            path?: string;
+            /**
+             * @description Timestamp when the error occurred
+             * @example 2025-12-26T12:00:00.000Z
+             */
+            timestamp?: string;
+        };
+        CreateChatDto: {
+            /**
+             * @description List of user IDs to include in the chat (excluding the creator, who is auto-added)
+             * @example [
+             *       "user-id-1",
+             *       "user-id-2"
+             *     ]
+             */
+            recipientIds: string[];
+            /**
+             * @description Chat name (required for group chats with 2+ recipients, ignored for 1-to-1)
+             * @example Gym Buddies
+             */
+            name?: string;
+        };
+        ChatResponseDto: {
+            /**
+             * @description Chat ID
+             * @example clr1abc2d0000
+             */
+            id: string;
+            /**
+             * @description Chat type
+             * @example DIRECT
+             * @enum {string}
+             */
+            type: "DIRECT" | "GROUP";
+            /**
+             * @description Chat name (null for direct chats)
+             * @example Gym Buddies
+             */
+            name?: Record<string, never>;
+            /**
+             * @description Creator user ID
+             * @example auth0|507f1f77bcf86cd799439011
+             */
+            creatorId: string;
+            /** @description Chat members */
+            members: components["schemas"]["ChatMemberDto"][];
+            /**
+             * Format: date-time
+             * @description Created timestamp
+             */
+            createdAt: string;
+        };
         PaginationMetaDto: {
             /**
              * @description Current page number
@@ -497,28 +546,6 @@ export interface components {
         ChatHistoryResponseDto: {
             data: components["schemas"]["MessageResponseDto"][];
             meta: components["schemas"]["PaginationMetaDto"];
-        };
-        UserChatResponseDto: {
-            /** @description Chat ID */
-            id: string;
-            /**
-             * @description Chat type
-             * @enum {string}
-             */
-            type: "DIRECT" | "GROUP";
-            /** @description Chat name (null for direct chats) */
-            name?: Record<string, never>;
-            /** @description Creator user ID */
-            creatorId: string;
-            /** @description Chat members */
-            members: components["schemas"]["ChatMemberDto"][];
-            /**
-             * Format: date-time
-             * @description Created timestamp
-             */
-            createdAt: string;
-            /** @description Most recent message in the chat */
-            lastMessage?: components["schemas"]["MessageResponseDto"] | null;
         };
         SendMessageDto: {
             /**
@@ -743,6 +770,22 @@ export interface components {
             bio?: string;
             favoriteSports?: string[];
         };
+        EnrichSessionDto: {
+            /** @description The refresh token for the current session */
+            refreshToken: string;
+        };
+        EnrichSessionResponseDto: {
+            /**
+             * @description Whether the session was enriched
+             * @example true
+             */
+            success: boolean;
+            /**
+             * @description The session ID that was enriched
+             * @example abc123-def456
+             */
+            sessionId: string;
+        };
         KeycloakSessionClientDto: {
             /**
              * @description Client ID
@@ -788,6 +831,21 @@ export interface components {
              * @example false
              */
             rememberMe: boolean;
+            /**
+             * @description Whether this is an offline session
+             * @example false
+             */
+            offline: boolean;
+            /**
+             * @description Whether this session can be individually revoked
+             * @example true
+             */
+            revocable: boolean;
+            /**
+             * @description Whether this is the session making the request
+             * @example false
+             */
+            thisSession: boolean;
         };
         RevokeSessionsResponseDto: {
             /**
@@ -1596,6 +1654,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserProfileResponseDto"];
+                };
+            };
+        };
+    };
+    UserController_enrichSession_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnrichSessionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrichSessionResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
                 };
             };
         };

@@ -36,6 +36,13 @@ export const userApi = {
     if (error) throw new Error(getErrorMessage(error, 'Failed to revoke session'))
   },
 
+  async enrichSession(refreshToken: string): Promise<void> {
+    const { error } = await apiClient.POST('/v1/user/sessions/enrich', {
+      body: { refreshToken },
+    })
+    if (error) throw new Error(getErrorMessage(error, 'Failed to enrich session'))
+  },
+
   async revokeAllSessions(): Promise<RevokeSessionsResponse> {
     const { data, error } = await apiClient.POST('/v1/user/sessions/logout')
     if (error) throw new Error(getErrorMessage(error, 'Failed to revoke all sessions'))

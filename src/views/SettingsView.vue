@@ -135,6 +135,9 @@
                 <div class="flex items-center gap-2">
                   <UIcon name="i-fa6-solid:desktop" class="text-white/50 shrink-0" />
                   <span class="text-sm font-medium truncate">{{ session.ipAddress }}</span>
+                  <UBadge v-if="(session as any).thisSession" color="primary" variant="soft" size="xs">
+                    {{ t('settings.thisSession') }}
+                  </UBadge>
                   <UBadge v-if="session.rememberMe" color="primary" variant="soft" size="xs">
                     {{ t('settings.rememberMe') }}
                   </UBadge>
@@ -148,6 +151,7 @@
                 </span>
               </div>
               <UButton
+                v-if="session.revocable"
                 color="red"
                 variant="soft"
                 size="xs"
@@ -469,9 +473,15 @@ async function loadSessions() {
 }
 
 async function revokeSession(id: string) {
+  const session = sessions.value.find((s) => s.id === id)
   revokingSessionId.value = id
   try {
     await userApi.revokeSession(id)
+    if ((session as any)?.thisSession) {
+      await authStore.clearLocalSession()
+      window.location.reload()
+      return
+    }
     sessions.value = sessions.value.filter((s) => s.id !== id)
   } catch (error) {
     console.error('Failed to revoke session', error)

@@ -55,6 +55,7 @@
     "startedAt": "Started",
     "lastAccessed": "Last accessed",
     "rememberMe": "Remember me",
+    "thisSession": "This device",
     "revokeSession": "Revoke",
     "revokeAllSessions": "Revoke All Sessions",
     "noSessions": "No active sessions found.",

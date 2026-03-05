@@ -55,6 +55,7 @@
     "startedAt": "Iniciada",
     "lastAccessed": "Último acceso",
     "rememberMe": "Recordarme",
+    "thisSession": "Este dispositivo",
     "revokeSession": "Revocar",
     "revokeAllSessions": "Revocar Todas las Sesiones",
     "noSessions": "No se encontraron sesiones activas.",

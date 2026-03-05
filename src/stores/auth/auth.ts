@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { Preferences } from '@capacitor/preferences'
 import { KoiosOidcClient } from './oauthlib'
 import { jwtDecode } from 'jwt-decode'
+import { apiClient } from '@/lib/api/client'
 
 const TOKEN_KEYS = {
   ACCESS: 'access_token',
@@ -106,6 +107,18 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     await persistTokens(tokens.accessToken, tokens.refreshToken)
+
+    // Enrich the session with the refresh token for offline session management
+    if (tokens.refreshToken) {
+      try {
+        await apiClient.POST('/v1/user/sessions/enrich', {
+          body: { refreshToken: tokens.refreshToken },
+        })
+      } catch (error) {
+        console.warn('Failed to enrich session', error)
+      }
+    }
+
     return tokens
   }
 
