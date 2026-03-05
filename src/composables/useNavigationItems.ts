@@ -11,10 +11,10 @@ export function useNavigationItems() {
   const route = useRoute()
 
   const items: NavigationItem[] = [
-    { label: 'Home', icon: 'i-fa6-solid:house', to: '/' },
-    { label: 'Messenger', icon: 'i-fa6-solid:comments', to: '/messenger' },
-    { label: 'Workouts', icon: 'i-fa6-solid:dumbbell', to: '/workouts' },
-    { label: 'Profile', icon: 'i-fa6-solid:user', to: '/profile' },
+    { label: 'Home', icon: 'i-lucide-home', to: '/' },
+    { label: 'Messenger', icon: 'i-lucide-message-circle', to: '/messenger' },
+    { label: 'Workouts', icon: 'i-lucide-dumbbell', to: '/workouts' },
+    { label: 'Profile', icon: 'i-lucide-user', to: '/profile' },
   ]
 
   const sidebarItems = computed(() =>

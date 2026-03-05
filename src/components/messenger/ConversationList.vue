@@ -35,7 +35,7 @@ function formatTimestamp(isoString: string): string {
   <div class="flex flex-col h-full overflow-y-auto">
     <!-- Loading state -->
     <div v-if="messengerStore.loading" class="flex justify-center py-8">
-      <UIcon name="i-fa6-solid:spinner" class="text-xl text-white/40 animate-spin" />
+      <UIcon name="i-lucide-loader-2" class="text-xl text-white/40 animate-spin" />
     </div>
 
     <!-- Empty state -->

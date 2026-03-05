@@ -73,7 +73,7 @@ onMounted(() => {
       <div class="p-6">
         <div class="text-center mb-6">
           <UIcon
-            name="i-fa6-solid:building"
+            name="i-lucide-building-2"
             class="text-3xl text-[var(--ui-color-primary-500)] mb-2"
           />
           <h2 class="text-lg font-semibold">Welcome to FitTime</h2>
@@ -129,7 +129,7 @@ onMounted(() => {
         <!-- Join tab -->
         <div v-else class="space-y-3">
           <div v-if="orgsLoading" class="flex justify-center py-8">
-            <UIcon name="i-fa6-solid:spinner" class="text-xl text-white/40 animate-spin" />
+            <UIcon name="i-lucide-loader-2" class="text-xl text-white/40 animate-spin" />
           </div>
 
           <div

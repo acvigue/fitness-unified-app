@@ -6,7 +6,7 @@
           v-if="backRoute"
           color="neutral"
           variant="ghost"
-          icon="i-fa6-solid:arrow-left"
+          icon="i-lucide-arrow-left"
           square
           @click="router.push(backRoute)"
         />

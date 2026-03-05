@@ -13,7 +13,7 @@
           <UButton
             color="primary"
             variant="ghost"
-            icon="i-fa6-solid:right-from-bracket"
+            icon="i-lucide-log-out"
             @click="handleLogout"
           >
             {{ t('settings.logout') }}
@@ -26,11 +26,11 @@
         v-if="profileError"
         color="error"
         :title="profileError"
-        icon="i-fa6-solid-circle-exclamation"
+        icon="i-lucide-circle-alert"
         :close="{
           color: 'error',
           variant: 'link',
-          icon: 'i-fa6-solid-xmark',
+          icon: 'i-lucide-x',
         }"
         @close="profileError = ''"
       />
@@ -42,45 +42,37 @@
 
           <!-- Profile Pictures -->
           <UFormField :label="t('settings.profilePictures')">
-            <div class="flex gap-3 flex-wrap items-center">
-              <div
+            <div class="flex gap-3 items-center overflow-x-auto pb-2">
+              <button
                 v-for="pic in profile.pictures"
                 :key="pic.id"
-                class="relative"
+                class="relative shrink-0 rounded-full transition-all"
+                :class="pic.isPrimary ? 'ring-3 ring-primary ring-offset-2 ring-offset-neutral-900' : 'opacity-60 hover:opacity-100'"
+                @click="setPrimaryPicture(pic.id)"
               >
-                <UChip
-                  v-if="pic.isPrimary"
-                  color="primary"
-                  size="lg"
-                >
-                  <UAvatar
-                    :src="pic.url"
-                    :alt="(pic.alt as unknown as string) || ''"
-                    size="3xl"
-                  />
-                </UChip>
                 <UAvatar
-                  v-else
                   :src="pic.url"
                   :alt="(pic.alt as unknown as string) || ''"
                   size="3xl"
                 />
-              </div>
+              </button>
               <UFileUpload
                 accept="image/*"
-                @change="handleFileUpload"
+                @update:model-value="handleFileUpload"
               >
                 <template #actions="{ open }">
-                  <UButton
-                    color="neutral"
-                    variant="outline"
-                    icon="i-fa6-solid-camera"
-                    :loading="uploading"
-                    size="lg"
+                  <button
+                    class="shrink-0 size-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center hover:border-white/40 transition-colors"
+                    :disabled="uploading"
                     @click="open()"
                   >
-                    {{ t('settings.uploadPhoto') }}
-                  </UButton>
+                    <UIcon
+                      v-if="uploading"
+                      name="i-lucide-loader-2"
+                      class="size-5 animate-spin text-white/40"
+                    />
+                    <UIcon v-else name="i-lucide-plus" class="size-5 text-white/40" />
+                  </button>
                 </template>
               </UFileUpload>
             </div>
@@ -111,7 +103,7 @@
                   color="primary"
                   variant="link"
                   size="2xs"
-                  icon="i-fa6-solid-xmark"
+                  icon="i-lucide-x"
                   @click="removeSport(sport.id)"
                 />
               </UBadge>
@@ -119,7 +111,7 @@
                 size="sm"
                 variant="outline"
                 color="neutral"
-                icon="i-fa6-solid-plus"
+                icon="i-lucide-plus"
                 @click="sportsPickerOpen = true"
               >
                 {{ t('settings.addSport') }}
@@ -179,7 +171,7 @@
             >
               <div class="flex flex-col gap-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <UIcon name="i-fa6-solid:desktop" class="text-white/50 shrink-0" />
+                  <UIcon name="i-lucide-monitor" class="text-white/50 shrink-0" />
                   <span class="text-sm font-medium truncate">{{ session.ipAddress }}</span>
                   <UBadge v-if="(session as any).thisSession" color="primary" variant="soft" size="xs">
                     {{ t('settings.thisSession') }}
@@ -213,7 +205,7 @@
             <UButton
               color="red"
               variant="ghost"
-              icon="i-fa6-solid:right-from-bracket"
+              icon="i-lucide-log-out"
               :loading="revokingAll"
               @click="revokeAllSessions"
             >
@@ -280,7 +272,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <UIcon
-                  :name="confirmModal.isDelete ? 'i-heroicons-trash' : 'i-heroicons-user-minus'"
+                  :name="confirmModal.isDelete ? 'i-lucide-trash-2' : 'i-lucide-user-minus'"
                   :class="confirmModal.isDelete ? 'text-red-500' : 'text-orange-500'"
                 />
                 <span class="font-bold text-white">{{ confirmModal.title }}</span>
@@ -288,7 +280,7 @@
               <UButton
                 color="gray"
                 variant="ghost"
-                icon="i-heroicons-x-mark"
+                icon="i-lucide-x"
                 @click="closeModal"
                 :disabled="confirmModal.loading"
               />
@@ -480,22 +472,30 @@ function removeSport(sportId: string) {
 
 // Profile pictures
 const uploading = ref(false)
+const pendingPictureIds = ref<string[]>([])
 
-async function handleFileUpload(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  if (!file) return
+function setPrimaryPicture(picId: string) {
+  profile.value.pictures = profile.value.pictures.map((p) => ({
+    ...p,
+    isPrimary: p.id === picId,
+  }))
+}
+
+async function handleFileUpload(value: File | null | undefined) {
+  if (!value) return
+  const file = value
 
   uploading.value = true
   profileError.value = ''
   try {
-    await userApi.uploadMedia(file)
-    // Reload profile to get updated pictures
-    const data = await userApi.getProfile()
-    profile.value = data
-    profileForm.bio = (data.bio as unknown as string) || ''
-    profileForm.favoriteSports = [...data.favoriteSports]
-    originalProfile.value = serializeForm()
+    const media = await userApi.uploadMedia(file)
+    pendingPictureIds.value.push(media.id)
+    // Add to display immediately
+    profile.value.pictures.push({
+      id: media.id,
+      url: media.url,
+      isPrimary: profile.value.pictures.length === 0,
+    })
   } catch (error: any) {
     console.error('Upload failed', error)
     profileError.value = error.message || t('settings.uploadFailed')
@@ -505,9 +505,12 @@ async function handleFileUpload(event: Event) {
 }
 
 function serializeForm() {
+  const primaryId = profile.value.pictures.find((p) => p.isPrimary)?.id || ''
   return JSON.stringify({
     bio: profileForm.bio,
     sportIds: profileForm.favoriteSports.map((s) => s.id).sort(),
+    pictureIds: profile.value.pictures.map((p) => p.id),
+    primaryPictureId: primaryId,
   })
 }
 
@@ -594,12 +597,20 @@ async function saveProfile() {
   saving.value = true
   profileError.value = ''
   try {
+    // Send primary picture first (API treats first as primary)
+    const sorted = [...profile.value.pictures].sort((a, b) =>
+      a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1,
+    )
+    const allPictureIds = sorted.map((p) => p.id)
+
     const updated = await userApi.updateProfile({
       bio: profileForm.bio,
       favoriteSportIds: profileForm.favoriteSports.map((s) => s.id),
+      pictureIds: allPictureIds,
     })
     profile.value = updated
     profileForm.favoriteSports = [...updated.favoriteSports]
+    pendingPictureIds.value = []
     originalProfile.value = serializeForm()
   } catch (error: any) {
     console.error('Update failed', error)

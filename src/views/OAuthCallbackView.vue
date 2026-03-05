@@ -3,20 +3,20 @@
     <div class="w-full max-w-md space-y-6 text-center">
       <!-- Loading -->
       <div v-if="processing" class="space-y-4">
-        <UIcon name="i-fa6-solid:spinner" class="mx-auto h-12 w-12 animate-spin text-primary-400" />
+        <UIcon name="i-lucide-loader-2" class="mx-auto h-12 w-12 animate-spin text-primary-400" />
         <p class="text-white/70">{{ t('login.authprocessing') }}</p>
       </div>
 
       <!-- Success -->
       <div v-else-if="success" class="space-y-4">
-        <UIcon name="i-fa6-solid:circle-check" class="mx-auto h-12 w-12 text-green-400" />
+        <UIcon name="i-lucide-circle-check" class="mx-auto h-12 w-12 text-green-400" />
         <p class="font-medium text-green-400">{{ t('login.connectedsuccess') }}</p>
         <p class="text-sm text-white/50">{{ t('login.canclose') }}</p>
       </div>
 
       <!-- Error -->
       <div v-else-if="errorMessage" class="space-y-4">
-        <UIcon name="i-fa6-solid:circle-exclamation" class="mx-auto h-12 w-12 text-red-400" />
+        <UIcon name="i-lucide-circle-alert" class="mx-auto h-12 w-12 text-red-400" />
         <p class="font-medium text-red-400">{{ t('login.authfailed') }}</p>
         <p class="text-sm text-white/50">{{ errorMessage }}</p>
       </div>

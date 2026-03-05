@@ -73,7 +73,7 @@ function confirm() {
         <UInput
           v-model="searchTerm"
           :placeholder="t('settings.searchSports')"
-          icon="i-fa6-solid-magnifying-glass"
+          icon="i-lucide-search"
           autofocus
         />
 
@@ -88,14 +88,14 @@ function confirm() {
             @click="toggleSport(sport)"
           >
             {{ sport.icon }} {{ sport.name }}
-            <UIcon name="i-fa6-solid-xmark" class="ml-1 size-3" />
+            <UIcon name="i-lucide-x" class="ml-1 size-3" />
           </UBadge>
         </div>
 
         <!-- Sports list -->
         <div class="max-h-60 overflow-y-auto -mx-2">
           <div v-if="loading" class="flex justify-center py-4">
-            <UIcon name="i-fa6-solid-spinner" class="size-5 animate-spin text-white/50" />
+            <UIcon name="i-lucide-loader-2" class="size-5 animate-spin text-white/50" />
           </div>
           <template v-else-if="filteredSports.length">
             <button
@@ -106,7 +106,7 @@ function confirm() {
               @click="toggleSport(sport)"
             >
               <UIcon
-                :name="isSelected(sport) ? 'i-fa6-solid-circle-check' : 'i-fa6-regular-circle'"
+                :name="isSelected(sport) ? 'i-lucide-circle-check' : 'i-lucide-circle'"
                 class="size-4 shrink-0"
                 :class="isSelected(sport) ? 'text-primary' : 'text-white/30'"
               />

@@ -1,108 +1,107 @@
 /**
- * Icon utilities for Font Awesome icons.
+ * Icon utilities for Lucide icons.
  *
- * This app uses Font Awesome 6 icons via Iconify.
- * Icons are bundled locally from @iconify-json/fa6-solid and @iconify-json/fa6-regular.
+ * This app uses Lucide icons via Iconify.
+ * Icons are bundled locally from @iconify-json/lucide.
  *
- * Format: i-{collection}:{icon-name}
- * The colon separates the collection (fa6-solid) from the icon name.
+ * Format: i-lucide-{icon-name}
  */
 
 /**
- * Font Awesome icon names used throughout the app.
+ * Lucide icon names used throughout the app.
  * Use these constants instead of hardcoding icon strings.
  */
 export const icons = {
   // Navigation
-  arrowLeft: 'i-fa6-solid:arrow-left',
-  arrowRight: 'i-fa6-solid:arrow-right',
-  arrowDown: 'i-fa6-solid:arrow-down',
-  arrowUp: 'i-fa6-solid:arrow-up',
-  chevronLeft: 'i-fa6-solid:chevron-left',
-  chevronRight: 'i-fa6-solid:chevron-right',
-  chevronDown: 'i-fa6-solid:chevron-down',
-  chevronUp: 'i-fa6-solid:chevron-up',
-  externalLink: 'i-fa6-solid:arrow-up-right-from-square',
+  arrowLeft: 'i-lucide-arrow-left',
+  arrowRight: 'i-lucide-arrow-right',
+  arrowDown: 'i-lucide-arrow-down',
+  arrowUp: 'i-lucide-arrow-up',
+  chevronLeft: 'i-lucide-chevron-left',
+  chevronRight: 'i-lucide-chevron-right',
+  chevronDown: 'i-lucide-chevron-down',
+  chevronUp: 'i-lucide-chevron-up',
+  externalLink: 'i-lucide-external-link',
 
   // Actions
-  check: 'i-fa6-solid:check',
-  close: 'i-fa6-solid:xmark',
-  plus: 'i-fa6-solid:plus',
-  minus: 'i-fa6-solid:minus',
-  search: 'i-fa6-solid:magnifying-glass',
-  trash: 'i-fa6-solid:trash',
-  edit: 'i-fa6-solid:pen',
-  copy: 'i-fa6-regular:copy',
-  upload: 'i-fa6-solid:upload',
-  download: 'i-fa6-solid:download',
-  play: 'i-fa6-solid:play',
-  stop: 'i-fa6-solid:stop',
-  refresh: 'i-fa6-solid:rotate-right',
-  settings: 'i-fa6-solid:gear',
-  sliders: 'i-fa6-solid:sliders',
-  gripVertical: 'i-fa6-solid:grip-vertical',
-  ellipsisVertical: 'i-fa6-solid:ellipsis-vertical',
-  link: 'i-fa6-solid:link',
-  pin: 'i-fa6-solid:thumbtack',
+  check: 'i-lucide-check',
+  close: 'i-lucide-x',
+  plus: 'i-lucide-plus',
+  minus: 'i-lucide-minus',
+  search: 'i-lucide-search',
+  trash: 'i-lucide-trash-2',
+  edit: 'i-lucide-pen',
+  copy: 'i-lucide-copy',
+  upload: 'i-lucide-upload',
+  download: 'i-lucide-download',
+  play: 'i-lucide-play',
+  stop: 'i-lucide-square',
+  refresh: 'i-lucide-refresh-cw',
+  settings: 'i-lucide-settings',
+  sliders: 'i-lucide-sliders-horizontal',
+  gripVertical: 'i-lucide-grip-vertical',
+  ellipsisVertical: 'i-lucide-ellipsis-vertical',
+  link: 'i-lucide-link',
+  pin: 'i-lucide-pin',
 
   // Status
-  spinner: 'i-fa6-solid:spinner',
-  circleCheck: 'i-fa6-solid:circle-check',
-  circleXmark: 'i-fa6-solid:circle-xmark',
-  circleExclamation: 'i-fa6-solid:circle-exclamation',
-  circleInfo: 'i-fa6-solid:circle-info',
-  triangleExclamation: 'i-fa6-solid:triangle-exclamation',
+  spinner: 'i-lucide-loader-2',
+  circleCheck: 'i-lucide-circle-check',
+  circleXmark: 'i-lucide-circle-x',
+  circleExclamation: 'i-lucide-circle-alert',
+  circleInfo: 'i-lucide-info',
+  triangleExclamation: 'i-lucide-triangle-alert',
 
   // UI Elements
-  info: 'i-fa6-solid:circle-info',
-  eye: 'i-fa6-regular:eye',
-  eyeSlash: 'i-fa6-regular:eye-slash',
-  image: 'i-fa6-regular:image',
-  imageSlash: 'i-fa6-solid:image', // No slash variant, use regular
-  sun: 'i-fa6-solid:sun',
-  moon: 'i-fa6-solid:moon',
+  info: 'i-lucide-info',
+  eye: 'i-lucide-eye',
+  eyeSlash: 'i-lucide-eye-off',
+  image: 'i-lucide-image',
+  imageSlash: 'i-lucide-image-off',
+  sun: 'i-lucide-sun',
+  moon: 'i-lucide-moon',
 
   // Users
-  user: 'i-fa6-solid:user',
-  userPlus: 'i-fa6-solid:user-plus',
-  userMinus: 'i-fa6-solid:user-minus',
-  userGear: 'i-fa6-solid:user-gear',
+  user: 'i-lucide-user',
+  userPlus: 'i-lucide-user-plus',
+  userMinus: 'i-lucide-user-minus',
+  userGear: 'i-lucide-user-cog',
 
   // Communication
-  envelope: 'i-fa6-regular:envelope',
+  envelope: 'i-lucide-mail',
 
   // Devices & Tech
-  wifi: 'i-fa6-solid:wifi',
-  wifiSlash: 'i-fa6-solid:wifi', // No slash, will need styling
-  bluetooth: 'i-fa6-brands:bluetooth-b',
-  microchip: 'i-fa6-solid:microchip',
-  desktop: 'i-fa6-solid:desktop',
-  power: 'i-fa6-solid:power-off',
-  key: 'i-fa6-solid:key',
-  lock: 'i-fa6-solid:lock',
-  shield: 'i-fa6-solid:shield',
-  shieldCheck: 'i-fa6-solid:shield-halved',
-  radar: 'i-fa6-solid:satellite-dish',
-  locationDot: 'i-fa6-solid:location-dot',
-  creditCard: 'i-fa6-regular:credit-card',
-  clock: 'i-fa6-regular:clock',
-  lifeRing: 'i-fa6-regular:life-ring',
-  signOut: 'i-fa6-solid:right-from-bracket',
-  signIn: 'i-fa6-solid:right-to-bracket',
-  hand: 'i-fa6-solid:hand',
-  sparkles: 'i-fa6-solid:wand-magic-sparkles',
-  sortAZ: 'i-fa6-solid:arrow-down-a-z',
-  sortZA: 'i-fa6-solid:arrow-down-z-a',
-  boxOpen: 'i-fa6-solid:box-open',
+  wifi: 'i-lucide-wifi',
+  wifiSlash: 'i-lucide-wifi-off',
+  bluetooth: 'i-lucide-bluetooth',
+  microchip: 'i-lucide-cpu',
+  desktop: 'i-lucide-monitor',
+  power: 'i-lucide-power',
+  key: 'i-lucide-key-round',
+  lock: 'i-lucide-lock',
+  shield: 'i-lucide-shield',
+  shieldCheck: 'i-lucide-shield-check',
+  radar: 'i-lucide-radar',
+  locationDot: 'i-lucide-map-pin',
+  creditCard: 'i-lucide-credit-card',
+  clock: 'i-lucide-clock',
+  lifeRing: 'i-lucide-life-buoy',
+  signOut: 'i-lucide-log-out',
+  signIn: 'i-lucide-log-in',
+  hand: 'i-lucide-hand',
+  sparkles: 'i-lucide-sparkles',
+  sortAZ: 'i-lucide-arrow-down-a-z',
+  sortZA: 'i-lucide-arrow-down-z-a',
+  boxOpen: 'i-lucide-package-open',
 
   // Circuit/Device specific
-  circuitBoard: 'i-fa6-solid:microchip',
+  circuitBoard: 'i-lucide-circuit-board',
 } as const
 
 export type IconName = keyof typeof icons
 
 /**
- * Get a Font Awesome icon name.
+ * Get a Lucide icon name.
  * This is a simple passthrough but provides type safety.
  */
 export function getIcon(name: IconName): string {

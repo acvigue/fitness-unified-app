@@ -9,10 +9,10 @@
             integration. Start building your app by modifying this home view.
           </p>
           <div class="flex justify-center gap-3 pt-4">
-            <UButton icon="i-fa6-solid:book" variant="soft" @click="openDocs">
+            <UButton icon="i-lucide-book-open" variant="soft" @click="openDocs">
               Documentation
             </UButton>
-            <UButton icon="i-fa6-solid:gear" variant="soft" @click="openSettings">
+            <UButton icon="i-lucide-settings" variant="soft" @click="openSettings">
               Settings
             </UButton>
           </div>

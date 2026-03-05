@@ -10,7 +10,7 @@ const { sidebarItems } = useNavigationItems()
 const footerItems = computed(() => [
   {
     label: 'Settings',
-    icon: 'i-fa6-solid:gear',
+    icon: 'i-lucide-settings',
     to: '/settings',
     active: route.path === '/settings',
   },

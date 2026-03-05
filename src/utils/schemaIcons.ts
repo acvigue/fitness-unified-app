@@ -1,9 +1,7 @@
 /**
- * Maps schema icon names (Font Awesome style from Pixlet) to Iconify icon names.
- * Schema icons use Font Awesome naming conventions (e.g., "cloud", "sun", "mapLocationDot").
- * We map these to the Font Awesome icon pack in Iconify format.
- *
- * See: https://github.com/tidbyt/pixlet/blob/main/icons/icons.go
+ * Maps schema icon names to Lucide Iconify icon names.
+ * Schema icons use camelCase naming (e.g., "cloud", "sun", "mapLocationDot").
+ * We map these to the Lucide icon pack in Iconify format.
  */
 
 /**
@@ -15,9 +13,9 @@ function toKebabCase(str: string): string {
 
 /**
  * Get the Iconify icon name for a schema icon.
- * Returns the full Iconify icon identifier (e.g., "i-fa6-solid-cloud").
+ * Returns the full Iconify icon identifier (e.g., "i-lucide-cloud").
  *
- * @param schemaIcon - The icon name from the schema (Font Awesome style)
+ * @param schemaIcon - The icon name from the schema (camelCase)
  * @returns The Iconify icon identifier for use with UIcon
  */
 export function getSchemaIconName(schemaIcon: string | undefined): string | undefined {
@@ -26,6 +24,5 @@ export function getSchemaIconName(schemaIcon: string | undefined): string | unde
   // Convert camelCase to kebab-case for Iconify
   const kebabName = toKebabCase(schemaIcon)
 
-  // Use Font Awesome 6 solid icons (fa6-solid) with colon separator for iconify
-  return `i-fa6-solid:${kebabName}`
+  return `i-lucide-${kebabName}`
 }

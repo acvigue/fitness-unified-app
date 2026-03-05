@@ -81,9 +81,9 @@ function handleSubmit() {
     <!-- Chat header -->
     <div class="flex items-center gap-3 px-4 py-3 border-b border-white/10 shrink-0">
       <RouterLink to="/messenger" class="lg:hidden text-white/70 hover:text-white transition-colors">
-        <UIcon name="i-fa6-solid:arrow-left" class="text-lg" />
+        <UIcon name="i-lucide-arrow-left" class="text-lg" />
       </RouterLink>
-      <UAvatar :icon="isGroup ? 'i-fa6-solid:users' : 'i-fa6-solid:user'" size="sm" />
+      <UAvatar :icon="isGroup ? 'i-lucide-users' : 'i-lucide-user'" size="sm" />
       <span class="font-medium text-sm">{{ chatName }}</span>
     </div>
 

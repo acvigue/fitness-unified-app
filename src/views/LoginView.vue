@@ -27,7 +27,7 @@
           size="xl"
           color="primary"
           block
-          trailing-icon="i-fa6-solid-arrow-right"
+          trailing-icon="i-lucide-arrow-right"
           :loading="isAuthorizing"
           @click="startLogin"
         >

@@ -18,7 +18,7 @@ defineProps<{
     :class="active ? 'bg-white/5' : ''"
   >
     <UAvatar
-      :icon="isGroup ? 'i-fa6-solid:users' : 'i-fa6-solid:user'"
+      :icon="isGroup ? 'i-lucide-users' : 'i-lucide-user'"
       :src="avatar ?? undefined"
       :alt="name"
       size="lg"

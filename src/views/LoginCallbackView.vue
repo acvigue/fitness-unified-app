@@ -10,7 +10,7 @@
 
     <div v-if="errorMessage" class="space-y-4 text-center">
       <p class="text-sm text-rose-300">{{ errorMessage }}</p>
-      <UButton color="primary" icon="i-fa6-solid:right-to-bracket" @click="retry">{{
+      <UButton color="primary" icon="i-lucide-log-in" @click="retry">{{
         t('login.tryagain')
       }}</UButton>
     </div>

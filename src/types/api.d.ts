@@ -55,6 +55,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/chats/search/{chatId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search messages in a chat thread */
+        get: operations["ChatController_searchMessages_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/chats/send-message": {
         parameters: {
             query?: never;
@@ -403,6 +420,23 @@ export interface components {
              */
             name?: Record<string, never>;
         };
+        MediaAttachmentDto: {
+            /**
+             * @description Media asset ID
+             * @example cm1abc123def456
+             */
+            id: string;
+            /**
+             * @description Public URL
+             * @example https://assets.fittime.app/fittime/assets/cm1abc123def456.jpg
+             */
+            url: string;
+            /**
+             * @description MIME type
+             * @example image/jpeg
+             */
+            mimeType: string;
+        };
         MessageResponseDto: {
             /**
              * @description Message ID
@@ -428,10 +462,12 @@ export interface components {
              */
             type: "TEXT" | "IMAGE" | "VIDEO" | "FILE";
             /**
-             * @description Media URL for non-text messages
+             * @description Media URL for non-text messages (legacy)
              * @example https://cdn.example.com/img.jpg
              */
             mediaUrl?: Record<string, never>;
+            /** @description Attached media assets */
+            media: components["schemas"]["MediaAttachmentDto"][];
             /**
              * @description Whether the message has been read
              * @example false
@@ -581,6 +617,51 @@ export interface components {
             data: components["schemas"]["MessageResponseDto"][];
             meta: components["schemas"]["PaginationMetaDto"];
         };
+        SearchMessageHitDto: {
+            /**
+             * @description Message ID
+             * @example clr1abc2d0001
+             */
+            id: string;
+            /**
+             * @description Message content
+             * @example Hey, want to work out today?
+             */
+            content: string;
+            /**
+             * @description Sender display name or username
+             * @example John Doe
+             */
+            senderName: string;
+            /**
+             * @description Sender user ID
+             * @example auth0|507f1f77bcf86cd799439011
+             */
+            senderId: string;
+            /**
+             * Format: date-time
+             * @description Timestamp when the message was sent
+             */
+            createdAt: string;
+            /**
+             * @description Zero-based index of this message in the full history (ordered by createdAt DESC)
+             * @example 127
+             */
+            index: number;
+            /**
+             * @description Page number where this message appears (based on per_page)
+             * @example 3
+             */
+            page: number;
+        };
+        SearchMessagesResponseDto: {
+            hits: components["schemas"]["SearchMessageHitDto"][];
+            /**
+             * @description Total number of matching messages
+             * @example 5
+             */
+            total: number;
+        };
         SendMessageDto: {
             /**
              * @description Chat ID to send the message to
@@ -592,6 +673,13 @@ export interface components {
              * @example Hey, want to work out today?
              */
             content: string;
+            /**
+             * @description List of media asset IDs to attach (uploaded via /v1/utils/media-upload)
+             * @example [
+             *       "cm1abc123def456"
+             *     ]
+             */
+            mediaIds?: string[];
         };
         HealthResponseDto: {
             /**
@@ -856,6 +944,13 @@ export interface components {
              *     ]
              */
             favoriteSportIds?: string[];
+            /**
+             * @description List of media IDs to use as profile pictures (first is primary)
+             * @example [
+             *       "clr1abc2d0000"
+             *     ]
+             */
+            pictureIds?: string[];
         };
         EnrichSessionDto: {
             /** @description The refresh token for the current session */
@@ -1084,6 +1179,61 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChatHistoryResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ChatController_searchMessages_v1: {
+        parameters: {
+            query: {
+                /** @description Page size used by history endpoint (for page calculation) */
+                per_page?: number;
+                /** @description Max results (1-50) */
+                limit?: number;
+                /** @description Search query */
+                q: string;
+            };
+            header?: never;
+            path: {
+                chatId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchMessagesResponseDto"];
                 };
             };
             /** @description Unauthorized - invalid or missing token */

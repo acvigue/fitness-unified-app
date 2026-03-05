@@ -4,7 +4,7 @@
       <UButton
         v-if="backEnabled"
         variant="ghost"
-        icon="i-fa6-solid:chevron-left"
+        icon="i-lucide-chevron-left"
         size="sm"
         @click="router.back()"
       >

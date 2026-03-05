@@ -36,7 +36,7 @@ onMounted(() => {
       <div class="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
         <h1 class="text-lg font-semibold">{{ t('messenger.messenger') }}</h1>
         <UButton
-          icon="i-fa6-solid:pen-to-square"
+          icon="i-lucide-square-pen"
           variant="ghost"
           color="neutral"
           size="sm"
@@ -58,7 +58,7 @@ onMounted(() => {
       <!-- Desktop empty state when no chat selected -->
       <div v-else class="flex flex-1 items-center justify-center text-white/30">
         <div class="text-center">
-          <UIcon name="i-fa6-solid:comments" class="text-4xl mb-3" />
+          <UIcon name="i-lucide-message-circle" class="text-4xl mb-3" />
           <p class="text-sm">{{ t('messenger.selectconversation') }}</p>
         </div>
       </div>
