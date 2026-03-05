@@ -194,6 +194,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/sports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all available sports */
+        get: operations["SportController_findAll_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/user/lookup": {
         parameters: {
             query?: never;
@@ -325,6 +342,23 @@ export interface paths {
         put?: never;
         /** Revoke all of the current user's identity provider sessions */
         post: operations["UserController_revokeAllSessions_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/utils/media-upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload a media file (image or video) to R2 storage */
+        post: operations["UtilsController_uploadMedia_v1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -669,6 +703,23 @@ export interface components {
              */
             createdAt: string;
         };
+        SportResponseDto: {
+            /**
+             * @description Sport ID (UUID)
+             * @example a1b2c3d4-0001-4000-8000-000000000001
+             */
+            id: string;
+            /**
+             * @description Sport name
+             * @example Running
+             */
+            name: string;
+            /**
+             * @description Sport icon emoji
+             * @example 🏃
+             */
+            icon?: Record<string, never>;
+        };
         UserLookupItemDto: {
             /**
              * @description User ID
@@ -755,20 +806,56 @@ export interface components {
             joinedAt: string;
         };
         UserProfilePictureDto: {
+            /**
+             * @description Picture ID
+             * @example clr1abc2d0000
+             */
             id: string;
+            /**
+             * @description Picture URL
+             * @example https://example.com/photo.jpg
+             */
             url: string;
+            /**
+             * @description Alt text
+             * @example Profile photo
+             */
             alt?: string;
+            /**
+             * @description Whether this is the primary picture
+             * @example true
+             */
             isPrimary: boolean;
         };
         UserProfileResponseDto: {
+            /**
+             * @description User ID
+             * @example auth0|507f1f77bcf86cd799439011
+             */
             userId: string;
-            bio?: string;
-            favoriteSports: string[];
+            /**
+             * @description User bio
+             * @example Fitness enthusiast
+             */
+            bio?: Record<string, never>;
+            /** @description Favorite sports */
+            favoriteSports: components["schemas"]["SportResponseDto"][];
+            /** @description Profile pictures */
             pictures: components["schemas"]["UserProfilePictureDto"][];
         };
         UpdateUserProfileDto: {
+            /**
+             * @description User bio
+             * @example Fitness enthusiast
+             */
             bio?: string;
-            favoriteSports?: string[];
+            /**
+             * @description List of sport IDs (UUIDs)
+             * @example [
+             *       "a1b2c3d4-0001-4000-8000-000000000001"
+             *     ]
+             */
+            favoriteSportIds?: string[];
         };
         EnrichSessionDto: {
             /** @description The refresh token for the current session */
@@ -858,6 +945,28 @@ export interface components {
              * @example All sessions have been revoked
              */
             message: string;
+        };
+        MediaUploadResponseDto: {
+            /**
+             * @description Media UUID
+             * @example cm1abc123def456
+             */
+            id: string;
+            /**
+             * @description Public URL of the uploaded file
+             * @example https://assets.fittime.app/fittime/assets/cm1abc123def456
+             */
+            url: string;
+            /**
+             * @description MIME type of the file
+             * @example image/png
+             */
+            mimeType: string;
+            /**
+             * @description File size in bytes
+             * @example 102400
+             */
+            size: number;
         };
     };
     responses: never;
@@ -1493,6 +1602,43 @@ export interface operations {
             };
         };
     };
+    SportController_findAll_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SportResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
     UserController_lookupUsers_v1: {
         parameters: {
             query: {
@@ -1807,6 +1953,54 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RevokeSessionsResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UtilsController_uploadMedia_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Image or video file (max 10 MB)
+                     */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description File uploaded successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaUploadResponseDto"];
                 };
             };
             /** @description Unauthorized - invalid or missing token */

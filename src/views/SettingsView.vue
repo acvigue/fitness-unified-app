@@ -22,64 +22,110 @@
       </UCard>
 
       <!--  Profile Section  -->
-      <p v-if="profileError" class="text-sm text-red-400">{{ profileError }}</p>
+      <UAlert
+        v-if="profileError"
+        color="error"
+        :title="profileError"
+        icon="i-fa6-solid-circle-exclamation"
+        :close="{
+          color: 'error',
+          variant: 'link',
+          icon: 'i-fa6-solid-xmark',
+        }"
+        @close="profileError = ''"
+      />
       <UCard class="bg-white/5">
-        <div class="flex flex-col gap-4">
-          <div>
-            <p class="text-xs uppercase tracking-[0.3em] text-white/60">
-              {{ t('settings.profile') }}
-            </p>
-          </div>
+        <div class="flex flex-col gap-5">
+          <p class="text-xs uppercase tracking-[0.3em] text-white/60">
+            {{ t('settings.profile') }}
+          </p>
+
+          <!-- Profile Pictures -->
+          <UFormField :label="t('settings.profilePictures')">
+            <div class="flex gap-3 flex-wrap items-center">
+              <div
+                v-for="pic in profile.pictures"
+                :key="pic.id"
+                class="relative"
+              >
+                <UChip
+                  v-if="pic.isPrimary"
+                  color="primary"
+                  size="lg"
+                >
+                  <UAvatar
+                    :src="pic.url"
+                    :alt="(pic.alt as unknown as string) || ''"
+                    size="3xl"
+                  />
+                </UChip>
+                <UAvatar
+                  v-else
+                  :src="pic.url"
+                  :alt="(pic.alt as unknown as string) || ''"
+                  size="3xl"
+                />
+              </div>
+              <UFileUpload
+                accept="image/*"
+                @change="handleFileUpload"
+              >
+                <template #actions="{ open }">
+                  <UButton
+                    color="neutral"
+                    variant="outline"
+                    icon="i-fa6-solid-camera"
+                    :loading="uploading"
+                    size="lg"
+                    @click="open()"
+                  >
+                    {{ t('settings.uploadPhoto') }}
+                  </UButton>
+                </template>
+              </UFileUpload>
+            </div>
+          </UFormField>
 
           <!-- Bio -->
-          <div class="space-y-1">
-            <label class="text-sm text-white/70">{{ t('settings.bio') }}</label>
+          <UFormField :label="t('settings.bio')">
             <UTextarea
               v-model="profileForm.bio"
               :placeholder="t('settings.bioPlaceholder')"
               :rows="3"
+              autoresize
             />
-          </div>
+          </UFormField>
 
           <!-- Favorite Sports -->
-          <div class="space-y-1">
-            <label class="text-sm text-white/70">{{ t('settings.favoriteSports') }}</label>
+          <UFormField :label="t('settings.favoriteSports')">
             <div class="flex flex-wrap gap-2">
               <UBadge
                 v-for="sport in profileForm.favoriteSports"
-                :key="sport"
+                :key="sport.id"
                 color="primary"
                 variant="soft"
-                class="px-3 py-1"
+                class="gap-1.5 pr-1.5"
               >
-                {{ sport }}
-                <button @click="removeSport(sport)" class="ml-2 text-white/50 hover:text-white">
-                  &times;
-                </button>
+                {{ sport.icon }} {{ sport.name }}
+                <UButton
+                  color="primary"
+                  variant="link"
+                  size="2xs"
+                  icon="i-fa6-solid-xmark"
+                  @click="removeSport(sport.id)"
+                />
               </UBadge>
-              <UInput
-                v-model="newSport"
-                :placeholder="t('settings.addSport')"
+              <UButton
                 size="sm"
-                @keyup.enter="addSport"
-              />
-            </div>
-          </div>
-
-          <!-- Profile Pictures -->
-          <!-- <div v-if="profile.pictures.length" class="space-y-2">
-            <label class="text-sm text-white/70">{{ t('settings.profilePictures') }}</label>
-            <div class="flex gap-2">
-              <div
-                v-for="pic in profile.pictures"
-                :key="pic.id"
-                class="relative w-16 h-16 rounded-lg overflow-hidden border-2"
-                :class="pic.isPrimary ? 'border-primary' : 'border-transparent'"
+                variant="outline"
+                color="neutral"
+                icon="i-fa6-solid-plus"
+                @click="sportsPickerOpen = true"
               >
-                <img :src="pic.url" :alt="pic.alt" class="w-full h-full object-cover" />
-              </div>
+                {{ t('settings.addSport') }}
+              </UButton>
             </div>
-          </div> -->
+          </UFormField>
 
           <!-- Save Button -->
           <div class="flex justify-end">
@@ -220,7 +266,7 @@
       </UCard>
     </section>
 
-    <!-- Custom Modal -->
+    <!-- Confirm Modal -->
     <Teleport to="body">
       <div v-if="confirmModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center">
         <!-- Backdrop -->
@@ -289,6 +335,13 @@
         </UCard>
       </div>
     </Teleport>
+
+    <!-- Sports Picker Modal -->
+    <SportsPickerModal
+      v-model:open="sportsPickerOpen"
+      :selected="profileForm.favoriteSports"
+      @update="onSportsUpdated"
+    />
   </PageLayout>
 </template>
 
@@ -297,11 +350,13 @@ import { ref, computed, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import PageLayout from '@/layouts/PageLayout.vue'
+import SportsPickerModal from '@/components/SportsPickerModal.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useAuthStore } from '@/stores/auth/auth'
 import { ENV } from '@/config/environment'
 import { userApi, type Session } from '@/stores/api/user'
 import type { UserProfile } from '@/stores/api/user'
+import type { Sport } from '@/stores/api/sports'
 import { useI18n } from 'vue-i18n'
 import { SUPPORT_LOCALES } from '@/i18n'
 const { t, locale } = useI18n()
@@ -406,11 +461,55 @@ const handleAccountAction = async () => {
   }
 }
 
+// Profile
 const profile = ref<UserProfile>({ userId: '', bio: '', favoriteSports: [], pictures: [] })
-const profileForm = reactive({ bio: '', favoriteSports: [] as string[] })
-const newSport = ref('')
+const profileForm = reactive({ bio: '', favoriteSports: [] as Sport[] })
 const saving = ref(false)
 const originalProfile = ref('')
+
+// Sports picker
+const sportsPickerOpen = ref(false)
+
+function onSportsUpdated(sports: Sport[]) {
+  profileForm.favoriteSports = sports
+}
+
+function removeSport(sportId: string) {
+  profileForm.favoriteSports = profileForm.favoriteSports.filter((s) => s.id !== sportId)
+}
+
+// Profile pictures
+const uploading = ref(false)
+
+async function handleFileUpload(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  uploading.value = true
+  profileError.value = ''
+  try {
+    await userApi.uploadMedia(file)
+    // Reload profile to get updated pictures
+    const data = await userApi.getProfile()
+    profile.value = data
+    profileForm.bio = (data.bio as unknown as string) || ''
+    profileForm.favoriteSports = [...data.favoriteSports]
+    originalProfile.value = serializeForm()
+  } catch (error: any) {
+    console.error('Upload failed', error)
+    profileError.value = error.message || t('settings.uploadFailed')
+  } finally {
+    uploading.value = false
+  }
+}
+
+function serializeForm() {
+  return JSON.stringify({
+    bio: profileForm.bio,
+    sportIds: profileForm.favoriteSports.map((s) => s.id).sort(),
+  })
+}
 
 onMounted(async () => {
   setHeader({ title: t('settings.settings'), backRoute: '/' })
@@ -418,28 +517,17 @@ onMounted(async () => {
   try {
     const data = await userApi.getProfile()
     profile.value = data
-    profileForm.bio = data.bio || ''
+    profileForm.bio = (data.bio as unknown as string) || ''
     profileForm.favoriteSports = [...data.favoriteSports]
-    originalProfile.value = JSON.stringify(profileForm)
+    originalProfile.value = serializeForm()
   } catch (error) {
     console.error('Failed to load profile', error)
   }
 })
 
 const hasChanges = computed(() => {
-  return JSON.stringify(profileForm) !== originalProfile.value
+  return serializeForm() !== originalProfile.value
 })
-
-function addSport() {
-  const trimmed = newSport.value.trim()
-  if (trimmed && !profileForm.favoriteSports.includes(trimmed)) {
-    profileForm.favoriteSports.push(trimmed)
-    newSport.value = ''
-  }
-}
-function removeSport(sport: string) {
-  profileForm.favoriteSports = profileForm.favoriteSports.filter((s) => s !== sport)
-}
 
 // Language
 const localeLabels: Record<string, string> = {
@@ -508,16 +596,14 @@ async function saveProfile() {
   try {
     const updated = await userApi.updateProfile({
       bio: profileForm.bio,
-      favoriteSports: profileForm.favoriteSports,
+      favoriteSportIds: profileForm.favoriteSports.map((s) => s.id),
     })
     profile.value = updated
-    originalProfile.value = JSON.stringify(profileForm)
-    // show success message
+    profileForm.favoriteSports = [...updated.favoriteSports]
+    originalProfile.value = serializeForm()
   } catch (error: any) {
     console.error('Update failed', error)
-    // Show error
     profileError.value = error.message || 'Failed to update profile'
-    alert(error.message || 'Failed to update profile')
   } finally {
     saving.value = false
   }

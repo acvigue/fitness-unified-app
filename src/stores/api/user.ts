@@ -9,6 +9,7 @@ export type UserProfile = components['schemas']['UserProfileResponseDto']
 export type ProfilePicture = components['schemas']['UserProfilePictureDto']
 export type Session = components['schemas']['KeycloakSessionResponseDto']
 export type RevokeSessionsResponse = components['schemas']['RevokeSessionsResponseDto']
+export type MediaUploadResponse = components['schemas']['MediaUploadResponseDto']
 
 export const userApi = {
   async getProfile(): Promise<UserProfile> {
@@ -17,10 +18,30 @@ export const userApi = {
     return data
   },
 
-  async updateProfile(body: { bio?: string; favoriteSports?: string[] }): Promise<UserProfile> {
+  async updateProfile(body: { bio?: string; favoriteSportIds?: string[] }): Promise<UserProfile> {
     const { data, error } = await apiClient.PATCH('/v1/user/profile', { body })
     if (error) throw new Error(getErrorMessage(error, 'Failed to update profile'))
     return data
+  },
+
+  async uploadMedia(file: File): Promise<MediaUploadResponse> {
+    const authStore = useAuthStore()
+    const token = await authStore.getAccessToken()
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await fetch(`${ENV.apiBaseUrl}/v1/utils/media-upload`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    })
+    if (!response.ok) {
+      const body = await response.json().catch(() => null)
+      throw new Error(getErrorMessage(body, 'Failed to upload media'))
+    }
+    return response.json()
   },
 
   async getSessions(): Promise<Session[]> {
