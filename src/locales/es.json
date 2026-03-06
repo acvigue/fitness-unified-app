@@ -85,7 +85,16 @@
     "reporter": "Reportador",
     "reporteduser": "Usuario Reportado",
     "reason": "Razón",
-    "result": "Resultado"
+    "result": "Resultado",
+    "selectuser": "Seleccionar Usuario",
+    "searchusers": "Buscar usuarios...",
+    "noresults": "No se encontraron usuarios",
+    "reasonplaceholder": "Describe la razón de tu reporte...",
+    "success": "Reporte enviado exitosamente",
+    "error": "Error al enviar el reporte",
+    "yourreports": "Tus Reportes",
+    "loading": "Cargando reportes...",
+    "noreports": "No hay reportes enviados aún"
   },
   "workouts": {
     "workouts": "Entrenamientos"
