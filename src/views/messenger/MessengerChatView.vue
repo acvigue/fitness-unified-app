@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useMessengerStore } from '@/stores/messenger'
 import { userApi, type MediaUploadResponse } from '@/stores/api/user'
@@ -18,6 +18,7 @@ interface PendingAttachment {
 
 const { t } = useI18n()
 const route = useRoute()
+const router = useRouter()
 const messengerStore = useMessengerStore()
 const messageInput = ref('')
 const showSearchModal = ref(false)
@@ -56,6 +57,14 @@ const chatName = computed(() => {
 })
 
 const isGroup = computed(() => messengerStore.activeChat?.chat.type === 'GROUP')
+
+const otherUserId = computed(() => {
+  const chat = messengerStore.activeChat?.chat
+  if (!chat || chat.type === 'GROUP') return null
+  const other = chat.members.find((m) => m.id !== messengerStore.currentUserId)
+  return other?.id || null
+})
+
 
 const chatMessages = computed(() => {
   return messengerStore.activeMessages.map((msg) => ({
@@ -178,6 +187,15 @@ async function handleSearchSelect(hit: SearchMessageHit) {
       </RouterLink>
       <UAvatar :icon="isGroup ? 'i-lucide-users' : 'i-lucide-user'" size="sm" />
       <span class="font-medium text-sm flex-1">{{ chatName }}</span>
+
+      <UDropdown v-if="otherUserId" :items="profileDropdownItems">
+        <!-- <UButton icon="i-lucide-more-vertical" variant="ghost" color="neutral" size="sm" square /> -->
+        <UButton
+          v-if="otherUserId" icon="i-lucide-user" variant="ghost" color="neutral" size="sm" square
+          @click="router.push(`/profile/${otherUserId}`)"/>
+      </UDropdown>
+
+
       <UButton
         icon="i-lucide-search"
         variant="ghost"

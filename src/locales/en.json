@@ -75,7 +75,17 @@
     "dark": "Dark"
   },
   "profile": {
-    "profile": "Profile"
+    "profile": "Profile",
+    "userProfile": "User Profile",
+    "name": "Name",
+    "bio": "Bio",
+    "noBio": "No bio",
+    "favoriteSports": "Favorite Sports",
+    "noSports": "No favorite sports added.",
+    "tournaments": "Tournaments",
+    "nonePlayed": "None played yet.",
+    "achievements": "Achievements",
+    "noneEarned": "None earned yet."
   },
   "report": {
     "report": "Report",
@@ -105,6 +115,7 @@
     "noresults": "No users found",
     "searchmessages": "Search Messages",
     "searchplaceholder": "Search in conversation...",
-    "nosearchresults": "No messages found"
+    "nosearchresults": "No messages found",
+    "viewProfile": "View Profile"
   }
 }

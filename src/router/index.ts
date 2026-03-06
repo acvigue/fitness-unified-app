@@ -8,7 +8,8 @@ import MessengerView from '@/views/messenger/MessengerView.vue'
 import WorkoutsView from '@/views/WorkoutsView.vue'
 import ReportView from '@/views/ReportView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import UserReportView from "@/views/UserReportView.vue";
+import UserReportView from "@/views/UserReportView.vue"
+import UserProfileView from '@/views/UserProfileView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 
@@ -56,6 +57,12 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfileView,
+    },
+    {
+      path: '/profile/:userId',
+      name: 'user-profile',
+      component: UserProfileView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/report',

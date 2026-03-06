@@ -105,6 +105,7 @@
     "noresults": "No se encontraron usuarios",
     "searchmessages": "Buscar Mensajes",
     "searchplaceholder": "Buscar en la conversación...",
-    "nosearchresults": "No se encontraron mensajes"
+    "nosearchresults": "No se encontraron mensajes",
+    "viewProfile": "Ver perfil"
   }
 }
