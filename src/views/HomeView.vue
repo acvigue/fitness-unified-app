@@ -8,11 +8,11 @@
             This is a generic Vue 3 + TypeScript template with OAuth authentication and OpenAPI
             integration. Start building your app by modifying this home view.
           </p>
-          <div class="flex justify-center gap-3 pt-4">
+          <div class="flex justify-center gap-3 pt-4" ref="docref">
             <UButton icon="i-lucide-book-open" variant="soft" @click="openDocs">
               Documentation
             </UButton>
-            <UButton icon="i-lucide-settings" variant="soft" @click="openSettings">
+            <UButton icon="i-lucide-settings" variant="soft" @click="openSettings" ref="settingsref">
               Settings
             </UButton>
           </div>
@@ -23,17 +23,21 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, useTemplateRef, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useShepherd } from 'vue-shepherd'
+import { useGuideRefsStore } from '@/stores/guide'
 
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
-const testref = ref(null)
+const refStore = useGuideRefsStore()
+
+const docRef = useTemplateRef('docref')
+const settingsRef = useTemplateRef('settingsref')
 
 const tour = useShepherd({
   useModalOverlay: true,
@@ -60,8 +64,11 @@ onMounted(() => {
   setHeader({
     title: 'Home',
   })
+  console.log("ref value:")
+  console.log(refStore.getSidebar)
+
   tour.addStep({
-    attachTo: { element: testref.value, on: 'bottom' },
+    attachTo: { element: refStore.getSidebar, on: 'bottom' },
     buttons: [
       {
         action() {
@@ -74,6 +81,6 @@ onMounted(() => {
     text: 'Test step',
   })
 
-  //tour.start();
+  tour.start();
 })
 </script>
