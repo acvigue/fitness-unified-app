@@ -192,7 +192,7 @@ async function handleSearchSelect(hit: SearchMessageHit) {
         <!-- <UButton icon="i-lucide-more-vertical" variant="ghost" color="neutral" size="sm" square /> -->
         <UButton
           v-if="otherUserId" icon="i-lucide-user" variant="ghost" color="neutral" size="sm" square
-          @click="router.push(`/profile/${otherUserId}`)"/>
+          @click="router.push({ path: `/profile/${otherUserId}`, query: { name: chatName } })"/>
       </UDropdown>
 
 

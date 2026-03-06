@@ -15,6 +15,7 @@ const userId = computed(() => route.params.userId as string)
 const profile = ref<any>(null)
 const loading = ref(true)
 const error = ref('')
+const nameFromQuery = computed(() => route.query.name as string || '')
 
 onMounted(async () => {
   setHeader({ title: t('profile.userProfile') })
@@ -55,7 +56,7 @@ const primaryPicture = computed(() => {
       <div class="text-center">
         <p class="text-white/70 text-sm">{{ t('profile.name') }}</p>
         <p class="text-white text-lg font-medium">
-          {{ profile?.firstName }} {{ profile?.lastName }}
+          {{ nameFromQuery || profile?.name || profile?.username || 'User' }}
         </p>
       </div>
 
