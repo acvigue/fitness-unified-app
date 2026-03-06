@@ -12,6 +12,9 @@
             <UButton icon="i-lucide-book-open" variant="soft" @click="openDocs">
               Documentation
             </UButton>
+			<UButton icon="i-lucide-book-open" variant="soft" @click="openGuide">
+              Guide
+            </UButton>
             <UButton icon="i-lucide-settings" variant="soft" @click="openSettings" ref="settingsref">
               Settings
             </UButton>
@@ -59,6 +62,9 @@ const openDocs = () => {
 const openSettings = () => {
   router.push('/settings')
 }
+const openGuide = () => {
+  tour.start();
+}
 
 onMounted(() => {
   setHeader({
@@ -68,7 +74,7 @@ onMounted(() => {
   console.log(refStore.getSidebar)
 
   tour.addStep({
-    attachTo: { element: refStore.getSidebar, on: 'bottom' },
+    attachTo: { element: null, on: 'bottom' },
     buttons: [
       {
         action() {
@@ -77,10 +83,47 @@ onMounted(() => {
         secondary: true,
         text: 'Exit',
       },
+	  {
+		action() {
+		  return tour.next()
+		},
+		text: 'Next',
+	  }
     ],
-    text: 'Test step',
+    text: 'Welcome to FitTime!',
+  })
+  tour.addStep({
+    attachTo: { element: null, on: 'bottom' },
+    buttons: [
+      {
+        action() {
+          return tour.cancel()
+        },
+        secondary: true,
+        text: 'Exit',
+      },
+	  {
+		action() {
+		  return tour.next()
+		},
+		text: 'Next',
+	  }
+    ],
+    text: 'On the left you can find buttons to go to Home (where you are now), Messenger (where you can message your friends and teammates), Workouts, Profile (for managing what others see), and Reports (for reporting bad stuff).',
+  })
+  tour.addStep({
+    attachTo: { element: null, on: 'bottom' },
+    buttons: [
+	  {
+		action() {
+		  return tour.next()
+		},
+		text: 'Done',
+	  }
+    ],
+    text: 'At the very bottom left you can see the settings button.',
   })
 
-  tour.start();
+  
 })
 </script>
