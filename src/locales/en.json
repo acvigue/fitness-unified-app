@@ -89,13 +89,22 @@
   },
   "report": {
     "report": "Report",
-    "whichuser": "Which User are you reporting?",
+    "whichuser": "Which user are you reporting?",
     "whyreporting": "Why are you reporting this user?",
     "submit": "Submit Report",
     "reporter": "Reporter",
     "reporteduser": "Reported User",
     "reason": "Reason",
-    "result": "Result"
+    "result": "Result",
+    "selectuser": "Select User",
+    "searchusers": "Search users...",
+    "noresults": "No users found",
+    "reasonplaceholder": "Describe the reason for your report...",
+    "success": "Report submitted successfully",
+    "error": "Failed to submit report",
+    "yourreports": "Your Reports",
+    "loading": "Loading reports...",
+    "noreports": "No reports submitted yet"
   },
   "workouts": {
     "workouts": "Workouts"
