@@ -155,6 +155,26 @@
         </div>
       </UCard>
 
+      <!-- Light Section -->
+      <UCard class="bg-white/5">
+        <div class="flex flex-col gap-4">
+          <div>
+            <p class="text-xs uppercase tracking-[0.3em] text-white/60">
+              {{ t('settings.theme') }}
+            </p>
+            <p class="text-sm text-white/60">{{ t('settings.themeDesc') }}</p>
+          </div>
+          <USelectMenu
+            v-model="currentTheme"
+            :items="themeOptions"
+            value-key="value"
+            :searchable="false"
+            @update:model-value="changeTheme"
+          />
+        </div>
+      </UCard>
+
+
       <!-- Sessions Section -->
       <UCard class="bg-white/5">
         <div class="flex flex-col gap-4">
@@ -350,11 +370,26 @@ const profileError = ref('')
 const showSaveSuccess = ref(false)
 const showSaveInfo = ref(false)
 
+// Theme
+const themeOptions = computed(() => [
+  { label: t('settings.light'), value: 'light' },
+  { label: t('settings.dark'), value: 'dark' },
+])
+
+const currentTheme = ref(localStorage.getItem('theme') || 'dark')
+
+
 onMounted(() => {
   setHeader({
     title: t('settings.settings'),
     backRoute: '/',
   })
+  // Apply saved theme
+  if (currentTheme.value === 'dark') {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
 })
 
 const handleLogout = async () => {
@@ -596,4 +631,15 @@ async function saveProfile() {
     saving.value = false
   }
 }
+
+function changeTheme(value: string) {
+  currentTheme.value = value
+  localStorage.setItem('theme', value)
+  if (value === 'dark') {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+}
+
 </script>

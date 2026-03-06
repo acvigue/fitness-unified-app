@@ -68,7 +68,11 @@
     "language": "Idioma",
     "languageDesc": "Elige tu idioma preferido.",
     "cancel": "Cancelar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "theme": "Brillo",
+    "themeDesc": "Elige tu brillo preferido",
+    "light": "La luz",
+    "dark": "Oscuro"
   },
   "profile": {
     "profile": "Perfil"

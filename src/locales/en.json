@@ -68,7 +68,11 @@
     "language": "Language",
     "languageDesc": "Choose your preferred language.",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "theme": "Brightness",
+    "themeDesc": "Choose your preferred brightness",
+    "light": "Lighter",
+    "dark": "Dark"
   },
   "profile": {
     "profile": "Profile"
