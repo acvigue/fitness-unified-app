@@ -15,6 +15,7 @@ export function useNavigationItems() {
     { label: 'Messenger', icon: 'i-lucide-message-circle', to: '/messenger' },
     { label: 'Workouts', icon: 'i-lucide-dumbbell', to: '/workouts' },
     { label: 'Profile', icon: 'i-lucide-user', to: '/profile' },
+    { label: 'Report', icon: 'i-lucide-shield-ban', to: '/report' },
   ]
 
   const sidebarItems = computed(() =>
