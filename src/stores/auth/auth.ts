@@ -75,6 +75,25 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+
+  type UserInfo = {
+    sub: string
+    given_name?: string
+    family_name?: string
+    name?: string
+    email?: string
+    [key: string]: unknown
+  }
+  
+  const user = computed<UserInfo | null>(() => {
+    if (!accessToken.value) return null
+    try {
+      return jwtDecode<UserInfo>(accessToken.value)
+    } catch {
+      return null
+    }
+  })
+
   /**
    * Persist tokens to storage and update reactive state
    */
@@ -179,6 +198,7 @@ export const useAuthStore = defineStore('auth', () => {
     // State
     isLoggedIn,
     accessTokenExpired,
+    user,
 
     // Actions
     initialize,
