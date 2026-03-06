@@ -119,9 +119,17 @@
             </div>
           </UFormField>
 
+          <!-- Status messages -->
+          <p v-if="showSaveSuccess" class="text-green-500 text-sm mt-2">
+            Saved profile
+          </p>
+          <p v-if="showSaveInfo" class="text-red-500 text-sm mt-2">
+            • Need to change the profile
+          </p>
+          
           <!-- Save Button -->
           <div class="flex justify-end">
-            <UButton color="primary" :loading="saving" :disabled="!hasChanges" @click="saveProfile">
+            <UButton color="primary" :loading="saving" @click="saveProfile">
               {{ t('settings.saveProfile') }}
             </UButton>
           </div>
@@ -339,6 +347,8 @@ const appVersion = ENV.appVersion
 const appChannel = ENV.appChannel
 
 const profileError = ref('')
+const showSaveSuccess = ref(false)
+const showSaveInfo = ref(false)
 
 onMounted(() => {
   setHeader({
@@ -552,8 +562,16 @@ async function revokeAllSessions() {
 }
 
 async function saveProfile() {
-  saving.value = true
-  profileError.value = ''
+  profileError.value = '' 
+  showSaveSuccess.value = false
+  showSaveInfo.value = false
+  
+  if (!hasChanges.value) {
+    showSaveInfo.value = true
+    return
+  }
+
+  saving.value = true 
   try {
     // Send primary picture first (API treats first as primary)
     const sorted = [...profile.value.pictures].sort((a, b) =>
@@ -570,6 +588,7 @@ async function saveProfile() {
     profileForm.favoriteSports = [...updated.favoriteSports]
     pendingPictureIds.value = []
     originalProfile.value = serializeForm()
+    showSaveSuccess.value = true
   } catch (error: any) {
     console.error('Update failed', error)
     profileError.value = error.message || 'Failed to update profile'
