@@ -4,2365 +4,2433 @@
  */
 
 export interface paths {
-    "/v1/chats": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all chats for the authenticated user */
-        get: operations["ChatController_getUserChats_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/chats/create": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create a new chat (1-to-1 or group) */
-        post: operations["ChatController_createChat_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/chats/history/{chatId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get paginated message history for a chat */
-        get: operations["ChatController_getHistory_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/chats/search/{chatId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Search messages in a chat thread */
-        get: operations["ChatController_searchMessages_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/chats/send-message": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Send a message to a chat */
-        post: operations["ChatController_sendMessage_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Readiness probe */
-        get: operations["HealthController_getHealth_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List organizations */
-        get: operations["OrganizationController_findAll_v1"];
-        put?: never;
-        /** Create a new organization */
-        post: operations["OrganizationController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an organization by ID */
-        get: operations["OrganizationController_findOne_v1"];
-        put?: never;
-        post?: never;
-        /** Delete an organization (ADMIN only) */
-        delete: operations["OrganizationController_delete_v1"];
-        options?: never;
-        head?: never;
-        /** Update an organization (STAFF or ADMIN only) */
-        patch: operations["OrganizationController_update_v1"];
-        trace?: never;
-    };
-    "/v1/organizations/{id}/join": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Join an organization as MEMBER */
-        post: operations["OrganizationController_join_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations/{id}/leave": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Leave an organization */
-        post: operations["OrganizationController_leave_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/report": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create a new Report */
-        post: operations["ReportController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/report/all": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all reports */
-        get: operations["ReportController_findAll_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/report/user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all user reports */
-        get: operations["ReportController_findAllUserReports_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/report/status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Set a user report */
-        post: operations["ReportController_setReportStatus_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/sports": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all available sports */
-        get: operations["SportController_findAll_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/lookup": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Search users by email, name, or username */
-        get: operations["UserController_lookupUsers_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get current user information */
-        get: operations["UserController_getCurrentUser_v1"];
-        put?: never;
-        post?: never;
-        /** Permanently delete current user account */
-        delete: operations["UserController_deleteAccount_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/me/memberships": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get current user organization memberships */
-        get: operations["UserController_getMemberships_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get current user profile */
-        get: operations["UserController_getProfile_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Update current user profile */
-        patch: operations["UserController_updateProfile_v1"];
-        trace?: never;
-    };
-    "/v1/user/sessions/enrich": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Store refresh token for the current session to enable offline session revocation */
-        post: operations["UserController_enrichSession_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/sessions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List current user's identity provider sessions */
-        get: operations["UserController_getSessions_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/sessions/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Revoke a specific identity provider session */
-        delete: operations["UserController_revokeSession_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/sessions/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Revoke all of the current user's identity provider sessions */
-        post: operations["UserController_revokeAllSessions_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/me/deactivate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Deactivate current user account */
-        post: operations["UserController_deactivateAccount_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/utils/media-upload": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Upload a media file (image or video) to R2 storage */
-        post: operations["UtilsController_uploadMedia_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
+  '/v1/chats': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get all chats for the authenticated user */
+    get: operations['ChatController_getUserChats_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/chats/create': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create a new chat (1-to-1 or group) */
+    post: operations['ChatController_createChat_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/chats/history/{chatId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get paginated message history for a chat */
+    get: operations['ChatController_getHistory_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/chats/search/{chatId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Search messages in a chat thread */
+    get: operations['ChatController_searchMessages_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/chats/send-message': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Send a message to a chat */
+    post: operations['ChatController_sendMessage_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/health': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Readiness probe */
+    get: operations['HealthController_getHealth_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/organizations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List organizations */
+    get: operations['OrganizationController_findAll_v1']
+    put?: never
+    /** Create a new organization */
+    post: operations['OrganizationController_create_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/organizations/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get an organization by ID */
+    get: operations['OrganizationController_findOne_v1']
+    put?: never
+    post?: never
+    /** Delete an organization (ADMIN only) */
+    delete: operations['OrganizationController_delete_v1']
+    options?: never
+    head?: never
+    /** Update an organization (STAFF or ADMIN only) */
+    patch: operations['OrganizationController_update_v1']
+    trace?: never
+  }
+  '/v1/organizations/{id}/join': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Join an organization as MEMBER */
+    post: operations['OrganizationController_join_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/organizations/{id}/leave': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Leave an organization */
+    post: operations['OrganizationController_leave_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/report': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create a new Report */
+    post: operations['ReportController_create_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/report/all': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get all reports */
+    get: operations['ReportController_findAll_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/report/user': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get all user reports */
+    get: operations['ReportController_findAllUserReports_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/report/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Set a user report */
+    post: operations['ReportController_setReportStatus_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/sports': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List all available sports */
+    get: operations['SportController_findAll_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/user/lookup': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Search users by email, name, or username */
+    get: operations['UserController_lookupUsers_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/user/me': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get current user information */
+    get: operations['UserController_getCurrentUser_v1']
+    put?: never
+    post?: never
+    /** Permanently delete current user account */
+    delete: operations['UserController_deleteAccount_v1']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/user/me/memberships': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get current user organization memberships */
+    get: operations['UserController_getMemberships_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/user/profile': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get current user profile */
+    get: operations['UserController_getProfile_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Update current user profile */
+    patch: operations['UserController_updateProfile_v1']
+    trace?: never
+  }
+  '/v1/user/sessions/enrich': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Store refresh token for the current session to enable offline session revocation */
+    post: operations['UserController_enrichSession_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/user/sessions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List current user's identity provider sessions */
+    get: operations['UserController_getSessions_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/user/sessions/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Revoke a specific identity provider session */
+    delete: operations['UserController_revokeSession_v1']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/user/sessions/logout': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Revoke all of the current user's identity provider sessions */
+    post: operations['UserController_revokeAllSessions_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/user/me/deactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Deactivate current user account */
+    post: operations['UserController_deactivateAccount_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/utils/media-upload': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Upload a media file (image or video) to R2 storage */
+    post: operations['UtilsController_uploadMedia_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/sessions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations['SessionController_getSessions_v1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/sessions/{id}/revoke': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations['SessionController_revokeSession_v1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
-export type webhooks = Record<string, never>;
+export type webhooks = Record<string, never>
 export interface components {
-    schemas: {
-        ChatMemberDto: {
-            /**
-             * @description User ID
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            id: string;
-            /**
-             * @description Username
-             * @example john.doe
-             */
-            username?: Record<string, never>;
-            /**
-             * @description Display name
-             * @example John Doe
-             */
-            name?: Record<string, never>;
-        };
-        MessageSenderDto: {
-            /**
-             * @description Sender user ID
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            id: string;
-            /**
-             * @description Sender username
-             * @example john.doe
-             */
-            username?: Record<string, never>;
-            /**
-             * @description Sender display name
-             * @example John Doe
-             */
-            name?: Record<string, never>;
-        };
-        MediaAttachmentDto: {
-            /**
-             * @description Media asset ID
-             * @example cm1abc123def456
-             */
-            id: string;
-            /**
-             * @description Public URL
-             * @example https://assets.fittime.app/fittime/assets/cm1abc123def456.jpg
-             */
-            url: string;
-            /**
-             * @description MIME type
-             * @example image/jpeg
-             */
-            mimeType: string;
-        };
-        MessageResponseDto: {
-            /**
-             * @description Message ID
-             * @example clr1abc2d0001
-             */
-            id: string;
-            /**
-             * @description Chat ID this message belongs to
-             * @example clr1abc2d0000
-             */
-            chatId: string;
-            /** @description Sender information */
-            sender: components["schemas"]["MessageSenderDto"];
-            /**
-             * @description Message content
-             * @example Hey, want to work out today?
-             */
-            content: string;
-            /**
-             * @description Message type
-             * @example TEXT
-             * @enum {string}
-             */
-            type: "TEXT" | "IMAGE" | "VIDEO" | "FILE";
-            /**
-             * @description Media URL for non-text messages (legacy)
-             * @example https://cdn.example.com/img.jpg
-             */
-            mediaUrl?: Record<string, never>;
-            /** @description Attached media assets */
-            media: components["schemas"]["MediaAttachmentDto"][];
-            /**
-             * @description Whether the message has been read
-             * @example false
-             */
-            read: boolean;
-            /**
-             * Format: date-time
-             * @description Timestamp when the message was sent
-             */
-            createdAt: string;
-        };
-        UserChatResponseDto: {
-            /**
-             * @description Chat ID
-             * @example clr1abc2d0000
-             */
-            id: string;
-            /**
-             * @description Chat type
-             * @example DIRECT
-             * @enum {string}
-             */
-            type: "DIRECT" | "GROUP";
-            /**
-             * @description Chat name (null for direct chats)
-             * @example Gym Buddies
-             */
-            name?: Record<string, never>;
-            /**
-             * @description Creator user ID
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            creatorId: string;
-            /** @description Chat members */
-            members: components["schemas"]["ChatMemberDto"][];
-            /**
-             * Format: date-time
-             * @description Created timestamp
-             */
-            createdAt: string;
-            /** @description Most recent message in the chat */
-            lastMessage?: components["schemas"]["MessageResponseDto"];
-        };
-        ErrorResponseDto: {
-            /**
-             * @description HTTP status code
-             * @example 400
-             */
-            statusCode: number;
-            /**
-             * @description Error type/code
-             * @example BAD_REQUEST
-             */
-            error: string;
-            /**
-             * @description Human-readable error message
-             * @example Invalid request parameters
-             */
-            message: string;
-            /**
-             * @description Detailed validation errors or additional context
-             * @example [
-             *       "field must be a string",
-             *       "value is required"
-             *     ]
-             */
-            details?: string[];
-            /**
-             * @description Request path that caused the error
-             * @example /v1/resource/abc123
-             */
-            path?: string;
-            /**
-             * @description Timestamp when the error occurred
-             * @example 2025-12-26T12:00:00.000Z
-             */
-            timestamp?: string;
-        };
-        CreateChatDto: {
-            /**
-             * @description List of user IDs to include in the chat (excluding the creator, who is auto-added)
-             * @example [
-             *       "user-id-1",
-             *       "user-id-2"
-             *     ]
-             */
-            recipientIds: string[];
-            /**
-             * @description Chat name (required for group chats with 2+ recipients, ignored for 1-to-1)
-             * @example Gym Buddies
-             */
-            name?: string;
-        };
-        ChatResponseDto: {
-            /**
-             * @description Chat ID
-             * @example clr1abc2d0000
-             */
-            id: string;
-            /**
-             * @description Chat type
-             * @example DIRECT
-             * @enum {string}
-             */
-            type: "DIRECT" | "GROUP";
-            /**
-             * @description Chat name (null for direct chats)
-             * @example Gym Buddies
-             */
-            name?: Record<string, never>;
-            /**
-             * @description Creator user ID
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            creatorId: string;
-            /** @description Chat members */
-            members: components["schemas"]["ChatMemberDto"][];
-            /**
-             * Format: date-time
-             * @description Created timestamp
-             */
-            createdAt: string;
-        };
-        PaginationMetaDto: {
-            /**
-             * @description Current page number
-             * @example 1
-             */
-            page: number;
-            /**
-             * @description Items per page
-             * @example 20
-             */
-            per_page: number;
-            /**
-             * @description Total number of items
-             * @example 100
-             */
-            total: number;
-            /**
-             * @description Total number of pages
-             * @example 5
-             */
-            total_pages: number;
-        };
-        ChatHistoryResponseDto: {
-            data: components["schemas"]["MessageResponseDto"][];
-            meta: components["schemas"]["PaginationMetaDto"];
-        };
-        SearchMessageHitDto: {
-            /**
-             * @description Message ID
-             * @example clr1abc2d0001
-             */
-            id: string;
-            /**
-             * @description Message content
-             * @example Hey, want to work out today?
-             */
-            content: string;
-            /**
-             * @description Sender display name or username
-             * @example John Doe
-             */
-            senderName: string;
-            /**
-             * @description Sender user ID
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            senderId: string;
-            /**
-             * Format: date-time
-             * @description Timestamp when the message was sent
-             */
-            createdAt: string;
-            /**
-             * @description Zero-based index of this message in the full history (ordered by createdAt DESC)
-             * @example 127
-             */
-            index: number;
-            /**
-             * @description Page number where this message appears (based on per_page)
-             * @example 3
-             */
-            page: number;
-        };
-        SearchMessagesResponseDto: {
-            hits: components["schemas"]["SearchMessageHitDto"][];
-            /**
-             * @description Total number of matching messages
-             * @example 5
-             */
-            total: number;
-        };
-        SendMessageDto: {
-            /**
-             * @description Chat ID to send the message to
-             * @example clr1abc2d0000
-             */
-            chatId: string;
-            /**
-             * @description Message content
-             * @example Hey, want to work out today?
-             */
-            content: string;
-            /**
-             * @description List of media asset IDs to attach (uploaded via /v1/utils/media-upload)
-             * @example [
-             *       "cm1abc123def456"
-             *     ]
-             */
-            mediaIds?: string[];
-        };
-        HealthResponseDto: {
-            /**
-             * @description Overall health status of the service
-             * @example ok
-             * @enum {string}
-             */
-            status: "ok" | "degraded";
-            /**
-             * Format: date-time
-             * @description ISO timestamp when the health check was performed
-             * @example 2025-12-24T22:00:00.000Z
-             */
-            timestamp: string;
-            /**
-             * @description Database connection status
-             * @example up
-             * @enum {string}
-             */
-            database: "up" | "error";
-        };
-        CreateOrganizationDto: {
-            /**
-             * @description Organization name
-             * @example Acme Corp
-             */
-            name: string;
-        };
-        OrganizationResponseDto: {
-            /**
-             * @description Organization ID
-             * @example clr1abc2d0000
-             */
-            id: string;
-            /**
-             * @description Organization name
-             * @example Acme Corp
-             */
-            name?: Record<string, never>;
-            /**
-             * @description Number of members
-             * @example 5
-             */
-            memberCount: number;
-            /**
-             * Format: date-time
-             * @description Created timestamp
-             */
-            createdAt: string;
-            /**
-             * Format: date-time
-             * @description Updated timestamp
-             */
-            updatedAt: string;
-        };
-        PaginatedOrganizationResponseDto: {
-            data: components["schemas"]["OrganizationResponseDto"][];
-            meta: components["schemas"]["PaginationMetaDto"];
-        };
-        UpdateOrganizationDto: {
-            /**
-             * @description Organization name
-             * @example Acme Corp
-             */
-            name?: string;
-        };
-        OrganizationMemberResponseDto: {
-            /** @description Membership ID */
-            id: string;
-            /** @description User ID */
-            userId: string;
-            /** @description Organization ID */
-            organizationId: string;
-            /**
-             * @description Member role
-             * @enum {string}
-             */
-            role: "MEMBER" | "STAFF" | "ADMIN";
-            /**
-             * Format: date-time
-             * @description Joined timestamp
-             */
-            createdAt: string;
-        };
-        ReportResponseDto: {
-            /**
-             * @description Reporter User ID
-             * @example wejfe023r2343
-             */
-            reporterId: string;
-            /**
-             * @description Reported User ID
-             * @example wejfe023r2343
-             */
-            reportedId: string;
-            /**
-             * @description Reason For Report
-             * @example They Harassed Me
-             */
-            reason: string;
-            /**
-             * @description Status
-             * @example Banned
-             */
-            status: string;
-            /**
-             * Format: date-time
-             * @description Created timestamp
-             */
-            createdAt: string;
-        };
-        SportResponseDto: {
-            /**
-             * @description Sport ID (UUID)
-             * @example a1b2c3d4-0001-4000-8000-000000000001
-             */
-            id: string;
-            /**
-             * @description Sport name
-             * @example Running
-             */
-            name: string;
-            /**
-             * @description Sport icon emoji
-             * @example 🏃
-             */
-            icon?: Record<string, never>;
-        };
-        UserLookupItemDto: {
-            /**
-             * @description User ID
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            id: string;
-            /**
-             * @description Username
-             * @example john.doe
-             */
-            username?: Record<string, never>;
-            /**
-             * @description Display name
-             * @example John Doe
-             */
-            name?: Record<string, never>;
-            /**
-             * @description Email address
-             * @example john@example.com
-             */
-            email?: Record<string, never>;
-        };
-        UserLookupResponseDto: {
-            /** @description Matching users */
-            users: components["schemas"]["UserLookupItemDto"][];
-        };
-        UserResponseDto: {
-            /**
-             * @description User subject identifier from the identity provider
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            sub: string;
-            /**
-             * @description Username or preferred username
-             * @example john.doe
-             */
-            username?: string;
-            /**
-             * @description Full name of the user
-             * @example John Doe
-             */
-            name?: string;
-            /**
-             * Format: email
-             * @description Email address of the user
-             * @example john.doe@example.com
-             */
-            email?: string;
-            /**
-             * @description List of user scopes/permissions
-             * @example [
-             *       "read",
-             *       "write"
-             *     ]
-             */
-            scopes: Record<string, never>[][];
-        };
-        UserMembershipResponseDto: {
-            /**
-             * @description Membership ID
-             * @example clr1abc2d0000
-             */
-            id: string;
-            /**
-             * @description Organization ID
-             * @example clr1abc2d0001
-             */
-            organizationId: string;
-            /**
-             * @description Organization name
-             * @example Acme Corp
-             */
-            organizationName?: Record<string, never>;
-            /**
-             * @description Member role
-             * @example MEMBER
-             * @enum {string}
-             */
-            role: "MEMBER" | "STAFF" | "ADMIN";
-            /**
-             * Format: date-time
-             * @description Joined timestamp
-             */
-            joinedAt: string;
-        };
-        UserProfilePictureDto: {
-            /**
-             * @description Picture ID
-             * @example clr1abc2d0000
-             */
-            id: string;
-            /**
-             * @description Picture URL
-             * @example https://example.com/photo.jpg
-             */
-            url: string;
-            /**
-             * @description Alt text
-             * @example Profile photo
-             */
-            alt?: string;
-            /**
-             * @description Whether this is the primary picture
-             * @example true
-             */
-            isPrimary: boolean;
-        };
-        UserProfileResponseDto: {
-            /**
-             * @description User ID
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            userId: string;
-            /**
-             * @description User bio
-             * @example Fitness enthusiast
-             */
-            bio?: Record<string, never>;
-            /** @description Favorite sports */
-            favoriteSports: components["schemas"]["SportResponseDto"][];
-            /** @description Profile pictures */
-            pictures: components["schemas"]["UserProfilePictureDto"][];
-        };
-        UpdateUserProfileDto: {
-            /**
-             * @description User bio
-             * @example Fitness enthusiast
-             */
-            bio?: string;
-            /**
-             * @description List of sport IDs (UUIDs)
-             * @example [
-             *       "a1b2c3d4-0001-4000-8000-000000000001"
-             *     ]
-             */
-            favoriteSportIds?: string[];
-            /**
-             * @description List of media IDs to use as profile pictures (first is primary)
-             * @example [
-             *       "clr1abc2d0000"
-             *     ]
-             */
-            pictureIds?: string[];
-        };
-        EnrichSessionDto: {
-            /** @description The refresh token for the current session */
-            refreshToken: string;
-        };
-        EnrichSessionResponseDto: {
-            /**
-             * @description Whether the session was enriched
-             * @example true
-             */
-            success: boolean;
-            /**
-             * @description The session ID that was enriched
-             * @example abc123-def456
-             */
-            sessionId: string;
-        };
-        KeycloakSessionClientDto: {
-            /**
-             * @description Client ID
-             * @example account
-             */
-            clientId: string;
-            /**
-             * @description Client display name
-             * @example Account Console
-             */
-            clientName: string;
-        };
-        KeycloakSessionResponseDto: {
-            /**
-             * @description Keycloak session ID
-             * @example abc123-def456-789
-             */
-            id: string;
-            /**
-             * @description Username associated with the session
-             * @example john.doe
-             */
-            username: string;
-            /**
-             * @description IP address of the session
-             * @example 192.168.1.100
-             */
-            ipAddress: string;
-            /**
-             * @description Session start time
-             * @example 2025-01-01T00:00:00.000Z
-             */
-            startedAt: string;
-            /**
-             * @description Last access time
-             * @example 2025-01-01T12:00:00.000Z
-             */
-            lastAccessedAt: string;
-            /** @description Clients active in this session */
-            clients: components["schemas"]["KeycloakSessionClientDto"][];
-            /**
-             * @description Whether "remember me" was used
-             * @example false
-             */
-            rememberMe: boolean;
-            /**
-             * @description Whether this is an offline session
-             * @example false
-             */
-            offline: boolean;
-            /**
-             * @description Whether this session can be individually revoked
-             * @example true
-             */
-            revocable: boolean;
-            /**
-             * @description Whether this is the session making the request
-             * @example false
-             */
-            thisSession: boolean;
-        };
-        RevokeSessionsResponseDto: {
-            /**
-             * @description Whether the logout was successful
-             * @example true
-             */
-            success: boolean;
-            /**
-             * @description Human-readable message
-             * @example All sessions have been revoked
-             */
-            message: string;
-        };
-        DeactivateAccountResponseDto: {
-            /**
-             * @description Whether the deactivation was successful
-             * @example true
-             */
-            success: boolean;
-            /**
-             * @description Human-readable message
-             * @example Account has been deactivated
-             */
-            message: string;
-        };
-        DeleteAccountResponseDto: {
-            /**
-             * @description Whether the deletion was successful
-             * @example true
-             */
-            success: boolean;
-            /**
-             * @description Human-readable message
-             * @example Account has been permanently deleted
-             */
-            message: string;
-        };
-        MediaUploadResponseDto: {
-            /**
-             * @description Media UUID
-             * @example cm1abc123def456
-             */
-            id: string;
-            /**
-             * @description Public URL of the uploaded file
-             * @example https://assets.fittime.app/fittime/assets/cm1abc123def456
-             */
-            url: string;
-            /**
-             * @description MIME type of the file
-             * @example image/png
-             */
-            mimeType: string;
-            /**
-             * @description File size in bytes
-             * @example 102400
-             */
-            size: number;
-        };
-    };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+  schemas: {
+    ChatMemberDto: {
+      /**
+       * @description User ID
+       * @example auth0|507f1f77bcf86cd799439011
+       */
+      id: string
+      /**
+       * @description Username
+       * @example john.doe
+       */
+      username?: Record<string, never>
+      /**
+       * @description Display name
+       * @example John Doe
+       */
+      name?: Record<string, never>
+    }
+    MessageSenderDto: {
+      /**
+       * @description Sender user ID
+       * @example auth0|507f1f77bcf86cd799439011
+       */
+      id: string
+      /**
+       * @description Sender username
+       * @example john.doe
+       */
+      username?: Record<string, never>
+      /**
+       * @description Sender display name
+       * @example John Doe
+       */
+      name?: Record<string, never>
+    }
+    MediaAttachmentDto: {
+      /**
+       * @description Media asset ID
+       * @example cm1abc123def456
+       */
+      id: string
+      /**
+       * @description Public URL
+       * @example https://assets.fittime.app/fittime/assets/cm1abc123def456.jpg
+       */
+      url: string
+      /**
+       * @description MIME type
+       * @example image/jpeg
+       */
+      mimeType: string
+    }
+    MessageResponseDto: {
+      /**
+       * @description Message ID
+       * @example clr1abc2d0001
+       */
+      id: string
+      /**
+       * @description Chat ID this message belongs to
+       * @example clr1abc2d0000
+       */
+      chatId: string
+      /** @description Sender information */
+      sender: components['schemas']['MessageSenderDto']
+      /**
+       * @description Message content
+       * @example Hey, want to work out today?
+       */
+      content: string
+      /**
+       * @description Message type
+       * @example TEXT
+       * @enum {string}
+       */
+      type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'FILE'
+      /**
+       * @description Media URL for non-text messages (legacy)
+       * @example https://cdn.example.com/img.jpg
+       */
+      mediaUrl?: Record<string, never>
+      /** @description Attached media assets */
+      media: components['schemas']['MediaAttachmentDto'][]
+      /**
+       * @description Whether the message has been read
+       * @example false
+       */
+      read: boolean
+      /**
+       * Format: date-time
+       * @description Timestamp when the message was sent
+       */
+      createdAt: string
+    }
+    UserChatResponseDto: {
+      /**
+       * @description Chat ID
+       * @example clr1abc2d0000
+       */
+      id: string
+      /**
+       * @description Chat type
+       * @example DIRECT
+       * @enum {string}
+       */
+      type: 'DIRECT' | 'GROUP'
+      /**
+       * @description Chat name (null for direct chats)
+       * @example Gym Buddies
+       */
+      name?: Record<string, never>
+      /**
+       * @description Creator user ID
+       * @example auth0|507f1f77bcf86cd799439011
+       */
+      creatorId: string
+      /** @description Chat members */
+      members: components['schemas']['ChatMemberDto'][]
+      /**
+       * Format: date-time
+       * @description Created timestamp
+       */
+      createdAt: string
+      /** @description Most recent message in the chat */
+      lastMessage?: components['schemas']['MessageResponseDto']
+    }
+    ErrorResponseDto: {
+      /**
+       * @description HTTP status code
+       * @example 400
+       */
+      statusCode: number
+      /**
+       * @description Error type/code
+       * @example BAD_REQUEST
+       */
+      error: string
+      /**
+       * @description Human-readable error message
+       * @example Invalid request parameters
+       */
+      message: string
+      /**
+       * @description Detailed validation errors or additional context
+       * @example [
+       *       "field must be a string",
+       *       "value is required"
+       *     ]
+       */
+      details?: string[]
+      /**
+       * @description Request path that caused the error
+       * @example /v1/resource/abc123
+       */
+      path?: string
+      /**
+       * @description Timestamp when the error occurred
+       * @example 2025-12-26T12:00:00.000Z
+       */
+      timestamp?: string
+    }
+    CreateChatDto: {
+      /**
+       * @description List of user IDs to include in the chat (excluding the creator, who is auto-added)
+       * @example [
+       *       "user-id-1",
+       *       "user-id-2"
+       *     ]
+       */
+      recipientIds: string[]
+      /**
+       * @description Chat name (required for group chats with 2+ recipients, ignored for 1-to-1)
+       * @example Gym Buddies
+       */
+      name?: string
+    }
+    ChatResponseDto: {
+      /**
+       * @description Chat ID
+       * @example clr1abc2d0000
+       */
+      id: string
+      /**
+       * @description Chat type
+       * @example DIRECT
+       * @enum {string}
+       */
+      type: 'DIRECT' | 'GROUP'
+      /**
+       * @description Chat name (null for direct chats)
+       * @example Gym Buddies
+       */
+      name?: Record<string, never>
+      /**
+       * @description Creator user ID
+       * @example auth0|507f1f77bcf86cd799439011
+       */
+      creatorId: string
+      /** @description Chat members */
+      members: components['schemas']['ChatMemberDto'][]
+      /**
+       * Format: date-time
+       * @description Created timestamp
+       */
+      createdAt: string
+    }
+    PaginationMetaDto: {
+      /**
+       * @description Current page number
+       * @example 1
+       */
+      page: number
+      /**
+       * @description Items per page
+       * @example 20
+       */
+      per_page: number
+      /**
+       * @description Total number of items
+       * @example 100
+       */
+      total: number
+      /**
+       * @description Total number of pages
+       * @example 5
+       */
+      total_pages: number
+    }
+    ChatHistoryResponseDto: {
+      data: components['schemas']['MessageResponseDto'][]
+      meta: components['schemas']['PaginationMetaDto']
+    }
+    SearchMessageHitDto: {
+      /**
+       * @description Message ID
+       * @example clr1abc2d0001
+       */
+      id: string
+      /**
+       * @description Message content
+       * @example Hey, want to work out today?
+       */
+      content: string
+      /**
+       * @description Sender display name or username
+       * @example John Doe
+       */
+      senderName: string
+      /**
+       * @description Sender user ID
+       * @example auth0|507f1f77bcf86cd799439011
+       */
+      senderId: string
+      /**
+       * Format: date-time
+       * @description Timestamp when the message was sent
+       */
+      createdAt: string
+      /**
+       * @description Zero-based index of this message in the full history (ordered by createdAt DESC)
+       * @example 127
+       */
+      index: number
+      /**
+       * @description Page number where this message appears (based on per_page)
+       * @example 3
+       */
+      page: number
+    }
+    SearchMessagesResponseDto: {
+      hits: components['schemas']['SearchMessageHitDto'][]
+      /**
+       * @description Total number of matching messages
+       * @example 5
+       */
+      total: number
+    }
+    SendMessageDto: {
+      /**
+       * @description Chat ID to send the message to
+       * @example clr1abc2d0000
+       */
+      chatId: string
+      /**
+       * @description Message content
+       * @example Hey, want to work out today?
+       */
+      content: string
+      /**
+       * @description List of media asset IDs to attach (uploaded via /v1/utils/media-upload)
+       * @example [
+       *       "cm1abc123def456"
+       *     ]
+       */
+      mediaIds?: string[]
+    }
+    HealthResponseDto: {
+      /**
+       * @description Overall health status of the service
+       * @example ok
+       * @enum {string}
+       */
+      status: 'ok' | 'degraded'
+      /**
+       * Format: date-time
+       * @description ISO timestamp when the health check was performed
+       * @example 2025-12-24T22:00:00.000Z
+       */
+      timestamp: string
+      /**
+       * @description Database connection status
+       * @example up
+       * @enum {string}
+       */
+      database: 'up' | 'error'
+    }
+    CreateOrganizationDto: {
+      /**
+       * @description Organization name
+       * @example Acme Corp
+       */
+      name: string
+    }
+    OrganizationResponseDto: {
+      /**
+       * @description Organization ID
+       * @example clr1abc2d0000
+       */
+      id: string
+      /**
+       * @description Organization name
+       * @example Acme Corp
+       */
+      name?: Record<string, never>
+      /**
+       * @description Number of members
+       * @example 5
+       */
+      memberCount: number
+      /**
+       * Format: date-time
+       * @description Created timestamp
+       */
+      createdAt: string
+      /**
+       * Format: date-time
+       * @description Updated timestamp
+       */
+      updatedAt: string
+    }
+    PaginatedOrganizationResponseDto: {
+      data: components['schemas']['OrganizationResponseDto'][]
+      meta: components['schemas']['PaginationMetaDto']
+    }
+    UpdateOrganizationDto: {
+      /**
+       * @description Organization name
+       * @example Acme Corp
+       */
+      name?: string
+    }
+    OrganizationMemberResponseDto: {
+      /** @description Membership ID */
+      id: string
+      /** @description User ID */
+      userId: string
+      /** @description Organization ID */
+      organizationId: string
+      /**
+       * @description Member role
+       * @enum {string}
+       */
+      role: 'MEMBER' | 'STAFF' | 'ADMIN'
+      /**
+       * Format: date-time
+       * @description Joined timestamp
+       */
+      createdAt: string
+    }
+    ReportResponseDto: {
+      /**
+       * @description Reporter User ID
+       * @example wejfe023r2343
+       */
+      reporterId: string
+      /**
+       * @description Reported User ID
+       * @example wejfe023r2343
+       */
+      reportedId: string
+      /**
+       * @description Reason For Report
+       * @example They Harassed Me
+       */
+      reason?: Record<string, never>
+      /**
+       * @description Status
+       * @example Banned
+       */
+      status: string
+      /**
+       * Format: date-time
+       * @description Created timestamp
+       */
+      createdAt: string
+    }
+    SportResponseDto: {
+      /**
+       * @description Sport ID (UUID)
+       * @example a1b2c3d4-0001-4000-8000-000000000001
+       */
+      id: string
+      /**
+       * @description Sport name
+       * @example Running
+       */
+      name: string
+      /**
+       * @description Sport icon emoji
+       * @example 🏃
+       */
+      icon?: Record<string, never>
+    }
+    UserLookupItemDto: {
+      /**
+       * @description User ID
+       * @example auth0|507f1f77bcf86cd799439011
+       */
+      id: string
+      /**
+       * @description Username
+       * @example john.doe
+       */
+      username?: Record<string, never>
+      /**
+       * @description Display name
+       * @example John Doe
+       */
+      name?: Record<string, never>
+      /**
+       * @description Email address
+       * @example john@example.com
+       */
+      email?: Record<string, never>
+    }
+    UserLookupResponseDto: {
+      /** @description Matching users */
+      users: components['schemas']['UserLookupItemDto'][]
+    }
+    UserResponseDto: {
+      /**
+       * @description User subject identifier from the identity provider
+       * @example auth0|507f1f77bcf86cd799439011
+       */
+      sub: string
+      /**
+       * @description Username or preferred username
+       * @example john.doe
+       */
+      username?: string
+      /**
+       * @description Full name of the user
+       * @example John Doe
+       */
+      name?: string
+      /**
+       * Format: email
+       * @description Email address of the user
+       * @example john.doe@example.com
+       */
+      email?: string
+      /**
+       * @description List of user scopes/permissions
+       * @example [
+       *       "read",
+       *       "write"
+       *     ]
+       */
+      scopes: Record<string, never>[][]
+    }
+    UserMembershipResponseDto: {
+      /**
+       * @description Membership ID
+       * @example clr1abc2d0000
+       */
+      id: string
+      /**
+       * @description Organization ID
+       * @example clr1abc2d0001
+       */
+      organizationId: string
+      /**
+       * @description Organization name
+       * @example Acme Corp
+       */
+      organizationName?: Record<string, never>
+      /**
+       * @description Member role
+       * @example MEMBER
+       * @enum {string}
+       */
+      role: 'MEMBER' | 'STAFF' | 'ADMIN'
+      /**
+       * Format: date-time
+       * @description Joined timestamp
+       */
+      joinedAt: string
+    }
+    UserProfilePictureDto: {
+      /**
+       * @description Picture ID
+       * @example clr1abc2d0000
+       */
+      id: string
+      /**
+       * @description Picture URL
+       * @example https://example.com/photo.jpg
+       */
+      url: string
+      /**
+       * @description Alt text
+       * @example Profile photo
+       */
+      alt?: string
+      /**
+       * @description Whether this is the primary picture
+       * @example true
+       */
+      isPrimary: boolean
+    }
+    UserProfileResponseDto: {
+      /**
+       * @description User ID
+       * @example auth0|507f1f77bcf86cd799439011
+       */
+      userId: string
+      /**
+       * @description User bio
+       * @example Fitness enthusiast
+       */
+      bio?: Record<string, never>
+      /** @description Favorite sports */
+      favoriteSports: components['schemas']['SportResponseDto'][]
+      /** @description Profile pictures */
+      pictures: components['schemas']['UserProfilePictureDto'][]
+    }
+    UpdateUserProfileDto: {
+      /**
+       * @description User bio
+       * @example Fitness enthusiast
+       */
+      bio?: string
+      /**
+       * @description List of sport IDs (UUIDs)
+       * @example [
+       *       "a1b2c3d4-0001-4000-8000-000000000001"
+       *     ]
+       */
+      favoriteSportIds?: string[]
+      /**
+       * @description List of media IDs to use as profile pictures (first is primary)
+       * @example [
+       *       "clr1abc2d0000"
+       *     ]
+       */
+      pictureIds?: string[]
+    }
+    EnrichSessionDto: {
+      /** @description The refresh token for the current session */
+      refreshToken: string
+    }
+    EnrichSessionResponseDto: {
+      /**
+       * @description Whether the session was enriched
+       * @example true
+       */
+      success: boolean
+      /**
+       * @description The session ID that was enriched
+       * @example abc123-def456
+       */
+      sessionId: string
+    }
+    KeycloakSessionClientDto: {
+      /**
+       * @description Client ID
+       * @example account
+       */
+      clientId: string
+      /**
+       * @description Client display name
+       * @example Account Console
+       */
+      clientName: string
+    }
+    KeycloakSessionResponseDto: {
+      /**
+       * @description Keycloak session ID
+       * @example abc123-def456-789
+       */
+      id: string
+      /**
+       * @description Username associated with the session
+       * @example john.doe
+       */
+      username: string
+      /**
+       * @description IP address of the session
+       * @example 192.168.1.100
+       */
+      ipAddress: string
+      /**
+       * @description Session start time
+       * @example 2025-01-01T00:00:00.000Z
+       */
+      startedAt: string
+      /**
+       * @description Last access time
+       * @example 2025-01-01T12:00:00.000Z
+       */
+      lastAccessedAt: string
+      /** @description Clients active in this session */
+      clients: components['schemas']['KeycloakSessionClientDto'][]
+      /**
+       * @description Whether "remember me" was used
+       * @example false
+       */
+      rememberMe: boolean
+      /**
+       * @description Whether this is an offline session
+       * @example false
+       */
+      offline: boolean
+      /**
+       * @description Whether this session can be individually revoked
+       * @example true
+       */
+      revocable: boolean
+      /**
+       * @description Whether this is the session making the request
+       * @example false
+       */
+      thisSession: boolean
+    }
+    RevokeSessionsResponseDto: {
+      /**
+       * @description Whether the logout was successful
+       * @example true
+       */
+      success: boolean
+      /**
+       * @description Human-readable message
+       * @example All sessions have been revoked
+       */
+      message: string
+    }
+    DeactivateAccountResponseDto: {
+      /**
+       * @description Whether the deactivation was successful
+       * @example true
+       */
+      success: boolean
+      /**
+       * @description Human-readable message
+       * @example Account has been deactivated
+       */
+      message: string
+    }
+    DeleteAccountResponseDto: {
+      /**
+       * @description Whether the deletion was successful
+       * @example true
+       */
+      success: boolean
+      /**
+       * @description Human-readable message
+       * @example Account has been permanently deleted
+       */
+      message: string
+    }
+    MediaUploadResponseDto: {
+      /**
+       * @description Media UUID
+       * @example cm1abc123def456
+       */
+      id: string
+      /**
+       * @description Public URL of the uploaded file
+       * @example https://assets.fittime.app/fittime/assets/cm1abc123def456
+       */
+      url: string
+      /**
+       * @description MIME type of the file
+       * @example image/png
+       */
+      mimeType: string
+      /**
+       * @description File size in bytes
+       * @example 102400
+       */
+      size: number
+    }
+  }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
 }
-export type $defs = Record<string, never>;
+export type $defs = Record<string, never>
 export interface operations {
-    ChatController_getUserChats_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserChatResponseDto"][];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    ChatController_createChat_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateChatDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChatResponseDto"];
-                };
-            };
-            /** @description Bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    ChatController_getHistory_v1: {
-        parameters: {
-            query?: {
-                per_page?: number;
-                page?: number;
-            };
-            header?: never;
-            path: {
-                chatId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChatHistoryResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Access denied */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    ChatController_searchMessages_v1: {
-        parameters: {
-            query: {
-                /** @description Page size used by history endpoint (for page calculation) */
-                per_page?: number;
-                /** @description Max results (1-50) */
-                limit?: number;
-                /** @description Search query */
-                q: string;
-            };
-            header?: never;
-            path: {
-                chatId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SearchMessagesResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Access denied */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    ChatController_sendMessage_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SendMessageDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageResponseDto"];
-                };
-            };
-            /** @description Bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Access denied */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    HealthController_getHealth_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Health check successful */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HealthResponseDto"];
-                };
-            };
-        };
-    };
-    OrganizationController_findAll_v1: {
-        parameters: {
-            query?: {
-                per_page?: number;
-                page?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedOrganizationResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    OrganizationController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateOrganizationDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrganizationResponseDto"];
-                };
-            };
-            /** @description Bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    OrganizationController_findOne_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrganizationResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    OrganizationController_delete_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Organization deleted */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Insufficient role — requires ADMIN */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    OrganizationController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateOrganizationDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrganizationResponseDto"];
-                };
-            };
-            /** @description Bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Insufficient role — requires STAFF or ADMIN */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    OrganizationController_join_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrganizationMemberResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Already a member */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    OrganizationController_leave_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Left the organization */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Not a member of this organization */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    ReportController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReportResponseDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReportResponseDto"];
-                };
-            };
-        };
-    };
-    ReportController_findAll_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReportResponseDto"];
-                };
-            };
-        };
-    };
-    ReportController_findAllUserReports_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReportResponseDto"];
-                };
-            };
-        };
-    };
-    ReportController_setReportStatus_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReportResponseDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReportResponseDto"];
-                };
-            };
-        };
-    };
-    SportController_findAll_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SportResponseDto"][];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_lookupUsers_v1: {
-        parameters: {
-            query: {
-                /** @description Search term to look up users by email, name, or username */
-                q: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserLookupResponseDto"];
-                };
-            };
-            /** @description Bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_getCurrentUser_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_deleteAccount_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DeleteAccountResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_getMemberships_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserMembershipResponseDto"][];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_getProfile_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserProfileResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_updateProfile_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateUserProfileDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserProfileResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_enrichSession_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EnrichSessionDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EnrichSessionResponseDto"];
-                };
-            };
-            /** @description Bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_getSessions_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["KeycloakSessionResponseDto"][];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_revokeSession_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Session revoked */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_revokeAllSessions_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RevokeSessionsResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_deactivateAccount_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DeactivateAccountResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
-    UtilsController_uploadMedia_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": {
-                    /**
-                     * Format: binary
-                     * @description Image or video file (max 10 MB)
-                     */
-                    file: string;
-                };
-            };
-        };
-        responses: {
-            /** @description File uploaded successfully */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MediaUploadResponseDto"];
-                };
-            };
-            /** @description Unauthorized - invalid or missing token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponseDto"];
-                };
-            };
-        };
-    };
+  ChatController_getUserChats_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserChatResponseDto'][]
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  ChatController_createChat_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateChatDto']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ChatResponseDto']
+        }
+      }
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  ChatController_getHistory_v1: {
+    parameters: {
+      query?: {
+        per_page?: number
+        page?: number
+      }
+      header?: never
+      path: {
+        chatId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ChatHistoryResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Access denied */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  ChatController_searchMessages_v1: {
+    parameters: {
+      query: {
+        /** @description Page size used by history endpoint (for page calculation) */
+        per_page?: number
+        /** @description Max results (1-50) */
+        limit?: number
+        /** @description Search query */
+        q: string
+      }
+      header?: never
+      path: {
+        chatId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SearchMessagesResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Access denied */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  ChatController_sendMessage_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendMessageDto']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MessageResponseDto']
+        }
+      }
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Access denied */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  HealthController_getHealth_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Health check successful */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HealthResponseDto']
+        }
+      }
+    }
+  }
+  OrganizationController_findAll_v1: {
+    parameters: {
+      query?: {
+        per_page?: number
+        page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PaginatedOrganizationResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  OrganizationController_create_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateOrganizationDto']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrganizationResponseDto']
+        }
+      }
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  OrganizationController_findOne_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrganizationResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Resource not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  OrganizationController_delete_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Organization deleted */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Insufficient role — requires ADMIN */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Resource not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  OrganizationController_update_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateOrganizationDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrganizationResponseDto']
+        }
+      }
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Insufficient role — requires STAFF or ADMIN */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Resource not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  OrganizationController_join_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrganizationMemberResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Resource not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Already a member */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  OrganizationController_leave_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Left the organization */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Not a member of this organization */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  ReportController_create_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReportResponseDto']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReportResponseDto']
+        }
+      }
+    }
+  }
+  ReportController_findAll_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReportResponseDto']
+        }
+      }
+    }
+  }
+  ReportController_findAllUserReports_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReportResponseDto']
+        }
+      }
+    }
+  }
+  ReportController_setReportStatus_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReportResponseDto']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReportResponseDto']
+        }
+      }
+    }
+  }
+  SportController_findAll_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SportResponseDto'][]
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  UserController_lookupUsers_v1: {
+    parameters: {
+      query: {
+        /** @description Search term to look up users by email, name, or username */
+        q: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserLookupResponseDto']
+        }
+      }
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  UserController_getCurrentUser_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  UserController_deleteAccount_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DeleteAccountResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  UserController_getMemberships_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserMembershipResponseDto'][]
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  UserController_getProfile_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserProfileResponseDto']
+        }
+      }
+    }
+  }
+  UserController_updateProfile_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateUserProfileDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserProfileResponseDto']
+        }
+      }
+    }
+  }
+  UserController_enrichSession_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EnrichSessionDto']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['EnrichSessionResponseDto']
+        }
+      }
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  UserController_getSessions_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['KeycloakSessionResponseDto'][]
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  UserController_revokeSession_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Session revoked */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Resource not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  UserController_revokeAllSessions_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RevokeSessionsResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  UserController_deactivateAccount_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DeactivateAccountResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  UtilsController_uploadMedia_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /**
+           * Format: binary
+           * @description Image or video file (max 10 MB)
+           */
+          file: string
+        }
+      }
+    }
+    responses: {
+      /** @description File uploaded successfully */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MediaUploadResponseDto']
+        }
+      }
+      /** @description Unauthorized - invalid or missing token */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseDto']
+        }
+      }
+    }
+  }
+  SessionController_getSessions_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SessionController_revokeSession_v1: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
 }

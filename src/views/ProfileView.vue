@@ -47,17 +47,19 @@ const primaryPicture = computed(() => {
     <div v-else class="flex flex-col gap-6 px-5 py-6">
       <!-- Profile Picture -->
       <div class="flex justify-center">
-        <img src="./icon.png" id="profile-picture" alt="bruh">
+        <img src="./icon.png" id="profile-picture" alt="bruh" />
       </div>
 
       <!-- Username -->
       <div class="text-center">
         <p class="text-white/70 text-sm">Username</p>
         <p class="text-white text-lg font-medium">
-          {{ authStore.user?.given_name && authStore.user?.family_name 
-          ? `${authStore.user.given_name} ${authStore.user.family_name}` 
-          : authStore.user?.name || 'User' }}
-          </p>
+          {{
+            authStore.user?.given_name && authStore.user?.family_name
+              ? `${authStore.user.given_name} ${authStore.user.family_name}`
+              : authStore.user?.name || 'User'
+          }}
+        </p>
       </div>
 
       <!-- Bio -->
@@ -98,11 +100,8 @@ const primaryPicture = computed(() => {
 
       <!-- My Reports Button -->
       <div class="flex justify-center">
-        <UButton @click="moveToReportsPage" color="primary" variant="soft">
-        My Reports
-        </UButton>
+        <UButton @click="moveToReportsPage" color="primary" variant="soft"> My Reports </UButton>
       </div>
     </div>
   </PageLayout>
 </template>
-

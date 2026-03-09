@@ -2,7 +2,11 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { apiClient } from '@/lib/api/client'
 import { chatApi, type UserChat, type MessageResponse, type ChatResponse } from '@/stores/api/chat'
-import { useChatSocket, type TypingStartEvent, type TypingStopEvent } from '@/composables/useChatSocket'
+import {
+  useChatSocket,
+  type TypingStartEvent,
+  type TypingStopEvent,
+} from '@/composables/useChatSocket'
 
 export interface ConversationSummary {
   chat: UserChat | ChatResponse
@@ -20,8 +24,15 @@ export const useMessengerStore = defineStore('messenger', () => {
   const currentUserId = ref<string | null>(null)
   const typingUsers = ref<Map<string, Map<string, string>>>(new Map())
 
-  const { connect, disconnect, sendMessage: socketSendMessage, joinChat, emitTypingStart, emitTypingStop, connected } =
-    useChatSocket()
+  const {
+    connect,
+    disconnect,
+    sendMessage: socketSendMessage,
+    joinChat,
+    emitTypingStart,
+    emitTypingStop,
+    connected,
+  } = useChatSocket()
 
   const sortedConversations = computed(() => {
     return Array.from(conversations.value.values()).sort((a, b) => {

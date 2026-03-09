@@ -127,7 +127,9 @@ async function handleCreate() {
               />
               <div class="flex flex-col min-w-0">
                 <span class="text-sm font-medium truncate">{{ user.name || user.username }}</span>
-                <span v-if="user.email" class="text-xs text-white/50 truncate">{{ user.email }}</span>
+                <span v-if="user.email" class="text-xs text-white/50 truncate">{{
+                  user.email
+                }}</span>
               </div>
             </button>
           </template>

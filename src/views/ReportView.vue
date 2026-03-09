@@ -2,9 +2,9 @@
 import { onMounted } from 'vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
-import { ReportApi } from "@/stores/api/report.ts";
+import { ReportApi } from '@/stores/api/report.ts'
 import { useI18n } from 'vue-i18n'
-import { ref } from 'vue';
+import { ref } from 'vue'
 const { t } = useI18n()
 const value = ref('')
 const value2 = ref('')
@@ -16,16 +16,15 @@ onMounted(() => {
   setHeader({ title: t('report.report') })
 })
 
-const SubmitReport = async () =>{
-    try {
-       await ReportApi.sumbitReport(value.value, value2.value)
-       showAlert.value = false
-       showSuccess.value = true
-    }
-    catch (error){
-       showAlert.value = true
-       showSuccess.value = false
-    }
+const SubmitReport = async () => {
+  try {
+    await ReportApi.sumbitReport(value.value, value2.value)
+    showAlert.value = false
+    showSuccess.value = true
+  } catch (error) {
+    showAlert.value = true
+    showSuccess.value = false
+  }
 }
 </script>
 
@@ -42,5 +41,3 @@ const SubmitReport = async () =>{
     </section>
   </PageLayout>
 </template>
-
-

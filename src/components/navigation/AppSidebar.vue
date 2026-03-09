@@ -22,13 +22,12 @@ const sidebarRef = useTemplateRef('sidebarref')
 const store = useGuideRefsStore()
 
 onMounted(() => {
-	console.log("sidebarmounted")
-	console.log(sidebarRef.value)
-	console.log(sidebarRef.value.$el)
-	store.setSidebar(sidebarRef.value.$el)
-	console.log(store.getSidebar)
+  console.log('sidebarmounted')
+  console.log(sidebarRef.value)
+  console.log(sidebarRef.value.$el)
+  store.setSidebar(sidebarRef.value.$el)
+  console.log(store.getSidebar)
 })
-
 </script>
 
 <template>
@@ -40,7 +39,13 @@ onMounted(() => {
     </div>
 
     <nav class="flex-1 overflow-y-auto py-3 px-2 pb-12">
-      <UNavigationMenu :items="sidebarItems" orientation="vertical" highlight color="primary" ref="sidebarref"/>
+      <UNavigationMenu
+        :items="sidebarItems"
+        orientation="vertical"
+        highlight
+        color="primary"
+        ref="sidebarref"
+      />
     </nav>
 
     <div class="border-t border-white/5 py-3 px-2 pb-[env(safe-area-inset-bottom)]">

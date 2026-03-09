@@ -12,7 +12,12 @@
             <UButton icon="i-lucide-book-open" variant="soft" @click="openDocs">
               Documentation
             </UButton>
-            <UButton icon="i-lucide-settings" variant="soft" @click="openSettings" ref="settingsref">
+            <UButton
+              icon="i-lucide-settings"
+              variant="soft"
+              @click="openSettings"
+              ref="settingsref"
+            >
               Settings
             </UButton>
           </div>
@@ -64,7 +69,7 @@ onMounted(() => {
   setHeader({
     title: 'Home',
   })
-  console.log("ref value:")
+  console.log('ref value:')
   console.log(refStore.getSidebar)
 
   tour.addStep({
@@ -81,6 +86,6 @@ onMounted(() => {
     text: 'Test step',
   })
 
-  tour.start();
+  tour.start()
 })
 </script>

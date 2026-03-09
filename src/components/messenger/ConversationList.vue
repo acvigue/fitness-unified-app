@@ -14,7 +14,11 @@ function getConversationName(convo: ConversationSummary): string {
     return convo.chat.name as unknown as string
   }
   const otherMember = convo.chat.members.find((m) => m.id !== messengerStore.currentUserId)
-  return (otherMember?.name as unknown as string) ?? (otherMember?.username as unknown as string) ?? 'Chat'
+  return (
+    (otherMember?.name as unknown as string) ??
+    (otherMember?.username as unknown as string) ??
+    'Chat'
+  )
 }
 
 function formatTimestamp(isoString: string): string {

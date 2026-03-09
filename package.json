@@ -28,6 +28,7 @@
     "@capacitor/preferences": "^8.0.0",
     "@iconify-json/lucide": "^1.2.95",
     "@iconify/vue": "^5.0.0",
+    "@nestjs/platform-socket.io": "^11.1.16",
     "@nuxt/ui": "^4.3.0",
     "@unhead/vue": "^2.1.1",
     "jwt-decode": "^4.0.0",

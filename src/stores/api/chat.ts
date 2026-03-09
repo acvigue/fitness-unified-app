@@ -38,7 +38,11 @@ export const chatApi = {
     return data
   },
 
-  async sendMessage(chatId: string, content: string, mediaIds?: string[]): Promise<MessageResponse> {
+  async sendMessage(
+    chatId: string,
+    content: string,
+    mediaIds?: string[],
+  ): Promise<MessageResponse> {
     const { data, error } = await apiClient.POST('/v1/chats/send-message', {
       body: { chatId, content, ...(mediaIds?.length ? { mediaIds } : {}) },
     })
@@ -46,7 +50,12 @@ export const chatApi = {
     return data
   },
 
-  async searchMessages(chatId: string, q: string, perPage = 50, limit = 20): Promise<SearchMessagesResponse> {
+  async searchMessages(
+    chatId: string,
+    q: string,
+    perPage = 50,
+    limit = 20,
+  ): Promise<SearchMessagesResponse> {
     const { data, error } = await apiClient.GET('/v1/chats/search/{chatId}', {
       params: {
         path: { chatId },

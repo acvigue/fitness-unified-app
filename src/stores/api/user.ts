@@ -20,7 +20,11 @@ export const userApi = {
     return data
   },
 
-  async updateProfile(body: { bio?: string; favoriteSportIds?: string[]; pictureIds?: string[] }): Promise<UserProfile> {
+  async updateProfile(body: {
+    bio?: string
+    favoriteSportIds?: string[]
+    pictureIds?: string[]
+  }): Promise<UserProfile> {
     const { data, error } = await apiClient.PATCH('/v1/user/profile', { body })
     if (error) throw new Error(getErrorMessage(error, 'Failed to update profile'))
     return data

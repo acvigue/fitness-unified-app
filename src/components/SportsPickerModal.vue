@@ -110,9 +110,7 @@ function confirm() {
                 class="size-4 shrink-0"
                 :class="isSelected(sport) ? 'text-primary' : 'text-white/30'"
               />
-              <span class="text-sm font-medium">
-                {{ sport.icon }} {{ sport.name }}
-              </span>
+              <span class="text-sm font-medium"> {{ sport.icon }} {{ sport.name }} </span>
             </button>
           </template>
           <p v-else-if="searchTerm" class="text-center text-sm text-white/40 py-4">

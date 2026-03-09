@@ -10,12 +10,7 @@
             </p>
             <p class="text-lg font-medium">{{ accountLabel }}</p>
           </div>
-          <UButton
-            color="primary"
-            variant="ghost"
-            icon="i-lucide-log-out"
-            @click="handleLogout"
-          >
+          <UButton color="primary" variant="ghost" icon="i-lucide-log-out" @click="handleLogout">
             {{ t('settings.logout') }}
           </UButton>
         </div>
@@ -47,14 +42,14 @@
                 v-for="pic in profile.pictures"
                 :key="pic.id"
                 class="relative shrink-0 rounded-full transition-all"
-                :class="pic.isPrimary ? 'ring-3 ring-primary ring-offset-2 ring-offset-neutral-900' : 'opacity-60 hover:opacity-100'"
+                :class="
+                  pic.isPrimary
+                    ? 'ring-3 ring-primary ring-offset-2 ring-offset-neutral-900'
+                    : 'opacity-60 hover:opacity-100'
+                "
                 @click="setPrimaryPicture(pic.id)"
               >
-                <UAvatar
-                  :src="pic.url"
-                  :alt="(pic.alt as unknown as string) || ''"
-                  size="3xl"
-                />
+                <UAvatar :src="pic.url" :alt="(pic.alt as unknown as string) || ''" size="3xl" />
               </button>
               <button
                 class="shrink-0 size-13 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-neutral-700 transition-colors"
@@ -120,13 +115,9 @@
           </UFormField>
 
           <!-- Status messages -->
-          <p v-if="showSaveSuccess" class="text-green-500 text-sm mt-2">
-            Saved profile
-          </p>
-          <p v-if="showSaveInfo" class="text-red-500 text-sm mt-2">
-            • Need to change the profile
-          </p>
-          
+          <p v-if="showSaveSuccess" class="text-green-500 text-sm mt-2">Saved profile</p>
+          <p v-if="showSaveInfo" class="text-red-500 text-sm mt-2">• Need to change the profile</p>
+
           <!-- Save Button -->
           <div class="flex justify-end">
             <UButton color="primary" :loading="saving" @click="saveProfile">
@@ -181,7 +172,12 @@
                 <div class="flex items-center gap-2">
                   <UIcon name="i-lucide-monitor" class="text-white/50 shrink-0" />
                   <span class="text-sm font-medium truncate">{{ session.ipAddress }}</span>
-                  <UBadge v-if="(session as any).thisSession" color="primary" variant="soft" size="xs">
+                  <UBadge
+                    v-if="(session as any).thisSession"
+                    color="primary"
+                    variant="soft"
+                    size="xs"
+                  >
                     {{ t('settings.thisSession') }}
                   </UBadge>
                   <UBadge v-if="session.rememberMe" color="primary" variant="soft" size="xs">
@@ -452,7 +448,6 @@ function onFileInputChange(event: Event) {
 }
 
 async function uploadFile(file: File) {
-
   uploading.value = true
   profileError.value = ''
   try {
@@ -562,16 +557,16 @@ async function revokeAllSessions() {
 }
 
 async function saveProfile() {
-  profileError.value = '' 
+  profileError.value = ''
   showSaveSuccess.value = false
   showSaveInfo.value = false
-  
+
   if (!hasChanges.value) {
     showSaveInfo.value = true
     return
   }
 
-  saving.value = true 
+  saving.value = true
   try {
     // Send primary picture first (API treats first as primary)
     const sorted = [...profile.value.pictures].sort((a, b) =>
