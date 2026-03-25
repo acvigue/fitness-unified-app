@@ -12,6 +12,7 @@ export function useNavigationItems() {
 
   const items: NavigationItem[] = [
     { label: 'Home', icon: 'i-lucide-home', to: '/' },
+    { label: 'Team', icon: 'i-lucide-users', to: '/team' },
     { label: 'Messenger', icon: 'i-lucide-message-circle', to: '/messenger' },
     { label: 'Workouts', icon: 'i-lucide-dumbbell', to: '/workouts' },
     { label: 'Profile', icon: 'i-lucide-user', to: '/profile' },
