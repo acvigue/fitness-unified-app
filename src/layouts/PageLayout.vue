@@ -12,7 +12,7 @@
         />
         <h1 class="text-xl font-semibold">{{ title }}</h1>
       </div>
-      <div v-if="actions.length" class="flex items-center gap-2">
+      <div class="flex items-center gap-2">
         <UButton
           v-for="(action, i) in actions"
           :key="i"
@@ -22,6 +22,7 @@
           square
           @click="action.onClick"
         />
+        <NotificationBell />
       </div>
     </header>
     <main class="page-content">
@@ -33,6 +34,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { usePageHeader } from '@/composables/usePageHeader'
+import NotificationBell from '@/components/notifications/NotificationBell.vue'
 
 const router = useRouter()
 const { title, backRoute, actions } = usePageHeader()
