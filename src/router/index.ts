@@ -10,6 +10,7 @@ import ReportView from '@/views/ReportView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import UserReportView from "@/views/UserReportView.vue"
 import UserProfileView from '@/views/UserProfileView.vue'
+import TeamView from '@/views/TeamView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 
@@ -35,6 +36,11 @@ const router = createRouter({
       path: '/oauth/callback',
       name: 'oauth-callback',
       component: OAuthCallbackView,
+    },
+    {
+      path: '/team',
+      name: 'team',
+      component: TeamView,
     },
     {
       path: '/messenger',
