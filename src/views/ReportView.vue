@@ -2,10 +2,15 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
-import { ReportApi, type Report } from '@/stores/api/report'
-import { chatApi, type UserLookupItem } from '@/stores/api/chat'
+import UserLink from '@/components/UserLink.vue'
+import { apiClient } from '@/lib/api/client'
+import { getErrorMessage } from '@/lib/api/errors'
+import type { components } from '@/types/api'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useI18n } from 'vue-i18n'
+
+type Report = components['schemas']['ReportResponseDto']
+type UserLookupItem = components['schemas']['UserLookupItemDto']
 
 const { t } = useI18n()
 const authStore = useAuthStore()
@@ -18,7 +23,9 @@ const reportsLoading = ref(false)
 async function loadReports() {
   reportsLoading.value = true
   try {
-    reports.value = await ReportApi.getReportsForUser()
+    const { data: reportsData, error: reportsError } = await apiClient.GET('/v1/report/user')
+    if (reportsError) throw new Error(getErrorMessage(reportsError, 'Failed to load reports'))
+    reports.value = Array.isArray(reportsData) ? reportsData : [reportsData]
   } catch {
     reports.value = []
   } finally {
@@ -49,7 +56,11 @@ watch(searchTerm, (term) => {
   searchLoading.value = true
   searchTimeout = setTimeout(async () => {
     try {
-      searchResults.value = await chatApi.lookupUsers(term)
+      const { data: lookupData, error: lookupError } = await apiClient.GET('/v1/user/lookup', {
+        params: { query: { q: term } },
+      })
+      if (lookupError) throw new Error(getErrorMessage(lookupError, 'Failed to search users'))
+      searchResults.value = lookupData.users
     } catch {
       searchResults.value = []
     } finally {
@@ -85,7 +96,17 @@ async function submitReport() {
 
   try {
     const reporterId = authStore.user?.sub ?? ''
-    await ReportApi.submitReport(reporterId, selectedUser.value.id, reason.value.trim())
+    const now = new Date()
+    const { error: submitError } = await apiClient.POST('/v1/report', {
+      body: {
+        reporterId,
+        reportedId: selectedUser.value.id,
+        reason: reason.value.trim(),
+        status: 'PENDING',
+        createdAt: now.toISOString(),
+      },
+    })
+    if (submitError) throw new Error(getErrorMessage(submitError, 'Failed to submit report'))
     showSuccess.value = true
     selectedUser.value = null
     reason.value = ''
@@ -196,7 +217,7 @@ async function submitReport() {
               <div class="flex flex-col gap-1 min-w-0">
                 <div class="flex items-center gap-2">
                   <UIcon name="i-lucide-flag" class="text-white/50 shrink-0" />
-                  <span class="text-sm font-medium truncate">{{ report.reportedId }}</span>
+                  <UserLink :user-id="report.reportedId" class="text-sm font-medium" />
                   <UBadge
                     :color="report.status === 'PENDING' ? 'warning' : report.status === 'RESOLVED' ? 'success' : 'neutral'"
                     variant="soft"

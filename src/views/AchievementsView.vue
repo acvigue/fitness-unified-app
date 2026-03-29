@@ -1,0 +1,172 @@
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useHead } from '@unhead/vue'
+import PageLayout from '@/layouts/PageLayout.vue'
+import { usePageHeader } from '@/composables/usePageHeader'
+import { apiClient } from '@/lib/api/client'
+import { getErrorMessage } from '@/lib/api/errors'
+import type { components } from '@/types/api'
+
+type UserAchievement = components['schemas']['UserAchievementResponseDto']
+
+useHead({ title: 'Achievements' })
+
+const { setHeader } = usePageHeader()
+
+const achievements = ref<UserAchievement[]>([])
+const loading = ref(true)
+const error = ref('')
+
+const earned = computed(() =>
+  achievements.value.filter((a) => a.unlockedAt),
+)
+
+const locked = computed(() =>
+  achievements.value.filter((a) => !a.unlockedAt),
+)
+
+const CRITERIA_ICONS: Record<string, string> = {
+  TOURNAMENT_PARTICIPATION: 'i-lucide-trophy',
+  TOURNAMENT_MATCH_WIN: 'i-lucide-swords',
+  TOURNAMENT_WIN: 'i-lucide-crown',
+}
+
+function getIcon(criteriaType: string) {
+  return CRITERIA_ICONS[criteriaType] || 'i-lucide-award'
+}
+
+function progressPercent(achievement: UserAchievement) {
+  const threshold = achievement.achievement.threshold
+  if (threshold <= 0) return 100
+  return Math.min((achievement.progress / threshold) * 100, 100)
+}
+
+function formatDate(dateStr: string | null | undefined | Record<string, never>) {
+  if (!dateStr || typeof dateStr !== 'string') return ''
+  return new Date(dateStr).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
+async function loadAchievements() {
+  loading.value = true
+  error.value = ''
+  try {
+    const { data, error: err } = await apiClient.GET('/v1/achievements/me')
+    if (err) {
+      error.value = getErrorMessage(err, 'Failed to load achievements')
+      return
+    }
+    achievements.value = data ?? []
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Failed to load achievements'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  setHeader({ title: 'Achievements' })
+  loadAchievements()
+})
+</script>
+
+<template>
+  <PageLayout>
+    <div v-if="loading" class="flex justify-center p-8">
+      <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-8" />
+    </div>
+
+    <div v-else-if="error" class="p-5">
+      <UAlert color="error" :title="error" icon="i-lucide-circle-alert" />
+    </div>
+
+    <section v-else class="flex flex-col gap-6 px-5 py-6">
+      <!-- Summary -->
+      <UCard class="bg-white/5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs uppercase tracking-[0.3em] text-white/60">Achievements</p>
+            <p class="text-lg font-medium">{{ earned.length }} / {{ achievements.length }} Unlocked</p>
+          </div>
+          <UButton
+            size="sm"
+            variant="ghost"
+            color="neutral"
+            icon="i-lucide-refresh-cw"
+            :loading="loading"
+            @click="loadAchievements"
+          />
+        </div>
+      </UCard>
+
+      <!-- Earned -->
+      <div v-if="earned.length > 0">
+        <p class="text-xs uppercase tracking-[0.3em] text-white/60 mb-3">Earned</p>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            v-for="ua in earned"
+            :key="ua.id"
+            class="rounded-lg border border-primary/30 bg-primary/5 p-4"
+          >
+            <div class="flex items-start gap-3">
+              <div class="rounded-full bg-primary/20 p-2.5">
+                <UIcon :name="getIcon(ua.achievement.criteriaType)" class="text-primary text-lg" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-sm">{{ ua.achievement.name }}</p>
+                <p class="text-xs text-white/60 mt-0.5">{{ ua.achievement.description }}</p>
+                <p class="text-xs text-primary/80 mt-1">
+                  Unlocked {{ formatDate(ua.unlockedAt as any) }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Locked / In Progress -->
+      <div v-if="locked.length > 0">
+        <p class="text-xs uppercase tracking-[0.3em] text-white/60 mb-3">In Progress</p>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            v-for="ua in locked"
+            :key="ua.id"
+            class="rounded-lg border border-white/10 bg-white/[0.02] p-4 opacity-80"
+          >
+            <div class="flex items-start gap-3">
+              <div class="rounded-full bg-white/10 p-2.5">
+                <UIcon :name="getIcon(ua.achievement.criteriaType)" class="text-white/40 text-lg" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-sm">{{ ua.achievement.name }}</p>
+                <p class="text-xs text-white/60 mt-0.5">{{ ua.achievement.description }}</p>
+                <div class="mt-2 flex items-center gap-2">
+                  <div class="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                    <div
+                      class="h-full rounded-full bg-white/30 transition-all"
+                      :style="{ width: `${progressPercent(ua)}%` }"
+                    />
+                  </div>
+                  <span class="text-[10px] text-white/40 whitespace-nowrap">
+                    {{ ua.progress }}/{{ ua.achievement.threshold }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div
+        v-if="achievements.length === 0"
+        class="rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
+      >
+        No achievements available yet. Participate in tournaments to earn achievements!
+      </div>
+    </section>
+  </PageLayout>
+</template>
