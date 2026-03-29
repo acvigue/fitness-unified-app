@@ -40,6 +40,29 @@
             {{ t('settings.profile') }}
           </p>
 
+          <!-- Name -->
+          <div class="flex gap-3">
+            <UFormField :label="t('settings.firstName')" class="flex-1">
+              <UInput v-model="nameForm.firstName" :placeholder="t('settings.firstName')" />
+            </UFormField>
+            <UFormField :label="t('settings.lastName')" class="flex-1">
+              <UInput v-model="nameForm.lastName" :placeholder="t('settings.lastName')" />
+            </UFormField>
+          </div>
+          <div class="flex items-center gap-3">
+            <UButton
+              color="primary"
+              variant="soft"
+              size="sm"
+              :loading="savingName"
+              :disabled="!nameChanged"
+              @click="saveName"
+            >
+              {{ t('settings.saveName') }}
+            </UButton>
+            <p v-if="nameSuccess" class="text-green-500 text-sm">{{ t('settings.nameSaved') }}</p>
+          </div>
+
           <!-- Profile Pictures -->
           <UFormField :label="t('settings.profilePictures')">
             <div class="flex gap-3 items-center overflow-x-auto p-1">
@@ -342,9 +365,14 @@ import SportsPickerModal from '@/components/SportsPickerModal.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useAuthStore } from '@/stores/auth/auth'
 import { ENV } from '@/config/environment'
-import { userApi, type Session } from '@/stores/api/user'
-import type { UserProfile } from '@/stores/api/user'
-import type { Sport } from '@/stores/api/sports'
+import { apiClient } from '@/lib/api/client'
+import { getErrorMessage } from '@/lib/api/errors'
+import type { components } from '@/types/api'
+
+type UserProfile = components['schemas']['UserProfileResponseDto']
+type Session = components['schemas']['KeycloakSessionResponseDto']
+type MediaUploadResponse = components['schemas']['MediaUploadResponseDto']
+type Sport = components['schemas']['SportResponseDto']
 import { useI18n } from 'vue-i18n'
 import { SUPPORT_LOCALES } from '@/i18n'
 const { t, locale } = useI18n()
@@ -435,9 +463,11 @@ const handleAccountAction = async () => {
 
   try {
     if (confirmModal.value.isDelete) {
-      await userApi.deleteAccount()
+      const { error: deleteErr } = await apiClient.DELETE('/v1/user/me')
+      if (deleteErr) throw new Error(getErrorMessage(deleteErr, 'Failed to delete account'))
     } else {
-      await userApi.deactivateAccount()
+      const { error: deactivateErr } = await apiClient.POST('/v1/user/me/deactivate')
+      if (deactivateErr) throw new Error(getErrorMessage(deactivateErr, 'Failed to deactivate account'))
     }
 
     confirmModal.value.isOpen = false
@@ -455,6 +485,32 @@ const profile = ref<UserProfile>({ userId: '', bio: '', favoriteSports: [], pict
 const profileForm = reactive({ bio: '', favoriteSports: [] as Sport[] })
 const saving = ref(false)
 const originalProfile = ref('')
+
+// Name
+const nameForm = reactive({ firstName: '', lastName: '' })
+const originalName = ref({ firstName: '', lastName: '' })
+const savingName = ref(false)
+const nameSuccess = ref(false)
+const nameChanged = computed(() =>
+  nameForm.firstName !== originalName.value.firstName || nameForm.lastName !== originalName.value.lastName,
+)
+
+async function saveName() {
+  savingName.value = true
+  nameSuccess.value = false
+  try {
+    const { error: nameErr } = await apiClient.PATCH('/v1/user/me/name', {
+      body: { firstName: nameForm.firstName, lastName: nameForm.lastName },
+    })
+    if (nameErr) throw new Error(getErrorMessage(nameErr, 'Failed to update name'))
+    originalName.value = { firstName: nameForm.firstName, lastName: nameForm.lastName }
+    nameSuccess.value = true
+  } catch (err: any) {
+    profileError.value = err.message || 'Failed to update name'
+  } finally {
+    savingName.value = false
+  }
+}
 
 // Sports picker
 const sportsPickerOpen = ref(false)
@@ -487,11 +543,22 @@ function onFileInputChange(event: Event) {
 }
 
 async function uploadFile(file: File) {
-
   uploading.value = true
   profileError.value = ''
   try {
-    const media = await userApi.uploadMedia(file)
+    const token = await authStore.getAccessToken()
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await fetch(`${ENV.apiBaseUrl}/v1/utils/media-upload`, {
+      method: 'POST',
+      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: formData,
+    })
+    if (!response.ok) {
+      const body = await response.json().catch(() => null)
+      throw new Error(getErrorMessage(body, 'Failed to upload media'))
+    }
+    const media: MediaUploadResponse = await response.json()
     pendingPictureIds.value.push(media.id)
     // Add to display immediately
     profile.value.pictures.push({
@@ -521,10 +588,14 @@ onMounted(async () => {
   setHeader({ title: t('settings.settings'), backRoute: '/' })
   loadSessions()
   try {
-    const data = await userApi.getProfile()
-    profile.value = data
-    profileForm.bio = (data.bio as unknown as string) || ''
-    profileForm.favoriteSports = [...data.favoriteSports]
+    const { data: profileData, error: profileLoadErr } = await apiClient.GET('/v1/user/profile')
+    if (profileLoadErr) throw new Error(getErrorMessage(profileLoadErr, 'Failed to load profile'))
+    profile.value = profileData
+    profileForm.bio = (profileData.bio as unknown as string) || ''
+    profileForm.favoriteSports = [...profileData.favoriteSports]
+    nameForm.firstName = profileData.firstName || ''
+    nameForm.lastName = profileData.lastName || ''
+    originalName.value = { firstName: nameForm.firstName, lastName: nameForm.lastName }
     originalProfile.value = serializeForm()
   } catch (error) {
     console.error('Failed to load profile', error)
@@ -558,7 +629,9 @@ const revokingAll = ref(false)
 async function loadSessions() {
   sessionsLoading.value = true
   try {
-    sessions.value = await userApi.getSessions()
+    const { data: sessionsData, error: sessionsErr } = await apiClient.GET('/v1/user/sessions')
+    if (sessionsErr) throw new Error(getErrorMessage(sessionsErr, 'Failed to load sessions'))
+    sessions.value = sessionsData
   } catch (error) {
     console.error('Failed to load sessions', error)
   } finally {
@@ -570,7 +643,10 @@ async function revokeSession(id: string) {
   const session = sessions.value.find((s) => s.id === id)
   revokingSessionId.value = id
   try {
-    await userApi.revokeSession(id)
+    const { error: revokeErr } = await apiClient.DELETE('/v1/user/sessions/{id}', {
+      params: { path: { id } },
+    })
+    if (revokeErr) throw new Error(getErrorMessage(revokeErr, 'Failed to revoke session'))
     if ((session as any)?.thisSession) {
       await authStore.clearLocalSession()
       window.location.reload()
@@ -587,7 +663,8 @@ async function revokeSession(id: string) {
 async function revokeAllSessions() {
   revokingAll.value = true
   try {
-    await userApi.revokeAllSessions()
+    const { error: revokeAllErr } = await apiClient.POST('/v1/user/sessions/logout')
+    if (revokeAllErr) throw new Error(getErrorMessage(revokeAllErr, 'Failed to revoke all sessions'))
     sessions.value = []
   } catch (error) {
     console.error('Failed to revoke all sessions', error)
@@ -614,13 +691,16 @@ async function saveProfile() {
     )
     const allPictureIds = sorted.map((p) => p.id)
 
-    const updated = await userApi.updateProfile({
-      bio: profileForm.bio,
-      favoriteSportIds: profileForm.favoriteSports.map((s) => s.id),
-      pictureIds: allPictureIds,
+    const { data: updatedProfile, error: updateErr } = await apiClient.PATCH('/v1/user/profile', {
+      body: {
+        bio: profileForm.bio,
+        favoriteSportIds: profileForm.favoriteSports.map((s) => s.id),
+        pictureIds: allPictureIds,
+      },
     })
-    profile.value = updated
-    profileForm.favoriteSports = [...updated.favoriteSports]
+    if (updateErr) throw new Error(getErrorMessage(updateErr, 'Failed to update profile'))
+    profile.value = updatedProfile
+    profileForm.favoriteSports = [...updatedProfile.favoriteSports]
     pendingPictureIds.value = []
     originalProfile.value = serializeForm()
     showSaveSuccess.value = true

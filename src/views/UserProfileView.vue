@@ -4,7 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useI18n } from 'vue-i18n'
-import { userApi } from '@/stores/api/user'
+import { apiClient } from '@/lib/api/client'
+import { getErrorMessage } from '@/lib/api/errors'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -15,13 +16,21 @@ const userId = computed(() => route.params.userId as string)
 const profile = ref<any>(null)
 const loading = ref(true)
 const error = ref('')
-const nameFromQuery = computed(() => route.query.name as string || '')
+const displayName = computed(() => {
+  const p = profile.value
+  if (p?.firstName || p?.lastName) return [p.firstName, p.lastName].filter(Boolean).join(' ')
+  return 'User'
+})
 
 onMounted(async () => {
   setHeader({ title: t('profile.userProfile') })
   try {
-    profile.value = await userApi.getUserProfile(userId.value)
-  } catch (err) {
+    const { data: profileData, error: profileErr } = await apiClient.GET('/v1/users/{userId}/profile', {
+      params: { path: { userId: userId.value } },
+    })
+    if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
+    profile.value = profileData
+  } catch (err: any) {
     console.error('Failed to load profile. userId:', userId.value, 'Error:', err)
     error.value = err.message || 'Failed to load profile'
   } finally {
@@ -56,7 +65,7 @@ const primaryPicture = computed(() => {
       <div class="text-center">
         <p class="text-white/70 text-sm">{{ t('profile.name') }}</p>
         <p class="text-white text-lg font-medium">
-          {{ nameFromQuery || profile?.name || profile?.username || 'User' }}
+          {{ displayName }}
         </p>
       </div>
 
@@ -90,10 +99,23 @@ const primaryPicture = computed(() => {
         <p class="text-white/50">{{ t('profile.nonePlayed') }}</p>
       </div>
 
-      <!-- Achievements -->
+      <!-- Featured Achievements -->
       <div class="bg-white/5 p-4 rounded-lg">
-        <p class="text-white/70 text-sm">{{ t('profile.achievements') }}</p>
-        <p class="text-white/50">{{ t('profile.noneEarned') }}</p>
+        <p class="text-white/70 text-sm mb-2">Featured Achievements</p>
+        <div v-if="profile?.featuredAchievements?.length" class="grid gap-2 sm:grid-cols-2">
+          <div
+            v-for="ua in profile.featuredAchievements"
+            :key="ua.id"
+            class="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 p-3"
+          >
+            <UIcon name="i-lucide-award" class="text-primary" />
+            <div class="min-w-0">
+              <p class="text-sm font-medium truncate">{{ ua.achievement.name }}</p>
+              <p class="text-xs text-white/50">{{ ua.achievement.description }}</p>
+            </div>
+          </div>
+        </div>
+        <p v-else class="text-white/50 text-sm">No featured achievements.</p>
       </div>
     </div>
   </PageLayout>
