@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { sportsApi, type Sport } from '@/stores/api/sports'
 import { useI18n } from 'vue-i18n'
+import { apiClient } from '@/lib/api/client'
+import { getErrorMessage } from '@/lib/api/errors'
+import type { components } from '@/types/api'
+
+type Sport = components['schemas']['SportResponseDto']
 
 const { t } = useI18n()
 
@@ -23,7 +27,9 @@ const localSelected = ref<Sport[]>([])
 onMounted(async () => {
   loading.value = true
   try {
-    allSports.value = await sportsApi.getAll()
+    const { data: sportsData, error: sportsError } = await apiClient.GET('/v1/sports')
+    if (sportsError) throw new Error(getErrorMessage(sportsError, 'Failed to load sports'))
+    allSports.value = sportsData
   } catch {
     allSports.value = []
   } finally {

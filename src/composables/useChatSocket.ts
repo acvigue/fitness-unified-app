@@ -2,7 +2,9 @@ import { ref, readonly } from 'vue'
 import { io, type Socket } from 'socket.io-client'
 import { ENV } from '@/config/environment'
 import { useAuthStore } from '@/stores/auth/auth'
-import type { MessageResponse } from '@/stores/api/chat'
+import type { components } from '@/types/api'
+
+type MessageResponse = components['schemas']['MessageResponseDto']
 
 export interface TypingStartEvent {
   chatId: string
