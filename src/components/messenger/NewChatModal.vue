@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { chatApi, type UserLookupItem } from '@/stores/api/chat'
+import { apiClient } from '@/lib/api/client'
+import { getErrorMessage } from '@/lib/api/errors'
+import type { components } from '@/types/api'
 import { useMessengerStore } from '@/stores/messenger'
 import { useI18n } from 'vue-i18n'
+
+type UserLookupItem = components['schemas']['UserLookupItemDto']
 
 const { t } = useI18n()
 const router = useRouter()
@@ -30,7 +34,11 @@ watch(searchTerm, (term) => {
   searchLoading.value = true
   searchTimeout = setTimeout(async () => {
     try {
-      searchResults.value = await chatApi.lookupUsers(term)
+      const { data: lookupData, error: lookupError } = await apiClient.GET('/v1/user/lookup', {
+        params: { query: { q: term } },
+      })
+      if (lookupError) throw new Error(getErrorMessage(lookupError, 'Failed to search users'))
+      searchResults.value = lookupData.users
     } catch {
       searchResults.value = []
     } finally {

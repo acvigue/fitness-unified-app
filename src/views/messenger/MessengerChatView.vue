@@ -3,9 +3,14 @@ import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useMessengerStore } from '@/stores/messenger'
-import { userApi, type MediaUploadResponse } from '@/stores/api/user'
+import { useAuthStore } from '@/stores/auth/auth'
+import { ENV } from '@/config/environment'
+import { getErrorMessage } from '@/lib/api/errors'
 import ChatSearchModal from '@/components/messenger/ChatSearchModal.vue'
-import type { SearchMessageHit } from '@/stores/api/chat'
+import type { components } from '@/types/api'
+
+type MediaUploadResponse = components['schemas']['MediaUploadResponseDto']
+type SearchMessageHit = components['schemas']['SearchMessageHitDto']
 
 interface PendingAttachment {
   id: string
@@ -121,7 +126,20 @@ async function handleFileSelect(event: Event) {
     })
 
     try {
-      const media: MediaUploadResponse = await userApi.uploadMedia(file)
+      const authStore = useAuthStore()
+      const token = await authStore.getAccessToken()
+      const formData = new FormData()
+      formData.append('file', file)
+      const response = await fetch(`${ENV.apiBaseUrl}/v1/utils/media-upload`, {
+        method: 'POST',
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: formData,
+      })
+      if (!response.ok) {
+        const body = await response.json().catch(() => null)
+        throw new Error(getErrorMessage(body, 'Failed to upload media'))
+      }
+      const media: MediaUploadResponse = await response.json()
       const idx = attachments.value.findIndex((a) => a.id === id)
       if (idx !== -1) attachments.value[idx] = { ...attachments.value[idx], mediaId: media.id, uploading: false }
     } catch {

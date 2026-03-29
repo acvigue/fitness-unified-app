@@ -1,8 +1,13 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { apiClient } from '@/lib/api/client'
-import { chatApi, type UserChat, type MessageResponse, type ChatResponse } from '@/stores/api/chat'
+import { getErrorMessage } from '@/lib/api/errors'
+import type { components } from '@/types/api'
 import { useChatSocket, type TypingStartEvent, type TypingStopEvent } from '@/composables/useChatSocket'
+
+type UserChat = components['schemas']['UserChatResponseDto']
+type ChatResponse = components['schemas']['ChatResponseDto']
+type MessageResponse = components['schemas']['MessageResponseDto']
 
 export interface ConversationSummary {
   chat: UserChat | ChatResponse
@@ -55,8 +60,9 @@ export const useMessengerStore = defineStore('messenger', () => {
       const { data } = await apiClient.GET('/v1/user/me')
       if (data) currentUserId.value = data.sub
 
-      const chats = await chatApi.getUserChats()
-      for (const chat of chats) {
+      const { data: chatsData, error: chatsError } = await apiClient.GET('/v1/chats')
+      if (chatsError) throw new Error(getErrorMessage(chatsError, 'Failed to load chats'))
+      for (const chat of chatsData) {
         conversations.value.set(chat.id, {
           chat,
           lastMessage: (chat.lastMessage as MessageResponse) ?? null,
@@ -79,7 +85,14 @@ export const useMessengerStore = defineStore('messenger', () => {
   }
 
   async function loadChatHistory(chatId: string, page = 1) {
-    const history = await chatApi.getChatHistory(chatId, page)
+    const { data: historyData, error: historyError } = await apiClient.GET('/v1/chats/history/{chatId}', {
+      params: {
+        path: { chatId },
+        query: { page, per_page: 50 },
+      },
+    })
+    if (historyError) throw new Error(getErrorMessage(historyError, 'Failed to load chat history'))
+    const history = historyData
     const existing = messages.value.get(chatId) ?? []
     if (page === 1) {
       messages.value.set(chatId, [...history.data].reverse())
@@ -90,8 +103,14 @@ export const useMessengerStore = defineStore('messenger', () => {
   }
 
   async function jumpToMessage(chatId: string, messageId: string, page: number) {
-    const history = await chatApi.getChatHistory(chatId, page)
-    messages.value.set(chatId, [...history.data].reverse())
+    const { data: jumpData, error: jumpError } = await apiClient.GET('/v1/chats/history/{chatId}', {
+      params: {
+        path: { chatId },
+        query: { page, per_page: 50 },
+      },
+    })
+    if (jumpError) throw new Error(getErrorMessage(jumpError, 'Failed to load chat history'))
+    messages.value.set(chatId, [...jumpData.data].reverse())
     highlightedMessageId.value = messageId
   }
 
@@ -127,7 +146,11 @@ export const useMessengerStore = defineStore('messenger', () => {
   }
 
   async function createChat(recipientIds: string[], name?: string): Promise<ChatResponse> {
-    const chat = await chatApi.createChat(recipientIds, name)
+    const { data: chatData, error: chatError } = await apiClient.POST('/v1/chats/create', {
+      body: { recipientIds, name },
+    })
+    if (chatError) throw new Error(getErrorMessage(chatError, 'Failed to create chat'))
+    const chat = chatData
     conversations.value.set(chat.id, { chat, lastMessage: null, unreadCount: 0 })
     messages.value.set(chat.id, [])
     joinChat(chat.id)
@@ -139,8 +162,11 @@ export const useMessengerStore = defineStore('messenger', () => {
     if (connected.value) {
       socketSendMessage(activeChatId.value, content, mediaIds)
     } else {
-      const message = await chatApi.sendMessage(activeChatId.value, content, mediaIds)
-      handleNewMessage(message)
+      const { data: msgData, error: msgError } = await apiClient.POST('/v1/chats/send-message', {
+        body: { chatId: activeChatId.value, content, ...(mediaIds?.length ? { mediaIds } : {}) },
+      })
+      if (msgError) throw new Error(getErrorMessage(msgError, 'Failed to send message'))
+      handleNewMessage(msgData)
     }
   }
 

@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { chatApi, type SearchMessageHit } from '@/stores/api/chat'
+import { apiClient } from '@/lib/api/client'
+import { getErrorMessage } from '@/lib/api/errors'
+import type { components } from '@/types/api'
+
+type SearchMessageHit = components['schemas']['SearchMessageHitDto']
 
 const props = defineProps<{
   chatId: string
@@ -32,9 +36,15 @@ watch(searchTerm, (term) => {
   loading.value = true
   searchTimeout = setTimeout(async () => {
     try {
-      const res = await chatApi.searchMessages(props.chatId, term)
-      results.value = res.hits
-      total.value = res.total
+      const { data: searchData, error: searchError } = await apiClient.GET('/v1/chats/search/{chatId}', {
+        params: {
+          path: { chatId: props.chatId },
+          query: { q: term, per_page: 50, limit: 20 },
+        },
+      })
+      if (searchError) throw new Error(getErrorMessage(searchError, 'Failed to search messages'))
+      results.value = searchData.hits
+      total.value = searchData.total
     } catch {
       results.value = []
       total.value = 0
