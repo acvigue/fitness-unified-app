@@ -45,7 +45,7 @@ onMounted(async () => {
 })
 
 const moveToReportsPage = () => {
-  router.push('/user/report')
+  router.push('/report')
 }
 
 const primaryPicture = computed(() => {
@@ -218,7 +218,7 @@ async function saveFeatured() {
       <!-- My Reports Button -->
       <div class="flex justify-center">
         <UButton @click="moveToReportsPage" color="primary" variant="soft">
-        My Reports
+        Report Users
         </UButton>
       </div>
     </div>
