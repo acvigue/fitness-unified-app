@@ -11,6 +11,15 @@ import ProfileView from '@/views/ProfileView.vue'
 import UserReportView from "@/views/UserReportView.vue"
 import UserProfileView from '@/views/UserProfileView.vue'
 import TeamView from '@/views/TeamView.vue'
+import TournamentsView from '@/views/TournamentsView.vue'
+import TournamentDetailView from '@/views/TournamentDetailView.vue'
+import TournamentCreateView from '@/views/TournamentCreateView.vue'
+import TournamentEditView from '@/views/TournamentEditView.vue'
+import TournamentManageView from '@/views/TournamentManageView.vue'
+import AchievementsView from '@/views/AchievementsView.vue'
+import TeamDetailView from '@/views/TeamDetailView.vue'
+import TeamSettingsView from '@/views/TeamSettingsView.vue'
+import NotificationsView from '@/views/NotificationsView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 
@@ -41,6 +50,51 @@ const router = createRouter({
       path: '/team',
       name: 'team',
       component: TeamView,
+    },
+    {
+      path: '/teams/:id',
+      name: 'team-detail',
+      component: TeamDetailView,
+    },
+    {
+      path: '/teams/:id/settings',
+      name: 'team-settings',
+      component: TeamSettingsView,
+    },
+    {
+      path: '/tournaments',
+      name: 'tournaments',
+      component: TournamentsView,
+    },
+    {
+      path: '/tournaments/create',
+      name: 'tournament-create',
+      component: TournamentCreateView,
+    },
+    {
+      path: '/tournaments/:id',
+      name: 'tournament-detail',
+      component: TournamentDetailView,
+    },
+    {
+      path: '/tournaments/:id/edit',
+      name: 'tournament-edit',
+      component: TournamentEditView,
+    },
+    {
+      path: '/tournaments/:id/manage',
+      name: 'tournament-manage',
+      component: TournamentManageView,
+    },
+    {
+      path: '/achievements',
+      name: 'achievements',
+      component: AchievementsView,
+    },
+    {
+      path: '/notifications',
+      name: 'notifications',
+      component: NotificationsView,
     },
     {
       path: '/messenger',
