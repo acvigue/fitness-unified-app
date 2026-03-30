@@ -130,11 +130,6 @@ const router = createRouter({
       component: ReportView,
     },
     {
-      path: '/user/report',
-      name: 'UserReport',
-      component: UserReportView,
-    },
-    {
       path: '/settings',
       name: 'settings',
       component: SettingsView,
