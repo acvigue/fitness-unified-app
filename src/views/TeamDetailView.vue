@@ -52,10 +52,15 @@ const teamSport = computed(() =>
 // as "members" derived from the invitations list.
 const memberUserIds = computed(() => {
   const ids = new Set<string>()
-  if (team.value) ids.add(team.value.captainId)
+  if (team.value) {
+	for (const u of team.value.members) {
+	  ids.add(u.userId);
+	}
+  }
+  /*if (team.value) ids.add(team.value.captainId)
   for (const inv of teamInvitations.value) {
     if (inv.status === 'ACCEPTED') ids.add(inv.userId)
-  }
+  }*/
   return [...ids]
 })
 
