@@ -54,7 +54,7 @@ const memberUserIds = computed(() => {
   const ids = new Set<string>()
   if (team.value) {
 	for (const u of team.value.members) {
-	  ids.add(u.id);
+	  ids.add(u.sub);
 	}
   }
   /*if (team.value) ids.add(team.value.captainId)
