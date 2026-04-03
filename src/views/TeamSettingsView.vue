@@ -62,9 +62,7 @@ const currentUserId = computed(() => {
   return user?.sub || user?.id || ''
 })
 
-const isCaptain = computed(() =>
-  team.value?.captainId === currentUserId.value,
-)
+const isCaptain = computed(() => team.value?.captainId === currentUserId.value)
 
 function setMessages(s = '', e = '') {
   success.value = s
@@ -375,7 +373,12 @@ onMounted(async () => {
             </UFormField>
 
             <UFormField label="Description">
-              <UTextarea v-model="editForm.description" placeholder="Description" :rows="4" autoresize />
+              <UTextarea
+                v-model="editForm.description"
+                placeholder="Description"
+                :rows="4"
+                autoresize
+              />
             </UFormField>
 
             <UFormField label="Sport">
@@ -423,7 +426,10 @@ onMounted(async () => {
               </UButton>
             </div>
 
-            <div v-if="userSearchResults.length > 0" class="flex flex-col gap-1 max-h-48 overflow-y-auto">
+            <div
+              v-if="userSearchResults.length > 0"
+              class="flex flex-col gap-1 max-h-48 overflow-y-auto"
+            >
               <button
                 v-for="u in userSearchResults"
                 :key="u.id"
@@ -447,24 +453,50 @@ onMounted(async () => {
                 >
                   <div class="min-w-0">
                     <UserLink :user-id="inv.userId" class="text-sm" />
-                    <p class="text-xs text-white/50">{{ inv.type === 'INVITE' ? 'Invitation' : 'Join Request' }}</p>
+                    <p class="text-xs text-white/50">
+                      {{ inv.type === 'INVITE' ? 'Invitation' : 'Join Request' }}
+                    </p>
                   </div>
                   <div v-if="inv.status === 'PENDING'" class="flex gap-1 shrink-0">
                     <template v-if="inv.type === 'REQUEST'">
-                      <UButton size="xs" color="primary" :loading="actionLoading" @click="acceptInvitation(inv.id)">
+                      <UButton
+                        size="xs"
+                        color="primary"
+                        :loading="actionLoading"
+                        @click="acceptInvitation(inv.id)"
+                      >
                         Accept
                       </UButton>
-                      <UButton size="xs" color="error" variant="soft" :loading="actionLoading" @click="declineInvitation(inv.id)">
+                      <UButton
+                        size="xs"
+                        color="error"
+                        variant="soft"
+                        :loading="actionLoading"
+                        @click="declineInvitation(inv.id)"
+                      >
                         Decline
                       </UButton>
                     </template>
-                    <UButton v-if="inv.type === 'INVITE'" size="xs" color="error" variant="soft" :loading="actionLoading" @click="cancelInvitation(inv.id)">
+                    <UButton
+                      v-if="inv.type === 'INVITE'"
+                      size="xs"
+                      color="error"
+                      variant="soft"
+                      :loading="actionLoading"
+                      @click="cancelInvitation(inv.id)"
+                    >
                       Cancel
                     </UButton>
                   </div>
                   <UBadge
                     v-else
-                    :color="inv.status === 'ACCEPTED' ? 'success' : inv.status === 'DECLINED' ? 'error' : 'warning'"
+                    :color="
+                      inv.status === 'ACCEPTED'
+                        ? 'success'
+                        : inv.status === 'DECLINED'
+                          ? 'error'
+                          : 'warning'
+                    "
                     variant="soft"
                     size="xs"
                   >
@@ -482,10 +514,16 @@ onMounted(async () => {
         <div class="flex flex-col gap-3">
           <div>
             <p class="text-xs uppercase tracking-[0.3em] text-white/60">Remove Member</p>
-            <p class="text-sm text-white/60">Remove a member from the team by their user ID.</p>
+            <p class="text-sm text-white/60">
+              Remove a member from the team by their user ID through their profile .
+            </p>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row">
-            <UInput v-model="removeMemberId" class="flex-1" placeholder="User ID to remove" />
+            <UInput
+              v-model="removeMemberId"
+              class="flex-1"
+              placeholder="User ID from their profile to remove"
+            />
             <UButton color="error" variant="soft" :loading="actionLoading" @click="removeMember">
               Remove Member
             </UButton>
@@ -498,16 +536,28 @@ onMounted(async () => {
         <div class="flex flex-col gap-3">
           <div>
             <p class="text-xs uppercase tracking-[0.3em] text-white/60">Transfer Captaincy</p>
-            <p class="text-sm text-white/60">Transfer captain role to another team member. You will lose captain access.</p>
+            <p class="text-sm text-white/60">
+              Transfer captain role to another team member. You will lose captain access.
+            </p>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row">
             <USelect
               v-model="captainForm.captainId"
               class="flex-1"
               placeholder="Select a team member"
-              :items="nonCaptainMembers.map((m) => ({ label: m.name || m.username || m.sub, value: m.sub }))"
+              :items="
+                nonCaptainMembers.map((m) => ({
+                  label: m.name || m.username || m.sub,
+                  value: m.sub,
+                }))
+              "
             />
-            <UButton color="primary" :loading="transferringCaptain" :disabled="!captainForm.captainId" @click="transferCaptain">
+            <UButton
+              color="primary"
+              :loading="transferringCaptain"
+              :disabled="!captainForm.captainId"
+              @click="transferCaptain"
+            >
               Transfer
             </UButton>
           </div>
@@ -521,7 +571,13 @@ onMounted(async () => {
           <p class="mt-1 text-sm text-red-100/80">
             Deleting a team cannot be undone. All members will be removed.
           </p>
-          <UButton class="mt-4" color="error" variant="soft" :loading="deletingTeam" @click="deleteTeam">
+          <UButton
+            class="mt-4"
+            color="error"
+            variant="soft"
+            :loading="deletingTeam"
+            @click="deleteTeam"
+          >
             Delete Team
           </UButton>
         </div>
