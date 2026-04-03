@@ -8,12 +8,14 @@ import { getErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/types/api'
 
 type UserAchievement = components['schemas']['UserAchievementResponseDto']
+type AchievementDefinition = components['schemas']['AchievementDefinitionResponseDto']
 
 useHead({ title: 'Achievements' })
 
 const { setHeader } = usePageHeader()
 
 const achievements = ref<UserAchievement[]>([])
+const definitions = ref<AchievementDefinition[]>([])
 const loading = ref(true)
 const error = ref('')
 
@@ -21,8 +23,20 @@ const earned = computed(() =>
   achievements.value.filter((a) => a.unlockedAt),
 )
 
+const inProgress = computed(() =>
+  achievements.value.filter((a) => !a.unlockedAt && a.progress > 0),
+)
+
+const trackedIds = computed(() =>
+  new Set(achievements.value.map((a) => a.achievement.id)),
+)
+
 const locked = computed(() =>
-  achievements.value.filter((a) => !a.unlockedAt),
+  definitions.value.filter((d) => !trackedIds.value.has(d.id)),
+)
+
+const totalCount = computed(() =>
+  definitions.value.length || achievements.value.length,
 )
 
 const CRITERIA_ICONS: Record<string, string> = {
@@ -50,16 +64,20 @@ function formatDate(dateStr: string | null | undefined | Record<string, never>) 
   })
 }
 
-async function loadAchievements() {
+async function loadData() {
   loading.value = true
   error.value = ''
   try {
-    const { data, error: err } = await apiClient.GET('/v1/achievements/me')
-    if (err) {
-      error.value = getErrorMessage(err, 'Failed to load achievements')
+    const [meResult, defsResult] = await Promise.all([
+      apiClient.GET('/v1/achievements/me'),
+      apiClient.GET('/v1/achievements/definitions'),
+    ])
+    if (meResult.error) {
+      error.value = getErrorMessage(meResult.error, 'Failed to load achievements')
       return
     }
-    achievements.value = data ?? []
+    achievements.value = meResult.data ?? []
+    definitions.value = defsResult.data ?? []
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to load achievements'
   } finally {
@@ -69,7 +87,7 @@ async function loadAchievements() {
 
 onMounted(() => {
   setHeader({ title: 'Achievements' })
-  loadAchievements()
+  loadData()
 })
 </script>
 
@@ -89,7 +107,7 @@ onMounted(() => {
         <div class="flex items-center justify-between">
           <div>
             <p class="text-xs uppercase tracking-[0.3em] text-white/60">Achievements</p>
-            <p class="text-lg font-medium">{{ earned.length }} / {{ achievements.length }} Unlocked</p>
+            <p class="text-lg font-medium">{{ earned.length }} / {{ totalCount }} Unlocked</p>
           </div>
           <UButton
             size="sm"
@@ -97,7 +115,7 @@ onMounted(() => {
             color="neutral"
             icon="i-lucide-refresh-cw"
             :loading="loading"
-            @click="loadAchievements"
+            @click="loadData"
           />
         </div>
       </UCard>
@@ -127,18 +145,18 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Locked / In Progress -->
-      <div v-if="locked.length > 0">
+      <!-- In Progress -->
+      <div v-if="inProgress.length > 0">
         <p class="text-xs uppercase tracking-[0.3em] text-white/60 mb-3">In Progress</p>
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div
-            v-for="ua in locked"
+            v-for="ua in inProgress"
             :key="ua.id"
-            class="rounded-lg border border-white/10 bg-white/[0.02] p-4 opacity-80"
+            class="rounded-lg border border-white/10 bg-white/[0.02] p-4"
           >
             <div class="flex items-start gap-3">
               <div class="rounded-full bg-white/10 p-2.5">
-                <UIcon :name="getIcon(ua.achievement.criteriaType)" class="text-white/40 text-lg" />
+                <UIcon :name="getIcon(ua.achievement.criteriaType)" class="text-white/50 text-lg" />
               </div>
               <div class="flex-1 min-w-0">
                 <p class="font-medium text-sm">{{ ua.achievement.name }}</p>
@@ -146,7 +164,7 @@ onMounted(() => {
                 <div class="mt-2 flex items-center gap-2">
                   <div class="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
                     <div
-                      class="h-full rounded-full bg-white/30 transition-all"
+                      class="h-full rounded-full bg-primary/50 transition-all"
                       :style="{ width: `${progressPercent(ua)}%` }"
                     />
                   </div>
@@ -160,9 +178,37 @@ onMounted(() => {
         </div>
       </div>
 
+      <!-- Locked -->
+      <div v-if="locked.length > 0">
+        <p class="text-xs uppercase tracking-[0.3em] text-white/60 mb-3">Locked</p>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            v-for="def in locked"
+            :key="def.id"
+            class="rounded-lg border border-white/5 bg-white/1 p-4 opacity-60"
+          >
+            <div class="flex items-start gap-3">
+              <div class="rounded-full bg-white/5 p-2.5">
+                <UIcon :name="getIcon(def.criteriaType)" class="text-white/30 text-lg" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-sm text-white/70">{{ def.name }}</p>
+                <p class="text-xs text-white/40 mt-0.5">{{ def.description }}</p>
+                <div class="mt-2 flex items-center gap-2">
+                  <div class="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden" />
+                  <span class="text-[10px] text-white/30 whitespace-nowrap">
+                    0/{{ def.threshold }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Empty state -->
       <div
-        v-if="achievements.length === 0"
+        v-if="totalCount === 0"
         class="rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
       >
         No achievements available yet. Participate in tournaments to earn achievements!
