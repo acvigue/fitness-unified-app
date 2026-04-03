@@ -41,6 +41,10 @@ const savingTeam = ref(false)
 const captainForm = reactive({ captainId: '' })
 const transferringCaptain = ref(false)
 
+const nonCaptainMembers = computed(() =>
+  (team.value?.members ?? []).filter((m) => m.sub !== team.value?.captainId),
+)
+
 // Invitations
 const teamInvitations = ref<TeamInvitation[]>([])
 const userSearchQuery = ref('')
@@ -146,8 +150,8 @@ async function saveTeam() {
 }
 
 async function transferCaptain() {
-  if (!captainForm.captainId.trim()) {
-    setMessages('', 'New captain ID is required')
+  if (!captainForm.captainId) {
+    setMessages('', 'Please select a team member')
     return
   }
   transferringCaptain.value = true
@@ -155,7 +159,7 @@ async function transferCaptain() {
   try {
     const { error: err } = await apiClient.PATCH('/v1/teams/{id}/captain', {
       params: { path: { id: teamId.value } },
-      body: { captainId: captainForm.captainId.trim() },
+      body: { captainId: captainForm.captainId },
     })
     if (err) {
       setMessages('', getErrorMessage(err, 'Failed to transfer captain'))
@@ -177,12 +181,15 @@ async function deleteTeam() {
   deletingTeam.value = true
   setMessages()
   try {
-    const { error: err } = await apiClient.DELETE('/v1/teams/{id}', {
+    const { data, error: err } = await apiClient.DELETE('/v1/teams/{id}', {
       params: { path: { id: teamId.value } },
     })
     if (err) {
       setMessages('', getErrorMessage(err, 'Failed to delete team'))
       return
+    }
+    if (data?.warning) {
+      window.alert(data.warning)
     }
     router.push('/team')
   } catch (e) {
@@ -494,8 +501,13 @@ onMounted(async () => {
             <p class="text-sm text-white/60">Transfer captain role to another team member. You will lose captain access.</p>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row">
-            <UInput v-model="captainForm.captainId" class="flex-1" placeholder="New captain user ID" />
-            <UButton color="primary" :loading="transferringCaptain" @click="transferCaptain">
+            <USelect
+              v-model="captainForm.captainId"
+              class="flex-1"
+              placeholder="Select a team member"
+              :items="nonCaptainMembers.map((m) => ({ label: m.name || m.username || m.sub, value: m.sub }))"
+            />
+            <UButton color="primary" :loading="transferringCaptain" :disabled="!captainForm.captainId" @click="transferCaptain">
               Transfer
             </UButton>
           </div>

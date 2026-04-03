@@ -1968,6 +1968,8 @@ export interface components {
              * @example 550e8400-e29b-41d4-a716-446655440000
              */
             sportId: string;
+            /** @description List of team members */
+            members: components["schemas"]["UserResponseDto"][];
         };
         TeamInvitationResponseDto: {
             /**
@@ -4206,11 +4208,16 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Team deleted */
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        /** @description Warning if the team was in tournaments */
+                        warning?: string | null;
+                    };
+                };
             };
             /** @description Unauthorized - invalid or missing token */
             401: {

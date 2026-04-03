@@ -22,6 +22,7 @@ const NOTIFICATION_ICONS: Record<string, string> = {
   MEMBER_LEFT: 'i-lucide-user-minus',
   REMOVED_FROM_TEAM: 'i-lucide-user-x',
   TEAM_DELETED: 'i-lucide-trash-2',
+  TOURNAMENT_DELETED: 'i-lucide-circle-x',
   TOURNAMENT_INVITE: 'i-lucide-trophy',
   ACHIEVEMENT_UNLOCKED: 'i-lucide-award',
 }
