@@ -119,6 +119,12 @@ const router = createRouter({
       component: ProfileView,
     },
     {
+      path: '/profile/:userId',
+      name: 'user-profile',
+      component: UserProfileView,
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/report',
       name: 'report',
       component: ReportView,
