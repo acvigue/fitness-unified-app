@@ -203,6 +203,9 @@ onMounted(() => {
           <div class="mt-1.5 flex items-center gap-2 text-sm text-white/60">
             <UIcon name="i-lucide-dumbbell" class="text-xs" />
             <span>{{ tournament.sport?.icon || '' }} {{ tournament.sport?.name || 'Unknown' }}</span>
+            <UBadge variant="subtle" color="neutral" size="xs">
+              {{ tournament.format === 'ROUND_ROBIN' ? 'Round Robin' : 'Elimination' }}
+            </UBadge>
           </div>
 
           <div class="mt-3 flex items-center gap-2">

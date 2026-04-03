@@ -15,6 +15,7 @@ type Tournament = components['schemas']['TournamentResponseDto']
 type TournamentTeam = components['schemas']['TournamentTeamResponseDto']
 type TournamentMatchDto = components['schemas']['TournamentMatchResponseDto']
 type BracketResponse = components['schemas']['TournamentBracketResponseDto']
+type StandingsResponse = components['schemas']['TournamentStandingsResponseDto']
 
 useHead({ title: 'Tournament' })
 
@@ -36,6 +37,10 @@ const bracket = ref<BracketResponse | null>(null)
 const bracketLoading = ref(false)
 const bracketError = ref('')
 const generatingBracket = ref(false)
+
+// Standings (round robin)
+const standings = ref<StandingsResponse | null>(null)
+const standingsLoading = ref(false)
 
 // Match result modal
 const resultModalOpen = ref(false)
@@ -83,6 +88,8 @@ const isFull = computed(() =>
 )
 
 const isOpen = computed(() => tournament.value?.status === 'OPEN')
+
+const isRoundRobin = computed(() => tournament.value?.format === 'ROUND_ROBIN')
 
 const canGenerateBracket = computed(() =>
   isOrgManager.value
@@ -178,6 +185,25 @@ async function loadBracket() {
   }
 }
 
+async function loadStandings() {
+  if (!isRoundRobin.value) return
+  standingsLoading.value = true
+  try {
+    const { data, error: err } = await apiClient.GET('/v1/tournaments/{id}/standings', {
+      params: { path: { id: tournamentId.value } },
+    })
+    if (err) {
+      standings.value = null
+      return
+    }
+    standings.value = data
+  } catch {
+    standings.value = null
+  } finally {
+    standingsLoading.value = false
+  }
+}
+
 async function generateBracket() {
   generatingBracket.value = true
   actionError.value = ''
@@ -191,8 +217,9 @@ async function generateBracket() {
       return
     }
     bracket.value = data
-    actionMessage.value = 'Bracket generated successfully!'
+    actionMessage.value = isRoundRobin.value ? 'Fixtures generated successfully!' : 'Bracket generated successfully!'
     await loadTournament()
+    if (isRoundRobin.value) await loadStandings()
   } catch (e) {
     actionError.value = e instanceof Error ? e.message : 'Failed to generate bracket'
   } finally {
@@ -209,7 +236,7 @@ function openRecordResult(match: TournamentMatchDto) {
 
 async function submitResult() {
   if (!selectedMatch.value) return
-  if (resultForm.value.team1Score === resultForm.value.team2Score) {
+  if (!isRoundRobin.value && resultForm.value.team1Score === resultForm.value.team2Score) {
     resultError.value = 'Scores cannot be tied in single elimination'
     return
   }
@@ -234,6 +261,7 @@ async function submitResult() {
     resultModalOpen.value = false
     await loadBracket()
     await loadTournament()
+    if (isRoundRobin.value) await loadStandings()
   } catch (e) {
     resultError.value = e instanceof Error ? e.message : 'Failed to record result'
   } finally {
@@ -313,7 +341,9 @@ watch(() => tournament.value?.status, (status) => {
 
 onMounted(() => {
   setHeader({ title: 'Tournament', backRoute: '/tournaments' })
-  loadTournament()
+  loadTournament().then(() => {
+    if (isRoundRobin.value) loadStandings()
+  })
   loadMyTeams()
   loadBracket()
 })
@@ -365,7 +395,11 @@ onUnmounted(() => {
             </UBadge>
           </div>
 
-          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <div class="rounded-lg border border-white/10 p-3">
+              <p class="text-xs uppercase tracking-wide text-white/50">Format</p>
+              <p class="mt-1 text-sm">{{ isRoundRobin ? 'Round Robin' : 'Single Elimination' }}</p>
+            </div>
             <div class="rounded-lg border border-white/10 p-3">
               <p class="text-xs uppercase tracking-wide text-white/50">Sport</p>
               <p class="mt-1 text-sm">{{ tournament.sport?.icon || '' }} {{ tournament.sport?.name }}</p>
@@ -404,10 +438,11 @@ onUnmounted(() => {
       <UCard v-if="canGenerateBracket" class="bg-white/5">
         <div class="flex flex-col gap-3">
           <div>
-            <p class="text-xs uppercase tracking-[0.3em] text-white/60">Bracket</p>
+            <p class="text-xs uppercase tracking-[0.3em] text-white/60">{{ isRoundRobin ? 'Fixtures' : 'Bracket' }}</p>
             <p class="text-sm text-white/60">
-              Generate a single-elimination bracket with {{ tournament.teams.length }} teams.
-              Teams will be randomly seeded.
+              Generate {{ isRoundRobin ? 'round robin fixtures' : 'a single-elimination bracket' }}
+              with {{ tournament.teams.length }} teams.
+              {{ isRoundRobin ? 'Every team plays every other team once.' : 'Teams will be randomly seeded.' }}
             </p>
           </div>
           <UButton
@@ -416,7 +451,7 @@ onUnmounted(() => {
             :loading="generatingBracket"
             @click="generateBracket"
           >
-            Generate Bracket
+            Generate {{ isRoundRobin ? 'Fixtures' : 'Bracket' }}
           </UButton>
         </div>
       </UCard>
@@ -426,7 +461,7 @@ onUnmounted(() => {
         <div class="flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-xs uppercase tracking-[0.3em] text-white/60">Bracket</p>
+              <p class="text-xs uppercase tracking-[0.3em] text-white/60">{{ isRoundRobin ? 'Fixtures' : 'Bracket' }}</p>
               <p class="text-sm text-white/60">{{ bracket.totalRounds }} rounds</p>
             </div>
             <UButton
@@ -445,6 +480,7 @@ onUnmounted(() => {
             :rounds="bracket.rounds"
             :total-rounds="bracket.totalRounds"
             :is-org-manager="!!isOrgManager"
+            :format="tournament.format"
             @record-result="openRecordResult"
           />
         </div>
@@ -453,6 +489,65 @@ onUnmounted(() => {
       <div v-if="showBracket && bracketLoading && !bracket" class="flex justify-center p-4">
         <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-6" />
       </div>
+
+      <!-- Standings Table (round robin) -->
+      <UCard v-if="isRoundRobin && standings && standings.standings.length > 0" class="bg-white/5">
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-[0.3em] text-white/60">Standings</p>
+            </div>
+            <UButton
+              size="xs"
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-refresh-cw"
+              :loading="standingsLoading"
+              @click="loadStandings"
+            >
+              Refresh
+            </UButton>
+          </div>
+
+          <div class="overflow-x-auto -mx-1">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-white/10 text-white/50 text-xs uppercase tracking-wide">
+                  <th class="text-left py-2 px-2">#</th>
+                  <th class="text-left py-2 px-2">Team</th>
+                  <th class="text-center py-2 px-2">P</th>
+                  <th class="text-center py-2 px-2">W</th>
+                  <th class="text-center py-2 px-2">D</th>
+                  <th class="text-center py-2 px-2">L</th>
+                  <th class="text-center py-2 px-2">PF</th>
+                  <th class="text-center py-2 px-2">PA</th>
+                  <th class="text-center py-2 px-2">+/-</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(row, idx) in standings.standings"
+                  :key="row.team.id"
+                  class="border-b border-white/5"
+                  :class="idx === 0 ? 'bg-primary/5' : ''"
+                >
+                  <td class="py-2 px-2 text-white/50">{{ idx + 1 }}</td>
+                  <td class="py-2 px-2 font-medium">{{ row.team.name }}</td>
+                  <td class="py-2 px-2 text-center">{{ row.played }}</td>
+                  <td class="py-2 px-2 text-center text-green-400">{{ row.wins }}</td>
+                  <td class="py-2 px-2 text-center text-white/50">{{ row.draws }}</td>
+                  <td class="py-2 px-2 text-center text-red-400">{{ row.losses }}</td>
+                  <td class="py-2 px-2 text-center">{{ row.pointsFor }}</td>
+                  <td class="py-2 px-2 text-center">{{ row.pointsAgainst }}</td>
+                  <td class="py-2 px-2 text-center font-mono" :class="row.pointDiff > 0 ? 'text-green-400' : row.pointDiff < 0 ? 'text-red-400' : 'text-white/50'">
+                    {{ row.pointDiff > 0 ? '+' : '' }}{{ row.pointDiff }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </UCard>
 
       <!-- Join Tournament (student/captain view) -->
       <UCard v-if="isOpen && !isFull && joinableTeams.length > 0" class="bg-white/5">
@@ -575,7 +670,10 @@ onUnmounted(() => {
             </div>
 
             <p class="text-xs text-white/40">
-              Scores cannot be tied. The higher score wins and advances.
+              {{ isRoundRobin
+                ? 'Ties are allowed. Results update the standings table.'
+                : 'Scores cannot be tied. The higher score wins and advances.'
+              }}
             </p>
 
             <div class="flex justify-end gap-3">

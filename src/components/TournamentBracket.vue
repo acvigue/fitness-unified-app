@@ -9,6 +9,7 @@ const props = defineProps<{
   rounds: BracketRound[]
   totalRounds: number
   isOrgManager: boolean
+  format?: 'SINGLE_ELIMINATION' | 'ROUND_ROBIN'
 }>()
 
 const emit = defineEmits<{
@@ -38,12 +39,17 @@ function canRecordResult(match: TournamentMatch) {
 }
 
 const champion = computed(() => {
+  if (props.format === 'ROUND_ROBIN') return null
   const finalRound = props.rounds[props.rounds.length - 1]
   if (!finalRound) return null
   const finalMatch = finalRound.matches[0]
   if (!finalMatch || finalMatch.status !== 'COMPLETED') return null
   return finalMatch.winner
 })
+
+function isDraw(match: TournamentMatch) {
+  return match.status === 'COMPLETED' && !match.winner
+}
 </script>
 
 <template>
@@ -88,13 +94,18 @@ const champion = computed(() => {
           <!-- Team 1 -->
           <div
             class="flex items-center justify-between px-3 py-2 border-b border-white/5"
-            :class="match.winner?.id === match.team1?.id ? 'bg-primary/10' : ''"
+            :class="match.winner?.id === match.team1?.id ? 'bg-primary/10' : isDraw(match) ? 'bg-white/[0.03]' : ''"
           >
             <div class="flex items-center gap-2 min-w-0">
               <UIcon
                 v-if="match.winner?.id === match.team1?.id"
                 name="i-lucide-check"
                 class="text-primary shrink-0 size-3.5"
+              />
+              <UIcon
+                v-else-if="isDraw(match)"
+                name="i-lucide-minus"
+                class="text-white/40 shrink-0 size-3.5"
               />
               <span class="text-sm truncate" :class="match.team1 ? '' : 'text-white/30 italic'">
                 {{ match.team1?.name || 'TBD' }}
@@ -111,13 +122,18 @@ const champion = computed(() => {
           <!-- Team 2 -->
           <div
             class="flex items-center justify-between px-3 py-2"
-            :class="match.winner?.id === match.team2?.id ? 'bg-primary/10' : ''"
+            :class="match.winner?.id === match.team2?.id ? 'bg-primary/10' : isDraw(match) ? 'bg-white/[0.03]' : ''"
           >
             <div class="flex items-center gap-2 min-w-0">
               <UIcon
                 v-if="match.winner?.id === match.team2?.id"
                 name="i-lucide-check"
                 class="text-primary shrink-0 size-3.5"
+              />
+              <UIcon
+                v-else-if="isDraw(match)"
+                name="i-lucide-minus"
+                class="text-white/40 shrink-0 size-3.5"
               />
               <span class="text-sm truncate" :class="match.team2 ? '' : 'text-white/30 italic'">
                 {{ match.team2?.name || 'TBD' }}

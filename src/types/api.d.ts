@@ -56,6 +56,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/achievements/me/locked": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get only locked (not yet earned) achievements for current user */
+        get: operations["AchievementController_getMyLockedAchievements_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/notifications": {
         parameters: {
             query?: never;
@@ -876,11 +893,28 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get the tournament bracket with all matches */
+        /** Get the tournament bracket/matches grouped by round */
         get: operations["TournamentController_getBracket_v1"];
         put?: never;
         /** Generate single-elimination bracket with random seeding (requires STAFF or ADMIN role) */
         post: operations["TournamentController_generateBracket_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tournaments/{id}/standings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get round robin standings (round robin tournaments only) */
+        get: operations["TournamentController_getStandings_v1"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2073,7 +2107,7 @@ export interface components {
              */
             organizationId: string;
             /**
-             * @description Maximum number of teams (must be a power of 2)
+             * @description Maximum number of teams (must be a power of 2 for SINGLE_ELIMINATION)
              * @example 16
              */
             maxTeams: number;
@@ -2082,6 +2116,12 @@ export interface components {
              * @example 2024-06-01T09:00:00Z
              */
             startDate: string;
+            /**
+             * @description Tournament format (defaults to SINGLE_ELIMINATION)
+             * @example SINGLE_ELIMINATION
+             * @enum {string}
+             */
+            format?: "SINGLE_ELIMINATION" | "ROUND_ROBIN";
         };
         TournamentTeamResponseDto: {
             /**
@@ -2108,6 +2148,12 @@ export interface components {
              * @example Spring Championship 2024
              */
             name: string;
+            /**
+             * @description Tournament format
+             * @example SINGLE_ELIMINATION
+             * @enum {string}
+             */
+            format: "SINGLE_ELIMINATION" | "ROUND_ROBIN";
             /**
              * @description Tournament status
              * @example OPEN
@@ -2246,6 +2292,54 @@ export interface components {
             totalRounds: number;
             /** @description Bracket rounds */
             rounds: components["schemas"]["BracketRoundDto"][];
+        };
+        TeamStandingDto: {
+            /** @description Team info */
+            team: components["schemas"]["TournamentTeamResponseDto"];
+            /**
+             * @description Matches played
+             * @example 3
+             */
+            played: number;
+            /**
+             * @description Matches won
+             * @example 2
+             */
+            wins: number;
+            /**
+             * @description Matches lost
+             * @example 1
+             */
+            losses: number;
+            /**
+             * @description Matches drawn
+             * @example 0
+             */
+            draws: number;
+            /**
+             * @description Points scored
+             * @example 9
+             */
+            pointsFor: number;
+            /**
+             * @description Points conceded
+             * @example 5
+             */
+            pointsAgainst: number;
+            /**
+             * @description Point differential
+             * @example 4
+             */
+            pointDiff: number;
+        };
+        TournamentStandingsResponseDto: {
+            /**
+             * @description Tournament ID
+             * @example clr1abc2d0001
+             */
+            tournamentId: string;
+            /** @description Team standings sorted by wins then point differential */
+            standings: components["schemas"]["TeamStandingDto"][];
         };
         RecordMatchResultDto: {
             /**
@@ -2437,6 +2531,43 @@ export interface operations {
         };
     };
     AchievementController_getMyEarnedAchievements_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserAchievementResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AchievementController_getMyLockedAchievements_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -5634,6 +5765,63 @@ export interface operations {
             };
             /** @description Insufficient role — requires STAFF or ADMIN */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TournamentController_getStandings_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TournamentStandingsResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
