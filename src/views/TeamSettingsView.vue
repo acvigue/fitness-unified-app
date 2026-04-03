@@ -475,10 +475,10 @@ onMounted(async () => {
         <div class="flex flex-col gap-3">
           <div>
             <p class="text-xs uppercase tracking-[0.3em] text-white/60">Remove Member</p>
-            <p class="text-sm text-white/60">Remove a member from the team by their user ID.</p>
+            <p class="text-sm text-white/60">Remove a member from the team by their user ID through their profile .</p>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row">
-            <UInput v-model="removeMemberId" class="flex-1" placeholder="User ID to remove" />
+            <UInput v-model="removeMemberId" class="flex-1" placeholder="User ID from their profile to remove" />
             <UButton color="error" variant="soft" :loading="actionLoading" @click="removeMember">
               Remove Member
             </UButton>
@@ -494,7 +494,8 @@ onMounted(async () => {
             <p class="text-sm text-white/60">Transfer captain role to another team member. You will lose captain access.</p>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row">
-            <UInput v-model="captainForm.captainId" class="flex-1" placeholder="New captain user ID" />
+            <UInput v-model="captainForm.captainId" class="flex-1"
+                    placeholder="New captain user ID" />
             <UButton color="primary" :loading="transferringCaptain" @click="transferCaptain">
               Transfer
             </UButton>
