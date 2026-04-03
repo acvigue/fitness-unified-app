@@ -27,12 +27,8 @@ const inProgress = computed(() =>
   achievements.value.filter((a) => !a.unlockedAt && a.progress > 0),
 )
 
-const trackedIds = computed(() =>
-  new Set(achievements.value.map((a) => a.achievement.id)),
-)
-
 const locked = computed(() =>
-  definitions.value.filter((d) => !trackedIds.value.has(d.id)),
+  achievements.value.filter((a) => !a.unlockedAt && a.progress === 0),
 )
 
 const totalCount = computed(() =>
@@ -152,7 +148,7 @@ onMounted(() => {
           <div
             v-for="ua in inProgress"
             :key="ua.id"
-            class="rounded-lg border border-white/10 bg-white/[0.02] p-4"
+            class="rounded-lg border border-white/10 bg-white/2 p-4"
           >
             <div class="flex items-start gap-3">
               <div class="rounded-full bg-white/10 p-2.5">
@@ -183,21 +179,21 @@ onMounted(() => {
         <p class="text-xs uppercase tracking-[0.3em] text-white/60 mb-3">Locked</p>
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div
-            v-for="def in locked"
-            :key="def.id"
+            v-for="ua in locked"
+            :key="ua.achievement.id"
             class="rounded-lg border border-white/5 bg-white/1 p-4 opacity-60"
           >
             <div class="flex items-start gap-3">
               <div class="rounded-full bg-white/5 p-2.5">
-                <UIcon :name="getIcon(def.criteriaType)" class="text-white/30 text-lg" />
+                <UIcon :name="getIcon(ua.achievement.criteriaType)" class="text-white/30 text-lg" />
               </div>
               <div class="flex-1 min-w-0">
-                <p class="font-medium text-sm text-white/70">{{ def.name }}</p>
-                <p class="text-xs text-white/40 mt-0.5">{{ def.description }}</p>
+                <p class="font-medium text-sm text-white/70">{{ ua.achievement.name }}</p>
+                <p class="text-xs text-white/40 mt-0.5">{{ ua.achievement.description }}</p>
                 <div class="mt-2 flex items-center gap-2">
                   <div class="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden" />
                   <span class="text-[10px] text-white/30 whitespace-nowrap">
-                    0/{{ def.threshold }}
+                    0/{{ ua.achievement.threshold }}
                   </span>
                 </div>
               </div>
