@@ -10,13 +10,9 @@ export const useNotificationStore = defineStore('notifications', () => {
   const loading = ref(false)
   let pollInterval: ReturnType<typeof setInterval> | null = null
 
-  const unreadCount = computed(() =>
-    notifications.value.filter((n) => !n.dismissed).length,
-  )
+  const unreadCount = computed(() => notifications.value.filter((n) => !n.dismissed).length)
 
-  const unreadNotifications = computed(() =>
-    notifications.value.filter((n) => !n.dismissed),
-  )
+  const unreadNotifications = computed(() => notifications.value.filter((n) => !n.dismissed))
 
   async function fetchNotifications() {
     loading.value = true

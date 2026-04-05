@@ -25,9 +25,12 @@ const displayName = computed(() => {
 onMounted(async () => {
   setHeader({ title: t('profile.userProfile') })
   try {
-    const { data: profileData, error: profileErr } = await apiClient.GET('/v1/users/{userId}/profile', {
-      params: { path: { userId: userId.value } },
-    })
+    const { data: profileData, error: profileErr } = await apiClient.GET(
+      '/v1/users/{userId}/profile',
+      {
+        params: { path: { userId: userId.value } },
+      },
+    )
     if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
     profile.value = profileData
   } catch (err: any) {
@@ -54,11 +57,7 @@ const primaryPicture = computed(() => {
     <div v-else class="flex flex-col gap-6 px-5 py-6">
       <!-- Profile Picture -->
       <div class="flex justify-center">
-        <UAvatar
-          :src="primaryPicture"
-          alt="Profile"
-          size="3xl"
-        />
+        <UAvatar :src="primaryPicture" alt="Profile" size="3xl" />
       </div>
 
       <!-- Full Name -->

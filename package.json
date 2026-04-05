@@ -68,6 +68,7 @@
   },
   "pnpm": {
     "ignoredBuiltDependencies": [
+      "@nestjs/core",
       "esbuild",
       "vue-demi"
     ],

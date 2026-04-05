@@ -55,9 +55,7 @@ onMounted(() => {
   <PageLayout>
     <section class="flex flex-col gap-4 px-5 py-6">
       <div class="flex items-center justify-between">
-        <p class="text-sm text-white/60">
-          {{ notificationStore.unreadCount }} unread
-        </p>
+        <p class="text-sm text-white/60">{{ notificationStore.unreadCount }} unread</p>
         <UButton
           size="sm"
           variant="ghost"

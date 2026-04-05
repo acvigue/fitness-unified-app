@@ -36,12 +36,15 @@ watch(searchTerm, (term) => {
   loading.value = true
   searchTimeout = setTimeout(async () => {
     try {
-      const { data: searchData, error: searchError } = await apiClient.GET('/v1/chats/search/{chatId}', {
-        params: {
-          path: { chatId: props.chatId },
-          query: { q: term, per_page: 50, limit: 20 },
+      const { data: searchData, error: searchError } = await apiClient.GET(
+        '/v1/chats/search/{chatId}',
+        {
+          params: {
+            path: { chatId: props.chatId },
+            query: { q: term, per_page: 50, limit: 20 },
+          },
         },
-      })
+      )
       if (searchError) throw new Error(getErrorMessage(searchError, 'Failed to search messages'))
       results.value = searchData.hits
       total.value = searchData.total
@@ -80,7 +83,10 @@ function formatTime(dateStr: string) {
 function highlightMatch(content: string, query: string) {
   if (!query) return content
   const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  return content.replace(new RegExp(`(${escaped})`, 'gi'), '<mark class="bg-primary/30 text-inherit rounded-sm px-0.5">$1</mark>')
+  return content.replace(
+    new RegExp(`(${escaped})`, 'gi'),
+    '<mark class="bg-primary/30 text-inherit rounded-sm px-0.5">$1</mark>',
+  )
 }
 </script>
 
@@ -117,11 +123,17 @@ function highlightMatch(content: string, query: string) {
                 <span class="text-xs text-white/30 shrink-0">{{ formatTime(hit.createdAt) }}</span>
               </div>
               <!-- eslint-disable-next-line vue/no-v-html -->
-              <p class="text-sm text-white/80 line-clamp-2" v-html="highlightMatch(hit.content, searchTerm)" />
+              <p
+                class="text-sm text-white/80 line-clamp-2"
+                v-html="highlightMatch(hit.content, searchTerm)"
+              />
             </button>
           </template>
 
-          <p v-else-if="searchTerm.length >= 2 && !loading" class="text-center text-sm text-white/40 py-4">
+          <p
+            v-else-if="searchTerm.length >= 2 && !loading"
+            class="text-center text-sm text-white/40 py-4"
+          >
             {{ t('messenger.nosearchresults') }}
           </p>
         </div>

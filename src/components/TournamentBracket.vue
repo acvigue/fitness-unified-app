@@ -18,19 +18,27 @@ const emit = defineEmits<{
 
 function getMatchStatusColor(status: string) {
   switch (status) {
-    case 'COMPLETED': return 'success'
-    case 'PENDING': return 'warning'
-    case 'BYE': return 'neutral'
-    default: return 'neutral'
+    case 'COMPLETED':
+      return 'success'
+    case 'PENDING':
+      return 'warning'
+    case 'BYE':
+      return 'neutral'
+    default:
+      return 'neutral'
   }
 }
 
 function getMatchStatusLabel(status: string) {
   switch (status) {
-    case 'COMPLETED': return 'Completed'
-    case 'PENDING': return 'Pending'
-    case 'BYE': return 'Bye'
-    default: return status
+    case 'COMPLETED':
+      return 'Completed'
+    case 'PENDING':
+      return 'Pending'
+    case 'BYE':
+      return 'Bye'
+    default:
+      return status
   }
 }
 
@@ -65,11 +73,7 @@ function isDraw(match: TournamentMatch) {
 
   <!-- Bracket Rounds -->
   <div class="flex gap-4 overflow-x-auto pb-2">
-    <div
-      v-for="round in rounds"
-      :key="round.round"
-      class="flex flex-col gap-3 min-w-56 shrink-0"
-    >
+    <div v-for="round in rounds" :key="round.round" class="flex flex-col gap-3 min-w-56 shrink-0">
       <p class="text-xs uppercase tracking-[0.3em] text-white/60 text-center">
         {{ round.label }}
       </p>
@@ -83,9 +87,7 @@ function isDraw(match: TournamentMatch) {
         >
           <!-- Match header -->
           <div class="flex items-center justify-between px-3 py-1.5 bg-white/5">
-            <span class="text-[10px] text-white/40 uppercase">
-              Match {{ match.matchNumber }}
-            </span>
+            <span class="text-[10px] text-white/40 uppercase"> Match {{ match.matchNumber }} </span>
             <UBadge :color="getMatchStatusColor(match.status)" variant="soft" size="xs">
               {{ getMatchStatusLabel(match.status) }}
             </UBadge>
@@ -94,7 +96,13 @@ function isDraw(match: TournamentMatch) {
           <!-- Team 1 -->
           <div
             class="flex items-center justify-between px-3 py-2 border-b border-white/5"
-            :class="match.winner?.id === match.team1?.id ? 'bg-primary/10' : isDraw(match) ? 'bg-white/[0.03]' : ''"
+            :class="
+              match.winner?.id === match.team1?.id
+                ? 'bg-primary/10'
+                : isDraw(match)
+                  ? 'bg-white/[0.03]'
+                  : ''
+            "
           >
             <div class="flex items-center gap-2 min-w-0">
               <UIcon
@@ -111,10 +119,7 @@ function isDraw(match: TournamentMatch) {
                 {{ match.team1?.name || 'TBD' }}
               </span>
             </div>
-            <span
-              v-if="match.team1Score != null"
-              class="text-sm font-mono font-medium ml-2"
-            >
+            <span v-if="match.team1Score != null" class="text-sm font-mono font-medium ml-2">
               {{ match.team1Score }}
             </span>
           </div>
@@ -122,7 +127,13 @@ function isDraw(match: TournamentMatch) {
           <!-- Team 2 -->
           <div
             class="flex items-center justify-between px-3 py-2"
-            :class="match.winner?.id === match.team2?.id ? 'bg-primary/10' : isDraw(match) ? 'bg-white/[0.03]' : ''"
+            :class="
+              match.winner?.id === match.team2?.id
+                ? 'bg-primary/10'
+                : isDraw(match)
+                  ? 'bg-white/[0.03]'
+                  : ''
+            "
           >
             <div class="flex items-center gap-2 min-w-0">
               <UIcon
@@ -139,10 +150,7 @@ function isDraw(match: TournamentMatch) {
                 {{ match.team2?.name || 'TBD' }}
               </span>
             </div>
-            <span
-              v-if="match.team2Score != null"
-              class="text-sm font-mono font-medium ml-2"
-            >
+            <span v-if="match.team2Score != null" class="text-sm font-mono font-medium ml-2">
               {{ match.team2Score }}
             </span>
           </div>

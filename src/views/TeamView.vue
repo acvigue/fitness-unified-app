@@ -43,12 +43,8 @@ const createForm = reactive({ name: '', description: '' })
 const creatingTeam = ref(false)
 const createError = ref('')
 
-const myTeams = computed(() =>
-  teams.value.filter((t) => t.captainId === currentUserId.value),
-)
-const otherTeams = computed(() =>
-  teams.value.filter((t) => t.captainId !== currentUserId.value),
-)
+const myTeams = computed(() => teams.value.filter((t) => t.captainId === currentUserId.value))
+const otherTeams = computed(() => teams.value.filter((t) => t.captainId !== currentUserId.value))
 
 function getSportName(sportId: string) {
   const sport = sports.value.find((s) => s.id === sportId)
@@ -213,10 +209,21 @@ onMounted(async () => {
               <p class="text-xs text-white/50">Team: {{ inv.teamId }}</p>
             </div>
             <div class="flex gap-2 shrink-0">
-              <UButton size="xs" color="primary" :loading="actionLoading" @click="acceptInvitation(inv.id)">
+              <UButton
+                size="xs"
+                color="primary"
+                :loading="actionLoading"
+                @click="acceptInvitation(inv.id)"
+              >
                 Accept
               </UButton>
-              <UButton size="xs" color="error" variant="soft" :loading="actionLoading" @click="declineInvitation(inv.id)">
+              <UButton
+                size="xs"
+                color="error"
+                variant="soft"
+                :loading="actionLoading"
+                @click="declineInvitation(inv.id)"
+              >
                 Decline
               </UButton>
             </div>

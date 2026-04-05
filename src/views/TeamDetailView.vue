@@ -39,13 +39,9 @@ const currentUserId = computed(() => {
   return user?.sub || user?.id || ''
 })
 
-const isCaptain = computed(() =>
-  team.value?.captainId === currentUserId.value,
-)
+const isCaptain = computed(() => team.value?.captainId === currentUserId.value)
 
-const teamSport = computed(() =>
-  sports.value.find((s) => s.id === team.value?.sportId),
-)
+const teamSport = computed(() => sports.value.find((s) => s.id === team.value?.sportId))
 
 // Members: the API doesn't return a members array on TeamResponseDto,
 // but we can show the captain. We also show accepted invitation users
@@ -53,9 +49,9 @@ const teamSport = computed(() =>
 const memberUserIds = computed(() => {
   const ids = new Set<string>()
   if (team.value) {
-	for (const u of team.value.members) {
-	  ids.add(u.sub);
-	}
+    for (const u of team.value.members) {
+      ids.add(u.sub)
+    }
   }
   /*if (team.value) ids.add(team.value.captainId)
   for (const inv of teamInvitations.value) {
@@ -79,9 +75,15 @@ async function loadTeam() {
     setHeader({
       title: data.name,
       backRoute: '/team',
-      actions: data.captainId === currentUserId.value
-        ? [{ icon: 'i-lucide-settings', onClick: () => router.push(`/teams/${teamId.value}/settings`) }]
-        : [],
+      actions:
+        data.captainId === currentUserId.value
+          ? [
+              {
+                icon: 'i-lucide-settings',
+                onClick: () => router.push(`/teams/${teamId.value}/settings`),
+              },
+            ]
+          : [],
     })
     // If captain, load invitations to derive member list
     if (data.captainId === currentUserId.value) {
@@ -177,7 +179,10 @@ async function leaveTeam() {
       params: { path: { id: teamId.value } },
     })
     if (err) {
-      actionError.value = getErrorMessage(err, 'Failed to leave team. If you are captain, transfer captaincy first.')
+      actionError.value = getErrorMessage(
+        err,
+        'Failed to leave team. If you are captain, transfer captaincy first.',
+      )
       return
     }
     router.push('/team')
@@ -279,20 +284,39 @@ onMounted(async () => {
       </UCard>
 
       <!-- Pending Join Requests (captain view) -->
-      <UCard v-if="isCaptain && teamInvitations.filter((i) => i.type === 'REQUEST' && i.status === 'PENDING').length > 0" class="bg-white/5">
+      <UCard
+        v-if="
+          isCaptain &&
+          teamInvitations.filter((i) => i.type === 'REQUEST' && i.status === 'PENDING').length > 0
+        "
+        class="bg-white/5"
+      >
         <div class="flex flex-col gap-3">
           <p class="text-xs uppercase tracking-[0.3em] text-white/60">Pending Join Requests</p>
           <div
-            v-for="inv in teamInvitations.filter((i) => i.type === 'REQUEST' && i.status === 'PENDING')"
+            v-for="inv in teamInvitations.filter(
+              (i) => i.type === 'REQUEST' && i.status === 'PENDING',
+            )"
             :key="inv.id"
             class="flex items-center justify-between rounded-lg border border-white/10 p-3"
           >
             <UserLink :user-id="inv.userId" class="text-sm" />
             <div class="flex gap-2 shrink-0">
-              <UButton size="xs" color="primary" :loading="actionLoading" @click="acceptRequest(inv.id)">
+              <UButton
+                size="xs"
+                color="primary"
+                :loading="actionLoading"
+                @click="acceptRequest(inv.id)"
+              >
                 Accept
               </UButton>
-              <UButton size="xs" color="error" variant="soft" :loading="actionLoading" @click="declineRequest(inv.id)">
+              <UButton
+                size="xs"
+                color="error"
+                variant="soft"
+                :loading="actionLoading"
+                @click="declineRequest(inv.id)"
+              >
                 Decline
               </UButton>
             </div>
@@ -310,25 +334,14 @@ onMounted(async () => {
           Team Settings
         </UButton>
 
-        <UButton
-          v-if="!isCaptain"
-          color="primary"
-          :loading="actionLoading"
-          @click="requestToJoin"
-        >
+        <UButton v-if="!isCaptain" color="primary" :loading="actionLoading" @click="requestToJoin">
           Request to Join
         </UButton>
 
-        <UButton
-          color="error"
-          variant="soft"
-          :loading="actionLoading"
-          @click="leaveTeam"
-        >
+        <UButton color="error" variant="soft" :loading="actionLoading" @click="leaveTeam">
           Leave Team
         </UButton>
       </div>
     </section>
   </PageLayout>
 </template>
-

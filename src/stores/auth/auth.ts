@@ -75,7 +75,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-
   type UserInfo = {
     sub: string
     given_name?: string
@@ -84,7 +83,7 @@ export const useAuthStore = defineStore('auth', () => {
     email?: string
     [key: string]: unknown
   }
-  
+
   const user = computed<UserInfo | null>(() => {
     if (!accessToken.value) return null
     try {

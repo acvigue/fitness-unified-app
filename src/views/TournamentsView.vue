@@ -95,12 +95,18 @@ function goToPage(p: number) {
 
 function getStatusColor(status: string) {
   switch (status) {
-    case 'OPEN': return 'success'
-    case 'UPCOMING': return 'info'
-    case 'INPROGRESS': return 'warning'
-    case 'COMPLETED': return 'neutral'
-    case 'CLOSED': return 'error'
-    default: return 'neutral'
+    case 'OPEN':
+      return 'success'
+    case 'UPCOMING':
+      return 'info'
+    case 'INPROGRESS':
+      return 'warning'
+    case 'COMPLETED':
+      return 'neutral'
+    case 'CLOSED':
+      return 'error'
+    default:
+      return 'neutral'
   }
 }
 
@@ -133,7 +139,10 @@ onMounted(() => {
           <UFormField label="Sport" class="flex-1">
             <USelect
               v-model="filterSportId"
-              :items="[{ label: 'All Sports', value: 'all' }, ...sports.map((s) => ({ label: `${s.icon || ''} ${s.name}`.trim(), value: s.id }))]"
+              :items="[
+                { label: 'All Sports', value: 'all' },
+                ...sports.map((s) => ({ label: `${s.icon || ''} ${s.name}`.trim(), value: s.id })),
+              ]"
               @update:model-value="applyFilters"
             />
           </UFormField>
@@ -146,11 +155,7 @@ onMounted(() => {
             />
           </UFormField>
 
-          <UButton
-            icon="i-lucide-search"
-            :loading="loading"
-            @click="applyFilters"
-          >
+          <UButton icon="i-lucide-search" :loading="loading" @click="applyFilters">
             Search
           </UButton>
         </div>
@@ -202,7 +207,9 @@ onMounted(() => {
 
           <div class="mt-1.5 flex items-center gap-2 text-sm text-white/60">
             <UIcon name="i-lucide-dumbbell" class="text-xs" />
-            <span>{{ tournament.sport?.icon || '' }} {{ tournament.sport?.name || 'Unknown' }}</span>
+            <span
+              >{{ tournament.sport?.icon || '' }} {{ tournament.sport?.name || 'Unknown' }}</span
+            >
             <UBadge variant="subtle" color="neutral" size="xs">
               {{ tournament.format === 'ROUND_ROBIN' ? 'Round Robin' : 'Elimination' }}
             </UBadge>
@@ -212,7 +219,9 @@ onMounted(() => {
             <div class="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
               <div
                 class="h-full rounded-full bg-primary transition-all"
-                :style="{ width: `${Math.min((tournament.teams.length / tournament.maxTeams) * 100, 100)}%` }"
+                :style="{
+                  width: `${Math.min((tournament.teams.length / tournament.maxTeams) * 100, 100)}%`,
+                }"
               />
             </div>
             <span class="text-xs text-white/50">
@@ -232,9 +241,7 @@ onMounted(() => {
           :disabled="page <= 1"
           @click="goToPage(page - 1)"
         />
-        <span class="text-sm text-white/60">
-          Page {{ meta.page }} of {{ meta.total_pages }}
-        </span>
+        <span class="text-sm text-white/60"> Page {{ meta.page }} of {{ meta.total_pages }} </span>
         <UButton
           size="sm"
           variant="outline"

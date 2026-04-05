@@ -12,10 +12,13 @@
             <UButton icon="i-lucide-book-open" variant="soft" @click="openDocs">
               Documentation
             </UButton>
-			<UButton icon="i-lucide-book-open" variant="soft" @click="openGuide">
-              Guide
-            </UButton>
-            <UButton icon="i-lucide-settings" variant="soft" @click="openSettings" ref="settingsref">
+            <UButton icon="i-lucide-book-open" variant="soft" @click="openGuide"> Guide </UButton>
+            <UButton
+              icon="i-lucide-settings"
+              variant="soft"
+              @click="openSettings"
+              ref="settingsref"
+            >
               Settings
             </UButton>
           </div>
@@ -63,14 +66,14 @@ const openSettings = () => {
   router.push('/settings')
 }
 const openGuide = () => {
-  tour.start();
+  tour.start()
 }
 
 onMounted(() => {
   setHeader({
     title: 'Home',
   })
-  console.log("ref value:")
+  console.log('ref value:')
   console.log(refStore.getSidebar)
 
   tour.addStep({
@@ -83,12 +86,12 @@ onMounted(() => {
         secondary: true,
         text: 'Exit',
       },
-	  {
-		action() {
-		  return tour.next()
-		},
-		text: 'Next',
-	  }
+      {
+        action() {
+          return tour.next()
+        },
+        text: 'Next',
+      },
     ],
     text: 'Welcome to FitTime!',
   })
@@ -102,28 +105,26 @@ onMounted(() => {
         secondary: true,
         text: 'Exit',
       },
-	  {
-		action() {
-		  return tour.next()
-		},
-		text: 'Next',
-	  }
+      {
+        action() {
+          return tour.next()
+        },
+        text: 'Next',
+      },
     ],
     text: 'On the left you can find buttons to go to Home (where you are now), Messenger (where you can message your friends and teammates), Workouts, Profile (for managing what others see), and Reports (for reporting bad stuff).',
   })
   tour.addStep({
     attachTo: { element: null, on: 'bottom' },
     buttons: [
-	  {
-		action() {
-		  return tour.next()
-		},
-		text: 'Done',
-	  }
+      {
+        action() {
+          return tour.next()
+        },
+        text: 'Done',
+      },
     ],
     text: 'At the very bottom left you can see the settings button.',
   })
-
-  
 })
 </script>

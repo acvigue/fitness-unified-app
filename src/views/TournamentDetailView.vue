@@ -69,9 +69,7 @@ const myCaptainTeams = computed(() =>
   myTeams.value.filter((t) => t.captainId === currentUserId.value),
 )
 
-const registeredTeamIds = computed(() =>
-  new Set(tournament.value?.teams.map((t) => t.id) ?? []),
-)
+const registeredTeamIds = computed(() => new Set(tournament.value?.teams.map((t) => t.id) ?? []))
 
 const joinableTeams = computed(() =>
   myCaptainTeams.value.filter((t) => !registeredTeamIds.value.has(t.id)),
@@ -82,26 +80,26 @@ const myRegisteredTeams = computed(() =>
 )
 
 const isFull = computed(() =>
-  tournament.value
-    ? tournament.value.teams.length >= tournament.value.maxTeams
-    : false,
+  tournament.value ? tournament.value.teams.length >= tournament.value.maxTeams : false,
 )
 
 const isOpen = computed(() => tournament.value?.status === 'OPEN')
 
 const isRoundRobin = computed(() => tournament.value?.format === 'ROUND_ROBIN')
 
-const canGenerateBracket = computed(() =>
-  isOrgManager.value
-  && tournament.value
-  && (tournament.value.status === 'OPEN' || tournament.value.status === 'CLOSED')
-  && tournament.value.teams.length >= 2
-  && !bracket.value,
+const canGenerateBracket = computed(
+  () =>
+    isOrgManager.value &&
+    tournament.value &&
+    (tournament.value.status === 'OPEN' || tournament.value.status === 'CLOSED') &&
+    tournament.value.teams.length >= 2 &&
+    !bracket.value,
 )
 
-const showBracket = computed(() =>
-  tournament.value
-  && (tournament.value.status === 'INPROGRESS' || tournament.value.status === 'COMPLETED'),
+const showBracket = computed(
+  () =>
+    tournament.value &&
+    (tournament.value.status === 'INPROGRESS' || tournament.value.status === 'COMPLETED'),
 )
 
 function formatDate(dateStr: string) {
@@ -116,12 +114,18 @@ function formatDate(dateStr: string) {
 
 function getStatusColor(status: string) {
   switch (status) {
-    case 'OPEN': return 'success'
-    case 'UPCOMING': return 'info'
-    case 'INPROGRESS': return 'warning'
-    case 'COMPLETED': return 'neutral'
-    case 'CLOSED': return 'error'
-    default: return 'neutral'
+    case 'OPEN':
+      return 'success'
+    case 'UPCOMING':
+      return 'info'
+    case 'INPROGRESS':
+      return 'warning'
+    case 'COMPLETED':
+      return 'neutral'
+    case 'CLOSED':
+      return 'error'
+    default:
+      return 'neutral'
   }
 }
 
@@ -142,8 +146,14 @@ async function loadTournament() {
       backRoute: '/tournaments',
       actions: isOrgManager.value
         ? [
-            { icon: 'i-lucide-pencil', onClick: () => router.push(`/tournaments/${tournamentId.value}/edit`) },
-            { icon: 'i-lucide-settings', onClick: () => router.push(`/tournaments/${tournamentId.value}/manage`) },
+            {
+              icon: 'i-lucide-pencil',
+              onClick: () => router.push(`/tournaments/${tournamentId.value}/edit`),
+            },
+            {
+              icon: 'i-lucide-settings',
+              onClick: () => router.push(`/tournaments/${tournamentId.value}/manage`),
+            },
           ]
         : [],
     })
@@ -217,7 +227,9 @@ async function generateBracket() {
       return
     }
     bracket.value = data
-    actionMessage.value = isRoundRobin.value ? 'Fixtures generated successfully!' : 'Bracket generated successfully!'
+    actionMessage.value = isRoundRobin.value
+      ? 'Fixtures generated successfully!'
+      : 'Bracket generated successfully!'
     await loadTournament()
     if (isRoundRobin.value) await loadStandings()
   } catch (e) {
@@ -331,13 +343,16 @@ function stopBracketPolling() {
   }
 }
 
-watch(() => tournament.value?.status, (status) => {
-  if (status === 'INPROGRESS') {
-    startBracketPolling()
-  } else {
-    stopBracketPolling()
-  }
-})
+watch(
+  () => tournament.value?.status,
+  (status) => {
+    if (status === 'INPROGRESS') {
+      startBracketPolling()
+    } else {
+      stopBracketPolling()
+    }
+  },
+)
 
 onMounted(() => {
   setHeader({ title: 'Tournament', backRoute: '/tournaments' })
@@ -402,7 +417,9 @@ onUnmounted(() => {
             </div>
             <div class="rounded-lg border border-white/10 p-3">
               <p class="text-xs uppercase tracking-wide text-white/50">Sport</p>
-              <p class="mt-1 text-sm">{{ tournament.sport?.icon || '' }} {{ tournament.sport?.name }}</p>
+              <p class="mt-1 text-sm">
+                {{ tournament.sport?.icon || '' }} {{ tournament.sport?.name }}
+              </p>
             </div>
             <div class="rounded-lg border border-white/10 p-3">
               <p class="text-xs uppercase tracking-wide text-white/50">Start Date</p>
@@ -438,11 +455,18 @@ onUnmounted(() => {
       <UCard v-if="canGenerateBracket" class="bg-white/5">
         <div class="flex flex-col gap-3">
           <div>
-            <p class="text-xs uppercase tracking-[0.3em] text-white/60">{{ isRoundRobin ? 'Fixtures' : 'Bracket' }}</p>
+            <p class="text-xs uppercase tracking-[0.3em] text-white/60">
+              {{ isRoundRobin ? 'Fixtures' : 'Bracket' }}
+            </p>
             <p class="text-sm text-white/60">
-              Generate {{ isRoundRobin ? 'round robin fixtures' : 'a single-elimination bracket' }}
-              with {{ tournament.teams.length }} teams.
-              {{ isRoundRobin ? 'Every team plays every other team once.' : 'Teams will be randomly seeded.' }}
+              Generate
+              {{ isRoundRobin ? 'round robin fixtures' : 'a single-elimination bracket' }} with
+              {{ tournament.teams.length }} teams.
+              {{
+                isRoundRobin
+                  ? 'Every team plays every other team once.'
+                  : 'Teams will be randomly seeded.'
+              }}
             </p>
           </div>
           <UButton
@@ -461,7 +485,9 @@ onUnmounted(() => {
         <div class="flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-xs uppercase tracking-[0.3em] text-white/60">{{ isRoundRobin ? 'Fixtures' : 'Bracket' }}</p>
+              <p class="text-xs uppercase tracking-[0.3em] text-white/60">
+                {{ isRoundRobin ? 'Fixtures' : 'Bracket' }}
+              </p>
               <p class="text-sm text-white/60">{{ bracket.totalRounds }} rounds</p>
             </div>
             <UButton
@@ -539,7 +565,16 @@ onUnmounted(() => {
                   <td class="py-2 px-2 text-center text-red-400">{{ row.losses }}</td>
                   <td class="py-2 px-2 text-center">{{ row.pointsFor }}</td>
                   <td class="py-2 px-2 text-center">{{ row.pointsAgainst }}</td>
-                  <td class="py-2 px-2 text-center font-mono" :class="row.pointDiff > 0 ? 'text-green-400' : row.pointDiff < 0 ? 'text-red-400' : 'text-white/50'">
+                  <td
+                    class="py-2 px-2 text-center font-mono"
+                    :class="
+                      row.pointDiff > 0
+                        ? 'text-green-400'
+                        : row.pointDiff < 0
+                          ? 'text-red-400'
+                          : 'text-white/50'
+                    "
+                  >
                     {{ row.pointDiff > 0 ? '+' : '' }}{{ row.pointDiff }}
                   </td>
                 </tr>
@@ -670,9 +705,10 @@ onUnmounted(() => {
             </div>
 
             <p class="text-xs text-white/40">
-              {{ isRoundRobin
-                ? 'Ties are allowed. Results update the standings table.'
-                : 'Scores cannot be tied. The higher score wins and advances.'
+              {{
+                isRoundRobin
+                  ? 'Ties are allowed. Results update the standings table.'
+                  : 'Scores cannot be tied. The higher score wins and advances.'
               }}
             </p>
 
@@ -685,11 +721,7 @@ onUnmounted(() => {
               >
                 Cancel
               </UButton>
-              <UButton
-                color="primary"
-                :loading="submittingResult"
-                @click="submitResult"
-              >
+              <UButton color="primary" :loading="submittingResult" @click="submitResult">
                 Submit Result
               </UButton>
             </div>

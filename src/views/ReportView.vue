@@ -219,7 +219,13 @@ async function submitReport() {
                   <UIcon name="i-lucide-flag" class="text-white/50 shrink-0" />
                   <UserLink :user-id="report.reportedId" class="text-sm font-medium" />
                   <UBadge
-                    :color="report.status === 'PENDING' ? 'warning' : report.status === 'RESOLVED' ? 'success' : 'neutral'"
+                    :color="
+                      report.status === 'PENDING'
+                        ? 'warning'
+                        : report.status === 'RESOLVED'
+                          ? 'success'
+                          : 'neutral'
+                    "
                     variant="soft"
                     size="xs"
                   >
@@ -263,7 +269,9 @@ async function submitReport() {
               >
                 <div class="flex flex-col min-w-0">
                   <span class="text-sm font-medium truncate">{{ user.name || user.username }}</span>
-                  <span v-if="user.email" class="text-xs text-white/50 truncate">{{ user.email }}</span>
+                  <span v-if="user.email" class="text-xs text-white/50 truncate">{{
+                    user.email
+                  }}</span>
                 </div>
               </button>
             </template>

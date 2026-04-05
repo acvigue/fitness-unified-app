@@ -27,9 +27,7 @@ const featuredMessage = ref('')
 onMounted(async () => {
   setHeader({
     title: t('profile.profile'),
-    actions: [
-      { icon: 'i-lucide-trophy', onClick: () => router.push('/achievements') },
-    ],
+    actions: [{ icon: 'i-lucide-trophy', onClick: () => router.push('/achievements') }],
   })
   try {
     const { data: profileData, error: profileErr } = await apiClient.GET('/v1/user/profile')
@@ -103,19 +101,17 @@ async function saveFeatured() {
     <div v-else class="flex flex-col gap-6 px-5 py-6">
       <!-- Profile Picture -->
       <div class="flex justify-center">
-        <UAvatar
-          :src="primaryPicture"
-          alt="Profile"
-          size="3xl"
-        />
+        <UAvatar :src="primaryPicture" alt="Profile" size="3xl" />
       </div>
 
       <!-- Name -->
       <div class="text-center">
         <p class="text-white text-lg font-medium">
-          {{ profile?.firstName || profile?.lastName
-            ? [profile.firstName, profile.lastName].filter(Boolean).join(' ')
-            : 'User' }}
+          {{
+            profile?.firstName || profile?.lastName
+              ? [profile.firstName, profile.lastName].filter(Boolean).join(' ')
+              : 'User'
+          }}
         </p>
       </div>
 
@@ -182,12 +178,16 @@ async function saveFeatured() {
               </div>
             </div>
           </div>
-          <p v-else class="text-white/50 text-sm">No featured achievements. Tap Edit to select up to 5.</p>
+          <p v-else class="text-white/50 text-sm">
+            No featured achievements. Tap Edit to select up to 5.
+          </p>
         </template>
 
         <!-- Edit mode -->
         <template v-else>
-          <p class="text-xs text-white/50 mb-2">Select up to 5 earned achievements to feature on your profile.</p>
+          <p class="text-xs text-white/50 mb-2">
+            Select up to 5 earned achievements to feature on your profile.
+          </p>
           <div v-if="earnedAchievements.length === 0" class="text-sm text-white/50">
             No earned achievements yet. Participate in tournaments to earn them!
           </div>
@@ -197,31 +197,43 @@ async function saveFeatured() {
               :key="ua.id"
               type="button"
               class="flex items-center gap-2 rounded-lg border p-3 text-left transition"
-              :class="selectedFeaturedIds.includes(ua.id) ? 'border-primary bg-primary/10' : 'border-white/10 hover:bg-white/5'"
+              :class="
+                selectedFeaturedIds.includes(ua.id)
+                  ? 'border-primary bg-primary/10'
+                  : 'border-white/10 hover:bg-white/5'
+              "
               @click="toggleFeatured(ua.id)"
             >
-              <UIcon name="i-lucide-award" :class="selectedFeaturedIds.includes(ua.id) ? 'text-primary' : 'text-white/40'" />
+              <UIcon
+                name="i-lucide-award"
+                :class="selectedFeaturedIds.includes(ua.id) ? 'text-primary' : 'text-white/40'"
+              />
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium">{{ ua.achievement.name }}</p>
                 <p class="text-xs text-white/50">{{ ua.achievement.description }}</p>
               </div>
-              <UIcon v-if="selectedFeaturedIds.includes(ua.id)" name="i-lucide-check" class="text-primary" />
+              <UIcon
+                v-if="selectedFeaturedIds.includes(ua.id)"
+                name="i-lucide-check"
+                class="text-primary"
+              />
             </button>
           </div>
           <div class="flex justify-end mt-3 gap-2">
-            <UButton size="sm" variant="outline" color="neutral" @click="editingFeatured = false">Cancel</UButton>
-            <UButton size="sm" color="primary" :loading="savingFeatured" @click="saveFeatured">Save</UButton>
+            <UButton size="sm" variant="outline" color="neutral" @click="editingFeatured = false"
+              >Cancel</UButton
+            >
+            <UButton size="sm" color="primary" :loading="savingFeatured" @click="saveFeatured"
+              >Save</UButton
+            >
           </div>
         </template>
       </div>
 
       <!-- My Reports Button -->
       <div class="flex justify-center">
-        <UButton @click="moveToReportsPage" color="primary" variant="soft">
-        Report Users
-        </UButton>
+        <UButton @click="moveToReportsPage" color="primary" variant="soft"> Report Users </UButton>
       </div>
     </div>
   </PageLayout>
 </template>
-

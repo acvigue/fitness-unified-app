@@ -8,7 +8,7 @@ import MessengerView from '@/views/messenger/MessengerView.vue'
 import WorkoutsView from '@/views/WorkoutsView.vue'
 import ReportView from '@/views/ReportView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import UserReportView from "@/views/UserReportView.vue"
+import UserReportView from '@/views/UserReportView.vue'
 import UserProfileView from '@/views/UserProfileView.vue'
 import TeamView from '@/views/TeamView.vue'
 import TournamentsView from '@/views/TournamentsView.vue'
@@ -122,7 +122,7 @@ const router = createRouter({
       path: '/profile/:userId',
       name: 'user-profile',
       component: UserProfileView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/report',

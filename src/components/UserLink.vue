@@ -18,16 +18,19 @@ onMounted(async () => {
   if (!profileCache.has(props.userId)) {
     profileCache.set(
       props.userId,
-      apiClient.GET('/v1/users/{userId}/profile', {
-        params: { path: { userId: props.userId } },
-      }).then(
-        ({ data }) => {
-          const d = data as any
-          if (d?.firstName || d?.lastName) return [d.firstName, d.lastName].filter(Boolean).join(' ')
-          return d?.name || d?.username || props.userId
-        },
-        () => props.userId,
-      ),
+      apiClient
+        .GET('/v1/users/{userId}/profile', {
+          params: { path: { userId: props.userId } },
+        })
+        .then(
+          ({ data }) => {
+            const d = data as any
+            if (d?.firstName || d?.lastName)
+              return [d.firstName, d.lastName].filter(Boolean).join(' ')
+            return d?.name || d?.username || props.userId
+          },
+          () => props.userId,
+        ),
     )
   }
   name.value = await profileCache.get(props.userId)!
@@ -36,11 +39,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <RouterLink
-    :to="`/profile/${userId}`"
-    class="text-primary hover:underline truncate"
-    @click.stop
-  >
+  <RouterLink :to="`/profile/${userId}`" class="text-primary hover:underline truncate" @click.stop>
     <template v-if="loading">
       <span class="inline-block w-20 h-4 rounded bg-white/10 animate-pulse align-middle" />
     </template>

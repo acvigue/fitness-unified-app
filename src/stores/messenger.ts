@@ -3,7 +3,11 @@ import { defineStore } from 'pinia'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/types/api'
-import { useChatSocket, type TypingStartEvent, type TypingStopEvent } from '@/composables/useChatSocket'
+import {
+  useChatSocket,
+  type TypingStartEvent,
+  type TypingStopEvent,
+} from '@/composables/useChatSocket'
 
 type UserChat = components['schemas']['UserChatResponseDto']
 type ChatResponse = components['schemas']['ChatResponseDto']
@@ -25,8 +29,15 @@ export const useMessengerStore = defineStore('messenger', () => {
   const currentUserId = ref<string | null>(null)
   const typingUsers = ref<Map<string, Map<string, string>>>(new Map())
 
-  const { connect, disconnect, sendMessage: socketSendMessage, joinChat, emitTypingStart, emitTypingStop, connected } =
-    useChatSocket()
+  const {
+    connect,
+    disconnect,
+    sendMessage: socketSendMessage,
+    joinChat,
+    emitTypingStart,
+    emitTypingStop,
+    connected,
+  } = useChatSocket()
 
   const sortedConversations = computed(() => {
     return Array.from(conversations.value.values()).sort((a, b) => {
@@ -85,12 +96,15 @@ export const useMessengerStore = defineStore('messenger', () => {
   }
 
   async function loadChatHistory(chatId: string, page = 1) {
-    const { data: historyData, error: historyError } = await apiClient.GET('/v1/chats/history/{chatId}', {
-      params: {
-        path: { chatId },
-        query: { page, per_page: 50 },
+    const { data: historyData, error: historyError } = await apiClient.GET(
+      '/v1/chats/history/{chatId}',
+      {
+        params: {
+          path: { chatId },
+          query: { page, per_page: 50 },
+        },
       },
-    })
+    )
     if (historyError) throw new Error(getErrorMessage(historyError, 'Failed to load chat history'))
     const history = historyData
     const existing = messages.value.get(chatId) ?? []
