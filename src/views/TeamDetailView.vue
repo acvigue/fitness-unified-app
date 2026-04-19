@@ -64,6 +64,10 @@ const memberUserIds = computed(() => {
   return [...ids]
 })
 
+const isMember = computed(() =>
+  memberUserIds.value.includes(currentUserId.value),
+)
+
 async function loadTeam() {
   loading.value = true
   error.value = ''
@@ -320,6 +324,7 @@ onMounted(async () => {
         </UButton>
 
         <UButton
+          v-if="isMember && !isCaptain"
           color="error"
           variant="soft"
           :loading="actionLoading"
