@@ -192,6 +192,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/chats/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create an announcement channel (org STAFF/ADMIN only) */
+        post: operations["ChatController_createAnnouncementChat_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/chats/announcements/{chatId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete an announcement channel (org STAFF/ADMIN only) */
+        delete: operations["ChatController_deleteAnnouncementChat_v1"];
+        options?: never;
+        head?: never;
+        /** Update an announcement channel (org STAFF/ADMIN only) */
+        patch: operations["ChatController_updateAnnouncementChat_v1"];
+        trace?: never;
+    };
     "/v1/health": {
         parameters: {
             query?: never;
@@ -204,6 +239,143 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/meetups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Propose a meetup with another team */
+        post: operations["MeetupController_proposeMeetup_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/meetups/team/{teamId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all meetups for a team */
+        get: operations["MeetupController_getTeamMeetups_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/meetups/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get meetup details */
+        get: operations["MeetupController_getMeetup_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/meetups/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Accept a meetup proposal (receiving team captain only) */
+        patch: operations["MeetupController_acceptMeetup_v1"];
+        trace?: never;
+    };
+    "/v1/meetups/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Decline a meetup proposal (receiving team captain only) */
+        patch: operations["MeetupController_declineMeetup_v1"];
+        trace?: never;
+    };
+    "/v1/meetups/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cancel a meetup (proposing team captain only) */
+        patch: operations["MeetupController_cancelMeetup_v1"];
+        trace?: never;
+    };
+    "/v1/teams/{teamId}/blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List blocked teams (captain only) */
+        get: operations["TeamBlockController_getBlockedTeams_v1"];
+        put?: never;
+        /** Block a team from messaging (captain only) */
+        post: operations["TeamBlockController_blockTeam_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teams/{teamId}/blocks/{blockedTeamId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Unblock a team (captain only) */
+        delete: operations["TeamBlockController_unblockTeam_v1"];
         options?: never;
         head?: never;
         patch?: never;
@@ -780,6 +952,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/team-chats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create or get a team-to-team chat */
+        post: operations["TeamChatController_createOrGetTeamChat_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/team-chats/team/{teamId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all team chats for a team */
+        get: operations["TeamChatController_getTeamChats_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/team-chats/{chatId}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a message in a team chat */
+        post: operations["TeamChatController_sendTeamMessage_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/team-chats/{chatId}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get paginated message history for a team chat */
+        get: operations["TeamChatController_getHistory_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/tournaments": {
         parameters: {
             query?: never;
@@ -1023,6 +1263,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/videos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all available videos */
+        get: operations["VideoController_findAll_v1"];
+        put?: never;
+        /** Create a video and assign creator as captain */
+        post: operations["VideoController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/videos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get video */
+        get: operations["VideoController_findOne_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a video (uploader only) */
+        delete: operations["VideoController_delete_v1"];
+        options?: never;
+        head?: never;
+        /** Update video (uploader only) */
+        patch: operations["VideoController_update_v1"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1123,10 +1400,10 @@ export interface components {
         };
         UserAchievementResponseDto: {
             /**
-             * @description User achievement ID
+             * @description User achievement ID (null if not yet started)
              * @example cm123abc
              */
-            id: string;
+            id?: string | null;
             /**
              * @description Current progress
              * @example 3
@@ -1323,7 +1600,7 @@ export interface components {
              * @example DIRECT
              * @enum {string}
              */
-            type: "DIRECT" | "GROUP";
+            type: "DIRECT" | "GROUP" | "ANNOUNCEMENT" | "TEAM";
             /**
              * @description Chat name (null for direct chats)
              * @example Gym Buddies
@@ -1336,6 +1613,10 @@ export interface components {
             creatorId: string;
             /** @description Chat members */
             members: components["schemas"]["ChatMemberDto"][];
+            /** @description Organization ID (announcement chats only) */
+            organizationId?: Record<string, never>;
+            /** @description Roles allowed to post (announcement chats only) */
+            writeRoles?: ("MEMBER" | "STAFF" | "ADMIN")[];
             /**
              * Format: date-time
              * @description Created timestamp
@@ -1432,6 +1713,48 @@ export interface components {
              */
             mediaIds?: string[];
         };
+        CreateAnnouncementChatDto: {
+            /**
+             * @description Organization ID this announcement channel belongs to
+             * @example clr1abc2d0000
+             */
+            organizationId: string;
+            /**
+             * @description Announcement channel name
+             * @example General Announcements
+             */
+            name: string;
+            /**
+             * @description Organization roles allowed to post messages
+             * @example [
+             *       "STAFF",
+             *       "ADMIN"
+             *     ]
+             */
+            writeRoles: ("MEMBER" | "STAFF" | "ADMIN")[];
+            /**
+             * @description Specific member user IDs to include. If omitted, all organization members are added.
+             * @example [
+             *       "user-id-1",
+             *       "user-id-2"
+             *     ]
+             */
+            memberIds?: string[];
+        };
+        UpdateAnnouncementChatDto: {
+            /**
+             * @description Updated channel name
+             * @example Important Announcements
+             */
+            name?: string;
+            /**
+             * @description Updated roles allowed to post messages
+             * @example [
+             *       "ADMIN"
+             *     ]
+             */
+            writeRoles?: ("MEMBER" | "STAFF" | "ADMIN")[];
+        };
         HealthResponseDto: {
             /**
              * @description Overall health status of the service
@@ -1451,6 +1774,114 @@ export interface components {
              * @enum {string}
              */
             database: "up" | "error";
+        };
+        CreateMeetupDto: {
+            /**
+             * @description ID of the proposing team
+             * @example clr1abc2d0000
+             */
+            proposingTeamId: string;
+            /**
+             * @description ID of the receiving team
+             * @example clr1abc2d0001
+             */
+            receivingTeamId: string;
+            /**
+             * @description Meetup title
+             * @example Saturday Scrimmage
+             */
+            title: string;
+            /**
+             * @description Meetup description
+             * @example Friendly match at the park
+             */
+            description?: string;
+            /**
+             * @description Meetup location
+             * @example Central Park Field 3
+             */
+            location: string;
+            /**
+             * @description Meetup date and time (ISO 8601)
+             * @example 2026-05-01T14:00:00.000Z
+             */
+            dateTime: string;
+        };
+        MeetupResponseDto: {
+            /**
+             * @description Meetup ID
+             * @example clr1abc2d0000
+             */
+            id: string;
+            /** @description Proposing team ID */
+            proposingTeamId: string;
+            /**
+             * @description Proposing team name
+             * @example Team Alpha
+             */
+            proposingTeamName: string;
+            /** @description Receiving team ID */
+            receivingTeamId: string;
+            /**
+             * @description Receiving team name
+             * @example Team Beta
+             */
+            receivingTeamName: string;
+            /**
+             * @description Meetup title
+             * @example Saturday Scrimmage
+             */
+            title: string;
+            /** @description Meetup description */
+            description?: Record<string, never>;
+            /**
+             * @description Meetup location
+             * @example Central Park Field 3
+             */
+            location: string;
+            /**
+             * Format: date-time
+             * @description Meetup date and time
+             */
+            dateTime: string;
+            /**
+             * @description Meetup status
+             * @enum {string}
+             */
+            status: "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
+            /**
+             * Format: date-time
+             * @description Created timestamp
+             */
+            createdAt: string;
+        };
+        CreateTeamBlockDto: {
+            /**
+             * @description ID of the team to block
+             * @example clr1abc2d0000
+             */
+            blockedTeamId: string;
+        };
+        TeamBlockResponseDto: {
+            /**
+             * @description Block record ID
+             * @example clr1abc2d0000
+             */
+            id: string;
+            /** @description ID of the team that initiated the block */
+            blockingTeamId: string;
+            /** @description ID of the blocked team */
+            blockedTeamId: string;
+            /**
+             * @description Name of the blocked team
+             * @example Team Alpha
+             */
+            blockedTeamName: string;
+            /**
+             * Format: date-time
+             * @description When the block was created
+             */
+            createdAt: string;
         };
         CreateOrganizationDto: {
             /**
@@ -1565,6 +1996,118 @@ export interface components {
              */
             isPrimary: boolean;
         };
+        UserResponseDto: {
+            /**
+             * @description User subject identifier from the identity provider
+             * @example auth0|507f1f77bcf86cd799439011
+             */
+            sub: string;
+            /**
+             * @description Username or preferred username
+             * @example john.doe
+             */
+            username?: string;
+            /**
+             * @description Full name of the user
+             * @example John Doe
+             */
+            name?: string;
+            /**
+             * @description First name of the user
+             * @example John
+             */
+            firstName?: string;
+            /**
+             * @description Last name of the user
+             * @example Doe
+             */
+            lastName?: string;
+            /**
+             * Format: email
+             * @description Email address of the user
+             * @example john.doe@example.com
+             */
+            email?: string;
+            /**
+             * @description List of user scopes/permissions
+             * @example [
+             *       "read",
+             *       "write"
+             *     ]
+             */
+            scopes: Record<string, never>[][];
+        };
+        TournamentTeamResponseDto: {
+            /**
+             * @description Team ID
+             * @example cm123abc456def789ghi0001
+             */
+            id: string;
+            /**
+             * @description Team name
+             * @example Purdue Badminton A
+             */
+            name: string;
+            /** @description Team captain user ID */
+            captainId: string;
+        };
+        TournamentResponseDto: {
+            /**
+             * @description Tournament ID
+             * @example clr1abc2d0001
+             */
+            id: string;
+            /**
+             * @description Tournament name
+             * @example Spring Championship 2024
+             */
+            name: string;
+            /**
+             * @description Tournament format
+             * @example SINGLE_ELIMINATION
+             * @enum {string}
+             */
+            format: "SINGLE_ELIMINATION" | "ROUND_ROBIN";
+            /**
+             * @description Tournament status
+             * @example OPEN
+             * @enum {string}
+             */
+            status: "UPCOMING" | "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+            /**
+             * @description Maximum number of teams
+             * @example 16
+             */
+            maxTeams: number;
+            /**
+             * @description Organization ID
+             * @example clr1abc2d0000
+             */
+            organizationId: string;
+            /**
+             * @description Creator user ID
+             * @example auth0|507f1f77bcf86cd799439011
+             */
+            createdById: string;
+            /**
+             * Format: date-time
+             * @description Tournament start date (ISO 8601)
+             * @example 2024-06-01T09:00:00.000Z
+             */
+            startDate: string;
+            /**
+             * Format: date-time
+             * @description Tournament creation date (ISO 8601)
+             * @example 2024-03-01T12:00:00.000Z
+             */
+            createdAt: string;
+            /** @description Associated sport */
+            sport: components["schemas"]["SportResponseDto"];
+            /** @description List of tournament participants */
+            participants: components["schemas"]["UserResponseDto"][];
+            /** @description List of registered teams */
+            teams: components["schemas"]["TournamentTeamResponseDto"][];
+        };
         UserProfileResponseDto: {
             /**
              * @description User ID
@@ -1592,6 +2135,8 @@ export interface components {
             pictures: components["schemas"]["UserProfilePictureDto"][];
             /** @description Featured achievements (up to 5) */
             featuredAchievements: components["schemas"]["UserAchievementResponseDto"][];
+            /** @description Tournament History */
+            tournaments: components["schemas"]["TournamentResponseDto"][];
         };
         OrganizationMemberProfileResponseDto: {
             /**
@@ -1687,47 +2232,6 @@ export interface components {
         UserLookupResponseDto: {
             /** @description Matching users */
             users: components["schemas"]["UserLookupItemDto"][];
-        };
-        UserResponseDto: {
-            /**
-             * @description User subject identifier from the identity provider
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            sub: string;
-            /**
-             * @description Username or preferred username
-             * @example john.doe
-             */
-            username?: string;
-            /**
-             * @description Full name of the user
-             * @example John Doe
-             */
-            name?: string;
-            /**
-             * @description First name of the user
-             * @example John
-             */
-            firstName?: string;
-            /**
-             * @description Last name of the user
-             * @example Doe
-             */
-            lastName?: string;
-            /**
-             * Format: email
-             * @description Email address of the user
-             * @example john.doe@example.com
-             */
-            email?: string;
-            /**
-             * @description List of user scopes/permissions
-             * @example [
-             *       "read",
-             *       "write"
-             *     ]
-             */
-            scopes: Record<string, never>[][];
         };
         UpdateNameDto: {
             /**
@@ -2090,6 +2594,55 @@ export interface components {
              */
             userId: string;
         };
+        CreateTeamChatDto: {
+            /**
+             * @description ID of the initiating team
+             * @example clr1abc2d0000
+             */
+            fromTeamId: string;
+            /**
+             * @description ID of the target team
+             * @example clr1abc2d0001
+             */
+            toTeamId: string;
+        };
+        TeamChatResponseDto: {
+            /**
+             * @description Chat ID
+             * @example clr1abc2d0000
+             */
+            id: string;
+            /**
+             * @description Chat name
+             * @example Team Alpha x Team Beta
+             */
+            name: Record<string, never>;
+            /** @description Team 1 ID */
+            team1Id: string;
+            /** @description Team 2 ID */
+            team2Id: string;
+            /** @description Chat members */
+            members: components["schemas"]["ChatMemberDto"][];
+            /**
+             * Format: date-time
+             * @description Created timestamp
+             */
+            createdAt: string;
+        };
+        SendTeamMessageDto: {
+            /**
+             * @description Message content
+             * @example Hey team, want to scrimmage?
+             */
+            content: string;
+            /**
+             * @description Media attachment IDs
+             * @example [
+             *       "media-id-1"
+             *     ]
+             */
+            mediaIds?: string[];
+        };
         CreateTournamentDto: {
             /**
              * @description Tournament name
@@ -2117,82 +2670,11 @@ export interface components {
              */
             startDate: string;
             /**
-             * @description Tournament format (defaults to SINGLE_ELIMINATION)
-             * @example SINGLE_ELIMINATION
-             * @enum {string}
-             */
-            format?: "SINGLE_ELIMINATION" | "ROUND_ROBIN";
-        };
-        TournamentTeamResponseDto: {
-            /**
-             * @description Team ID
-             * @example cm123abc456def789ghi0001
-             */
-            id: string;
-            /**
-             * @description Team name
-             * @example Purdue Badminton A
-             */
-            name: string;
-            /** @description Team captain user ID */
-            captainId: string;
-        };
-        TournamentResponseDto: {
-            /**
-             * @description Tournament ID
-             * @example clr1abc2d0001
-             */
-            id: string;
-            /**
-             * @description Tournament name
-             * @example Spring Championship 2024
-             */
-            name: string;
-            /**
              * @description Tournament format
              * @example SINGLE_ELIMINATION
              * @enum {string}
              */
-            format: "SINGLE_ELIMINATION" | "ROUND_ROBIN";
-            /**
-             * @description Tournament status
-             * @example OPEN
-             * @enum {string}
-             */
-            status: "OPEN" | "CLOSED" | "UPCOMING" | "INPROGRESS" | "COMPLETED";
-            /**
-             * @description Maximum number of teams
-             * @example 16
-             */
-            maxTeams: number;
-            /**
-             * @description Organization ID
-             * @example clr1abc2d0000
-             */
-            organizationId: string;
-            /**
-             * @description Creator user ID
-             * @example auth0|507f1f77bcf86cd799439011
-             */
-            createdById: string;
-            /**
-             * Format: date-time
-             * @description Tournament start date (ISO 8601)
-             * @example 2024-06-01T09:00:00.000Z
-             */
-            startDate: string;
-            /**
-             * Format: date-time
-             * @description Tournament creation date (ISO 8601)
-             * @example 2024-03-01T12:00:00.000Z
-             */
-            createdAt: string;
-            /** @description Associated sport */
-            sport: components["schemas"]["SportResponseDto"];
-            /** @description List of tournament participants */
-            participants: components["schemas"]["UserResponseDto"][];
-            /** @description List of registered teams */
-            teams: components["schemas"]["TournamentTeamResponseDto"][];
+            format?: "SINGLE_ELIMINATION" | "ROUND_ROBIN";
         };
         PaginatedTournamentResponseDto: {
             data: components["schemas"]["TournamentResponseDto"][];
@@ -2219,7 +2701,7 @@ export interface components {
              * @example UPCOMING
              * @enum {string}
              */
-            status?: "OPEN" | "CLOSED" | "UPCOMING" | "INPROGRESS" | "COMPLETED";
+            status?: "UPCOMING" | "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
         };
         TournamentMatchResponseDto: {
             /**
@@ -2258,7 +2740,7 @@ export interface components {
              * @example PENDING
              * @enum {string}
              */
-            status: "PENDING" | "COMPLETED" | "BYE";
+            status: "PENDING" | "READY" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
             /**
              * @description Next match ID the winner advances to
              * @example cm456def789ghi
@@ -2396,6 +2878,76 @@ export interface components {
              * @example 102400
              */
             size: number;
+        };
+        VideoCreateDto: {
+            /**
+             * @description Video name
+             * @example Cool Video
+             */
+            name: string;
+            /**
+             * @description Video description
+             * @example Cool stuff happens
+             */
+            description: string;
+            /**
+             * @description Sport ID (UUID)
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            sportId: string;
+            /**
+             * @description Video url
+             * @example 123.123.123
+             */
+            url: string;
+        };
+        VideoResponseDto: {
+            /**
+             * @description Video ID
+             * @example cm123abc456def789ghi0001
+             */
+            id: string;
+            /**
+             * @description Video name
+             * @example Cool Video
+             */
+            name: string;
+            /**
+             * @description Video description
+             * @example Cool stuff happens
+             */
+            description: string;
+            /** @description Video uploader user ID */
+            uploaderId: string;
+            /**
+             * @description Sport ID (UUID)
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            sportId: string;
+            /** @description Video url */
+            url: string;
+        };
+        VideoUpdateDto: {
+            /**
+             * @description Video name
+             * @example Purdue Badminton A
+             */
+            name: string;
+            /**
+             * @description Sport ID (UUID)
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            sportId: string;
+            /**
+             * @description Video description
+             * @example Updated description
+             */
+            description?: string;
+            /**
+             * @description Video url
+             * @example 123.123.123
+             */
+            url: string;
         };
     };
     responses: never;
@@ -2941,6 +3493,163 @@ export interface operations {
             };
         };
     };
+    ChatController_createAnnouncementChat_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAnnouncementChatDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ChatController_deleteAnnouncementChat_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chatId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ChatController_updateAnnouncementChat_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chatId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAnnouncementChatDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
     HealthController_getHealth_v1: {
         parameters: {
             query?: never;
@@ -2957,6 +3666,452 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponseDto"];
+                };
+            };
+        };
+    };
+    MeetupController_proposeMeetup_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMeetupDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeetupResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    MeetupController_getTeamMeetups_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeetupResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    MeetupController_getMeetup_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeetupResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    MeetupController_acceptMeetup_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeetupResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    MeetupController_declineMeetup_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeetupResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    MeetupController_cancelMeetup_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeetupResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TeamBlockController_getBlockedTeams_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamBlockResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TeamBlockController_blockTeam_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTeamBlockDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamBlockResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TeamBlockController_unblockTeam_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+                blockedTeamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
                 };
             };
         };
@@ -5080,6 +6235,225 @@ export interface operations {
             };
         };
     };
+    TeamChatController_createOrGetTeamChat_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTeamChatDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamChatResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TeamChatController_getTeamChats_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamChatResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TeamChatController_sendTeamMessage_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chatId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendTeamMessageDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TeamChatController_getHistory_v1: {
+        parameters: {
+            query?: {
+                per_page?: number;
+                page?: number;
+            };
+            header?: never;
+            path: {
+                chatId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatHistoryResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
     TournamentController_findAll_v1: {
         parameters: {
             query?: {
@@ -6206,6 +7580,267 @@ export interface operations {
             };
             /** @description Unauthorized - invalid or missing token */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VideoController_findAll_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VideoController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VideoCreateDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VideoController_findOne_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VideoController_delete_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Video deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description You are not the video uploader */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VideoController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VideoUpdateDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description You are not the video uploader */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
