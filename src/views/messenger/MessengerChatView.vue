@@ -70,13 +70,17 @@ const otherUserId = computed(() => {
   return other?.id || null
 })
 
-
 const chatMessages = computed(() => {
   return messengerStore.activeMessages.map((msg) => ({
     id: msg.id,
-    role: (msg.sender.id === messengerStore.currentUserId ? 'user' : 'assistant') as 'user' | 'assistant',
+    role: (msg.sender.id === messengerStore.currentUserId ? 'user' : 'assistant') as
+      | 'user'
+      | 'assistant',
     parts: [{ type: 'text' as const, text: msg.content }],
-    sender: (msg.sender.name as unknown as string) ?? (msg.sender.username as unknown as string) ?? undefined,
+    sender:
+      (msg.sender.name as unknown as string) ??
+      (msg.sender.username as unknown as string) ??
+      undefined,
     media: msg.media ?? [],
   }))
 })
@@ -141,10 +145,16 @@ async function handleFileSelect(event: Event) {
       }
       const media: MediaUploadResponse = await response.json()
       const idx = attachments.value.findIndex((a) => a.id === id)
-      if (idx !== -1) attachments.value[idx] = { ...attachments.value[idx], mediaId: media.id, uploading: false }
+      if (idx !== -1)
+        attachments.value[idx] = { ...attachments.value[idx], mediaId: media.id, uploading: false }
     } catch {
       const idx = attachments.value.findIndex((a) => a.id === id)
-      if (idx !== -1) attachments.value[idx] = { ...attachments.value[idx], error: 'Upload failed', uploading: false }
+      if (idx !== -1)
+        attachments.value[idx] = {
+          ...attachments.value[idx],
+          error: 'Upload failed',
+          uploading: false,
+        }
     }
   }
 
@@ -200,7 +210,10 @@ async function handleSearchSelect(hit: SearchMessageHit) {
   <div class="flex flex-col h-full">
     <!-- Chat header -->
     <div class="flex items-center gap-3 px-4 py-3 border-b border-white/10 shrink-0">
-      <RouterLink to="/messenger" class="lg:hidden text-white/70 hover:text-white transition-colors">
+      <RouterLink
+        to="/messenger"
+        class="lg:hidden text-white/70 hover:text-white transition-colors"
+      >
         <UIcon name="i-lucide-arrow-left" class="text-lg" />
       </RouterLink>
       <UAvatar :icon="isGroup ? 'i-lucide-users' : 'i-lucide-user'" size="sm" />
@@ -209,10 +222,15 @@ async function handleSearchSelect(hit: SearchMessageHit) {
       <UDropdown v-if="otherUserId" :items="profileDropdownItems">
         <!-- <UButton icon="i-lucide-more-vertical" variant="ghost" color="neutral" size="sm" square /> -->
         <UButton
-          v-if="otherUserId" icon="i-lucide-user" variant="ghost" color="neutral" size="sm" square
-          @click="router.push({ path: `/profile/${otherUserId}`, query: { name: chatName } })"/>
+          v-if="otherUserId"
+          icon="i-lucide-user"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          square
+          @click="router.push({ path: `/profile/${otherUserId}`, query: { name: chatName } })"
+        />
       </UDropdown>
-
 
       <UButton
         icon="i-lucide-search"
@@ -237,7 +255,11 @@ async function handleSearchSelect(hit: SearchMessageHit) {
           <div
             :id="`msg-${(message as any).id}`"
             class="transition-colors duration-500"
-            :class="messengerStore.highlightedMessageId === (message as any).id ? 'bg-primary/20 rounded-lg -mx-2 px-2 py-1' : ''"
+            :class="
+              messengerStore.highlightedMessageId === (message as any).id
+                ? 'bg-primary/20 rounded-lg -mx-2 px-2 py-1'
+                : ''
+            "
           >
             <p
               v-if="isGroup && message.role !== 'user' && (message as any).sender"
@@ -279,13 +301,23 @@ async function handleSearchSelect(hit: SearchMessageHit) {
     <div class="shrink-0 border-t border-white/10">
       <!-- Attachment previews -->
       <div v-if="attachments.length" class="flex gap-2 px-3 pt-3 overflow-x-auto">
-        <div v-for="att in attachments" :key="att.id" class="relative shrink-0 size-16 rounded-lg overflow-hidden bg-white/5">
+        <div
+          v-for="att in attachments"
+          :key="att.id"
+          class="relative shrink-0 size-16 rounded-lg overflow-hidden bg-white/5"
+        >
           <video v-if="isVideo(att.file)" :src="att.previewUrl" class="size-full object-cover" />
           <img v-else :src="att.previewUrl" class="size-full object-cover" />
-          <div v-if="att.uploading" class="absolute inset-0 flex items-center justify-center bg-black/50">
+          <div
+            v-if="att.uploading"
+            class="absolute inset-0 flex items-center justify-center bg-black/50"
+          >
             <UIcon name="i-lucide-loader-2" class="size-4 animate-spin" />
           </div>
-          <div v-else-if="att.error" class="absolute inset-0 flex items-center justify-center bg-red-900/50">
+          <div
+            v-else-if="att.error"
+            class="absolute inset-0 flex items-center justify-center bg-red-900/50"
+          >
             <UIcon name="i-lucide-alert-circle" class="size-4 text-red-400" />
           </div>
           <button

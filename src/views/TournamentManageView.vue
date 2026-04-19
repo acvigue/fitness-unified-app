@@ -31,7 +31,9 @@ const searchQuery = ref('')
 
 const availableTeams = computed(() => {
   const registeredIds = new Set(tournament.value?.teams.map((t) => t.id) ?? [])
-  const invitedIds = new Set(invitations.value.filter((i) => i.status === 'PENDING').map((i) => i.teamId))
+  const invitedIds = new Set(
+    invitations.value.filter((i) => i.status === 'PENDING').map((i) => i.teamId),
+  )
   return allTeams.value.filter((t) => !registeredIds.has(t.id) && !invitedIds.has(t.id))
 })
 
@@ -97,7 +99,9 @@ async function addTeam(teamId: string) {
     }
     setMessages('Team added to tournament')
     searchTeamId.value = ''
-    const { data } = await apiClient.GET('/v1/tournaments/{id}', { params: { path: { id: tournamentId.value } } })
+    const { data } = await apiClient.GET('/v1/tournaments/{id}', {
+      params: { path: { id: tournamentId.value } },
+    })
     if (data) tournament.value = data
   } catch (e) {
     setMessages('', e instanceof Error ? e.message : 'Failed to add team')
@@ -118,7 +122,9 @@ async function removeTeam(teamId: string) {
       return
     }
     setMessages('Team removed from tournament')
-    const { data } = await apiClient.GET('/v1/tournaments/{id}', { params: { path: { id: tournamentId.value } } })
+    const { data } = await apiClient.GET('/v1/tournaments/{id}', {
+      params: { path: { id: tournamentId.value } },
+    })
     if (data) tournament.value = data
   } catch (e) {
     setMessages('', e instanceof Error ? e.message : 'Failed to remove team')
@@ -150,10 +156,14 @@ async function inviteTeam(teamId: string) {
 
 function getInvitationStatusColor(status: string) {
   switch (status) {
-    case 'PENDING': return 'warning'
-    case 'ACCEPTED': return 'success'
-    case 'DECLINED': return 'error'
-    default: return 'neutral'
+    case 'PENDING':
+      return 'warning'
+    case 'ACCEPTED':
+      return 'success'
+    case 'DECLINED':
+      return 'error'
+    default:
+      return 'neutral'
   }
 }
 
@@ -246,7 +256,10 @@ onMounted(() => {
                 icon="i-lucide-search"
                 class="mb-2"
               />
-              <div v-if="filteredTeams.length > 0" class="flex flex-col gap-1 max-h-48 overflow-y-auto">
+              <div
+                v-if="filteredTeams.length > 0"
+                class="flex flex-col gap-1 max-h-48 overflow-y-auto"
+              >
                 <button
                   v-for="team in filteredTeams.slice(0, 10)"
                   :key="team.id"
@@ -260,7 +273,10 @@ onMounted(() => {
               </div>
               <p v-else-if="searchQuery" class="text-xs text-white/40">No matching teams found.</p>
             </div>
-            <div v-else class="text-sm text-amber-200/80 border border-amber-400/30 bg-amber-500/10 rounded-lg p-3">
+            <div
+              v-else
+              class="text-sm text-amber-200/80 border border-amber-400/30 bg-amber-500/10 rounded-lg p-3"
+            >
               Tournament is at capacity. Remove a team before adding another.
             </div>
           </div>
@@ -283,7 +299,10 @@ onMounted(() => {
                 icon="i-lucide-search"
                 class="mb-2"
               />
-              <div v-if="filteredTeams.length > 0" class="flex flex-col gap-1 max-h-48 overflow-y-auto">
+              <div
+                v-if="filteredTeams.length > 0"
+                class="flex flex-col gap-1 max-h-48 overflow-y-auto"
+              >
                 <button
                   v-for="team in filteredTeams.slice(0, 10)"
                   :key="team.id"

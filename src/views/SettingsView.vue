@@ -10,12 +10,7 @@
             </p>
             <p class="text-lg font-medium">{{ accountLabel }}</p>
           </div>
-          <UButton
-            color="primary"
-            variant="ghost"
-            icon="i-lucide-log-out"
-            @click="handleLogout"
-          >
+          <UButton color="primary" variant="ghost" icon="i-lucide-log-out" @click="handleLogout">
             {{ t('settings.logout') }}
           </UButton>
         </div>
@@ -70,14 +65,14 @@
                 v-for="pic in profile.pictures"
                 :key="pic.id"
                 class="relative shrink-0 rounded-full transition-all"
-                :class="pic.isPrimary ? 'ring-3 ring-primary ring-offset-2 ring-offset-neutral-900' : 'opacity-60 hover:opacity-100'"
+                :class="
+                  pic.isPrimary
+                    ? 'ring-3 ring-primary ring-offset-2 ring-offset-neutral-900'
+                    : 'opacity-60 hover:opacity-100'
+                "
                 @click="setPrimaryPicture(pic.id)"
               >
-                <UAvatar
-                  :src="pic.url"
-                  :alt="(pic.alt as unknown as string) || ''"
-                  size="3xl"
-                />
+                <UAvatar :src="pic.url" :alt="(pic.alt as unknown as string) || ''" size="3xl" />
               </button>
               <button
                 class="shrink-0 size-13 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-neutral-700 transition-colors"
@@ -143,13 +138,9 @@
           </UFormField>
 
           <!-- Status messages -->
-          <p v-if="showSaveSuccess" class="text-green-500 text-sm mt-2">
-            Saved profile
-          </p>
-          <p v-if="showSaveInfo" class="text-red-500 text-sm mt-2">
-            • Need to change the profile
-          </p>
-          
+          <p v-if="showSaveSuccess" class="text-green-500 text-sm mt-2">Saved profile</p>
+          <p v-if="showSaveInfo" class="text-red-500 text-sm mt-2">• Need to change the profile</p>
+
           <!-- Save Button -->
           <div class="flex justify-end">
             <UButton color="primary" :loading="saving" @click="saveProfile">
@@ -197,7 +188,6 @@
         </div>
       </UCard>
 
-
       <!-- Sessions Section -->
       <UCard class="bg-white/5">
         <div class="flex flex-col gap-4">
@@ -224,7 +214,12 @@
                 <div class="flex items-center gap-2">
                   <UIcon name="i-lucide-monitor" class="text-white/50 shrink-0" />
                   <span class="text-sm font-medium truncate">{{ session.ipAddress }}</span>
-                  <UBadge v-if="(session as any).thisSession" color="primary" variant="soft" size="xs">
+                  <UBadge
+                    v-if="(session as any).thisSession"
+                    color="primary"
+                    variant="soft"
+                    size="xs"
+                  >
                     {{ t('settings.thisSession') }}
                   </UBadge>
                   <UBadge v-if="session.rememberMe" color="primary" variant="soft" size="xs">
@@ -406,7 +401,6 @@ const themeOptions = computed(() => [
 
 const currentTheme = ref(localStorage.getItem('theme') || 'dark')
 
-
 onMounted(() => {
   setHeader({
     title: t('settings.settings'),
@@ -467,7 +461,8 @@ const handleAccountAction = async () => {
       if (deleteErr) throw new Error(getErrorMessage(deleteErr, 'Failed to delete account'))
     } else {
       const { error: deactivateErr } = await apiClient.POST('/v1/user/me/deactivate')
-      if (deactivateErr) throw new Error(getErrorMessage(deactivateErr, 'Failed to deactivate account'))
+      if (deactivateErr)
+        throw new Error(getErrorMessage(deactivateErr, 'Failed to deactivate account'))
     }
 
     confirmModal.value.isOpen = false
@@ -491,8 +486,10 @@ const nameForm = reactive({ firstName: '', lastName: '' })
 const originalName = ref({ firstName: '', lastName: '' })
 const savingName = ref(false)
 const nameSuccess = ref(false)
-const nameChanged = computed(() =>
-  nameForm.firstName !== originalName.value.firstName || nameForm.lastName !== originalName.value.lastName,
+const nameChanged = computed(
+  () =>
+    nameForm.firstName !== originalName.value.firstName ||
+    nameForm.lastName !== originalName.value.lastName,
 )
 
 async function saveName() {
@@ -664,7 +661,8 @@ async function revokeAllSessions() {
   revokingAll.value = true
   try {
     const { error: revokeAllErr } = await apiClient.POST('/v1/user/sessions/logout')
-    if (revokeAllErr) throw new Error(getErrorMessage(revokeAllErr, 'Failed to revoke all sessions'))
+    if (revokeAllErr)
+      throw new Error(getErrorMessage(revokeAllErr, 'Failed to revoke all sessions'))
     sessions.value = []
   } catch (error) {
     console.error('Failed to revoke all sessions', error)
@@ -674,16 +672,16 @@ async function revokeAllSessions() {
 }
 
 async function saveProfile() {
-  profileError.value = '' 
+  profileError.value = ''
   showSaveSuccess.value = false
   showSaveInfo.value = false
-  
+
   if (!hasChanges.value) {
     showSaveInfo.value = true
     return
   }
 
-  saving.value = true 
+  saving.value = true
   try {
     // Send primary picture first (API treats first as primary)
     const sorted = [...profile.value.pictures].sort((a, b) =>
@@ -721,5 +719,4 @@ function changeTheme(value: string) {
     document.documentElement.classList.remove('dark')
   }
 }
-
 </script>

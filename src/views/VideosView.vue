@@ -4,25 +4,23 @@ import { useHead } from '@unhead/vue'
 import { useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
-import { useOrganizationStore } from '@/stores/organization'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/types/api'
 
 type Sport = components['schemas']['SportResponseDto']
 
-type Tournament = components['schemas']['TournamentResponseDto']
+type Video = components['schemas']['VideoResponseDto']
 type PaginationMeta = components['schemas']['PaginationMetaDto']
 
 useHead({
-  title: 'Tournaments',
+  title: 'Videos',
 })
 
 const router = useRouter()
 const { setHeader } = usePageHeader()
-const orgStore = useOrganizationStore()
 
-const tournaments = ref<Tournament[]>([])
+const videos = ref<Video[]>([])
 const meta = ref<PaginationMeta | null>(null)
 const loading = ref(false)
 const error = ref('')
@@ -32,21 +30,8 @@ const filterSportId = ref('all')
 const filterStatus = ref('all')
 const page = ref(1)
 
-const STATUS_OPTIONS = [
-  { label: 'All Statuses', value: 'all' },
-  { label: 'Open', value: 'OPEN' },
-  { label: 'Upcoming', value: 'UPCOMING' },
-  { label: 'In Progress', value: 'INPROGRESS' },
-  { label: 'Completed', value: 'COMPLETED' },
-  { label: 'Closed', value: 'CLOSED' },
-]
 
-const isOrgManager = computed(() => {
-  const membership = orgStore.currentOrganization
-  return membership && (membership.role === 'STAFF' || membership.role === 'ADMIN')
-})
-
-async function loadTournaments() {
+async function loadVideos() {
   loading.value = true
   error.value = ''
   try {
@@ -55,19 +40,18 @@ async function loadTournaments() {
       per_page: 12,
     }
     if (filterSportId.value && filterSportId.value !== 'all') query.sportId = filterSportId.value
-    if (filterStatus.value && filterStatus.value !== 'all') query.status = filterStatus.value
 
-    const { data, error: err } = await apiClient.GET('/v1/tournaments', {
+    const { data, error: err } = await apiClient.GET('/v1/videos', {
       params: { query: query as any },
     })
     if (err) {
-      error.value = getErrorMessage(err, 'Failed to load tournaments')
+      error.value = getErrorMessage(err, 'Failed to load videos')
       return
     }
-    tournaments.value = data.data
+    videos.value = data.data
     meta.value = data.meta
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Failed to load tournaments'
+    error.value = e instanceof Error ? e.message : 'Failed to load videos'
   } finally {
     loading.value = false
   }
@@ -85,29 +69,12 @@ async function loadSports() {
 
 function applyFilters() {
   page.value = 1
-  loadTournaments()
+  loadVideos()
 }
 
 function goToPage(p: number) {
   page.value = p
-  loadTournaments()
-}
-
-function getStatusColor(status: string) {
-  switch (status) {
-    case 'OPEN':
-      return 'success'
-    case 'UPCOMING':
-      return 'info'
-    case 'INPROGRESS':
-      return 'warning'
-    case 'COMPLETED':
-      return 'neutral'
-    case 'CLOSED':
-      return 'error'
-    default:
-      return 'neutral'
-  }
+  loadVideos()
 }
 
 function formatDate(dateStr: string) {
@@ -120,13 +87,11 @@ function formatDate(dateStr: string) {
 
 onMounted(() => {
   setHeader({
-    title: 'Tournaments',
-    actions: isOrgManager.value
-      ? [{ icon: 'i-lucide-plus', onClick: () => router.push('/tournaments/create') }]
-      : [],
+    title: 'Videos',
+    actions: { icon: 'i-lucide-plus', onClick: () => router.push('/videos/create') }
   })
   loadSports()
-  loadTournaments()
+  loadVideos()
 })
 </script>
 
@@ -146,15 +111,6 @@ onMounted(() => {
               @update:model-value="applyFilters"
             />
           </UFormField>
-
-          <UFormField label="Status" class="flex-1">
-            <USelect
-              v-model="filterStatus"
-              :items="STATUS_OPTIONS"
-              @update:model-value="applyFilters"
-            />
-          </UFormField>
-
           <UButton icon="i-lucide-search" :loading="loading" @click="applyFilters">
             Search
           </UButton>
@@ -178,55 +134,31 @@ onMounted(() => {
 
       <!-- Empty -->
       <div
-        v-else-if="tournaments.length === 0"
+        v-else-if="videos.length === 0"
         class="rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
       >
-        No tournaments found. Try adjusting your filters.
+        No videos found. Try adjusting your filters.
       </div>
 
-      <!-- Tournament Cards -->
+      <!-- Video Cards -->
       <div v-else class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <button
-          v-for="tournament in tournaments"
-          :key="tournament.id"
+          v-for="video in videos"
+          :key="video.id"
           type="button"
           class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10"
-          @click="router.push(`/tournaments/${tournament.id}`)"
+          @click="router.push(`/videos/${video.id}`)"
         >
-          <div class="flex items-start justify-between gap-2">
-            <p class="font-medium truncate">{{ tournament.name }}</p>
-            <UBadge :color="getStatusColor(tournament.status)" variant="soft" size="xs">
-              {{ tournament.status }}
-            </UBadge>
-          </div>
-
           <div class="mt-3 flex items-center gap-2 text-sm text-white/60">
             <UIcon name="i-lucide-calendar" class="text-xs" />
-            <span>{{ formatDate(tournament.startDate) }}</span>
+            <span>{{ formatDate(video.updatedAt) }}</span>
           </div>
 
           <div class="mt-1.5 flex items-center gap-2 text-sm text-white/60">
             <UIcon name="i-lucide-dumbbell" class="text-xs" />
             <span
-              >{{ tournament.sport?.icon || '' }} {{ tournament.sport?.name || 'Unknown' }}</span
+              >{{ video.sport?.icon || '' }} {{ video.sport?.name || 'Unknown' }}</span
             >
-            <UBadge variant="subtle" color="neutral" size="xs">
-              {{ tournament.format === 'ROUND_ROBIN' ? 'Round Robin' : 'Elimination' }}
-            </UBadge>
-          </div>
-
-          <div class="mt-3 flex items-center gap-2">
-            <div class="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
-              <div
-                class="h-full rounded-full bg-primary transition-all"
-                :style="{
-                  width: `${Math.min((tournament.teams.length / tournament.maxTeams) * 100, 100)}%`,
-                }"
-              />
-            </div>
-            <span class="text-xs text-white/50">
-              {{ tournament.teams.length }}/{{ tournament.maxTeams }} teams
-            </span>
           </div>
         </button>
       </div>

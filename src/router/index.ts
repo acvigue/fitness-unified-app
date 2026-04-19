@@ -8,7 +8,7 @@ import MessengerView from '@/views/messenger/MessengerView.vue'
 import WorkoutsView from '@/views/WorkoutsView.vue'
 import ReportView from '@/views/ReportView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import UserReportView from "@/views/UserReportView.vue"
+import UserReportView from '@/views/UserReportView.vue'
 import UserProfileView from '@/views/UserProfileView.vue'
 import TeamView from '@/views/TeamView.vue'
 import TournamentsView from '@/views/TournamentsView.vue'
@@ -20,6 +20,9 @@ import AchievementsView from '@/views/AchievementsView.vue'
 import TeamDetailView from '@/views/TeamDetailView.vue'
 import TeamSettingsView from '@/views/TeamSettingsView.vue'
 import NotificationsView from '@/views/NotificationsView.vue'
+import VideosView from '@/views/VideosView.vue'
+import VideoDetailView from '@/views/VideoDetailView.vue'
+import VideoCreateView from '@/views/VideoCreateView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 
@@ -122,7 +125,7 @@ const router = createRouter({
       path: '/profile/:userId',
       name: 'user-profile',
       component: UserProfileView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/report',
@@ -133,6 +136,21 @@ const router = createRouter({
       path: '/settings',
       name: 'settings',
       component: SettingsView,
+    },
+	{
+      path: '/videos',
+      name: 'videos',
+      component: VideosView,
+    },
+	{
+      path: '/videos/:id',
+      name: 'video-detail',
+      component: VideoDetailView,
+    },
+	{
+      path: '/videos/create',
+      name: 'video-create',
+      component: VideoCreateView,
     },
   ],
 })

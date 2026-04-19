@@ -19,21 +19,13 @@ const definitions = ref<AchievementDefinition[]>([])
 const loading = ref(true)
 const error = ref('')
 
-const earned = computed(() =>
-  achievements.value.filter((a) => a.unlockedAt),
-)
+const earned = computed(() => achievements.value.filter((a) => a.unlockedAt))
 
-const inProgress = computed(() =>
-  achievements.value.filter((a) => !a.unlockedAt && a.progress > 0),
-)
+const inProgress = computed(() => achievements.value.filter((a) => !a.unlockedAt && a.progress > 0))
 
-const locked = computed(() =>
-  achievements.value.filter((a) => !a.unlockedAt && a.progress === 0),
-)
+const locked = computed(() => achievements.value.filter((a) => !a.unlockedAt && a.progress === 0))
 
-const totalCount = computed(() =>
-  definitions.value.length || achievements.value.length,
-)
+const totalCount = computed(() => definitions.value.length || achievements.value.length)
 
 const CRITERIA_ICONS: Record<string, string> = {
   TOURNAMENT_PARTICIPATION: 'i-lucide-trophy',

@@ -48,13 +48,16 @@ const maxTeamOptions = computed(() =>
   form.format === 'SINGLE_ELIMINATION' ? POWER_OF_2_OPTIONS : GENERAL_TEAM_OPTIONS,
 )
 
-watch(() => form.format, () => {
-  // Reset to a valid default when switching formats
-  const validValues = maxTeamOptions.value.map((o) => o.value)
-  if (!validValues.includes(form.maxTeams)) {
-    form.maxTeams = form.format === 'SINGLE_ELIMINATION' ? 8 : 4
-  }
-})
+watch(
+  () => form.format,
+  () => {
+    // Reset to a valid default when switching formats
+    const validValues = maxTeamOptions.value.map((o) => o.value)
+    if (!validValues.includes(form.maxTeams)) {
+      form.maxTeams = form.format === 'SINGLE_ELIMINATION' ? 8 : 4
+    }
+  },
+)
 
 async function createTournament() {
   if (!form.name.trim() || !selectedSport.value || !form.startDate) {
@@ -76,7 +79,7 @@ async function createTournament() {
       body: {
         name: form.name.trim(),
         sportId: selectedSport.value.id,
-        organizationId: org.organizationId,
+        organizationId: org.id,
         format: form.format,
         maxTeams: form.maxTeams,
         startDate: new Date(form.startDate).toISOString(),
@@ -153,11 +156,7 @@ onMounted(() => {
             <UInput v-model="form.startDate" type="datetime-local" />
           </UFormField>
 
-          <UButton
-            color="primary"
-            :loading="creating"
-            @click="createTournament"
-          >
+          <UButton color="primary" :loading="creating" @click="createTournament">
             Create Tournament
           </UButton>
         </div>

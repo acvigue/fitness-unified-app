@@ -111,7 +111,7 @@ async function deleteTournament() {
       params: { path: { id: tournamentId.value } },
     })
     if (err) {
-      error.value = getErrorMessage(err, 'Failed to delete tournament')
+      error.value = getErrorMessage(err, 'Failed to delete the tournament')
       return
     }
     router.push('/tournaments')
