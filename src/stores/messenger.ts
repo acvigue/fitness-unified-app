@@ -171,6 +171,25 @@ export const useMessengerStore = defineStore('messenger', () => {
     return chat
   }
 
+  function upsertChat(chat: UserChat | ChatResponse) {
+    const existing = conversations.value.get(chat.id)
+    conversations.value.set(chat.id, {
+      chat,
+      lastMessage: existing?.lastMessage ?? null,
+      unreadCount: existing?.unreadCount ?? 0,
+    })
+    if (!messages.value.has(chat.id)) {
+      messages.value.set(chat.id, [])
+    }
+    joinChat(chat.id)
+  }
+
+  function removeChat(chatId: string) {
+    conversations.value.delete(chatId)
+    messages.value.delete(chatId)
+    if (activeChatId.value === chatId) activeChatId.value = null
+  }
+
   async function sendMessage(content: string, mediaIds?: string[]) {
     if (!activeChatId.value || (!content.trim() && !mediaIds?.length)) return
     if (connected.value) {
@@ -222,6 +241,8 @@ export const useMessengerStore = defineStore('messenger', () => {
     loadChatHistory,
     jumpToMessage,
     createChat,
+    upsertChat,
+    removeChat,
     sendMessage,
     setActiveChat,
     emitTypingStart,

@@ -5,16 +5,23 @@ import { useHead } from '@unhead/vue'
 import { useI18n } from 'vue-i18n'
 import ConversationList from '@/components/messenger/ConversationList.vue'
 import NewChatModal from '@/components/messenger/NewChatModal.vue'
+import AnnouncementCreateModal from '@/components/messenger/AnnouncementCreateModal.vue'
 import { useMessengerStore } from '@/stores/messenger'
+import { useOrganizationStore } from '@/stores/organization'
 
 const { t } = useI18n()
 const route = useRoute()
 const messengerStore = useMessengerStore()
+const orgStore = useOrganizationStore()
 
 useHead({ title: 'Messenger' })
 
 const hasChatSelected = computed(() => !!route.params.id)
 const showNewChatModal = ref(false)
+const showAnnouncementModal = ref(false)
+const canCreateAnnouncement = computed(() =>
+  orgStore.memberships.some((m) => m.role === 'STAFF' || m.role === 'ADMIN'),
+)
 
 onMounted(() => {
   messengerStore.initialize()
@@ -35,14 +42,26 @@ onMounted(() => {
       <!-- List header -->
       <div class="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
         <h1 class="text-lg font-semibold">{{ t('messenger.messenger') }}</h1>
-        <UButton
-          icon="i-lucide-square-pen"
-          variant="ghost"
-          color="neutral"
-          size="sm"
-          square
-          @click="showNewChatModal = true"
-        />
+        <div class="flex items-center gap-1">
+          <UButton
+            v-if="canCreateAnnouncement"
+            icon="i-lucide-megaphone"
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            square
+            title="New announcement channel"
+            @click="showAnnouncementModal = true"
+          />
+          <UButton
+            icon="i-lucide-square-pen"
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            square
+            @click="showNewChatModal = true"
+          />
+        </div>
       </div>
 
       <ConversationList />
@@ -65,5 +84,9 @@ onMounted(() => {
     </div>
 
     <NewChatModal v-model:open="showNewChatModal" />
+    <AnnouncementCreateModal
+      v-model:open="showAnnouncementModal"
+      @created="(chat) => messengerStore.upsertChat(chat)"
+    />
   </div>
 </template>

@@ -8,6 +8,8 @@ import { useAuthStore } from '@/stores/auth/auth'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import UserLink from '@/components/UserLink.vue'
+import MeetupProposeModal from '@/components/meetup/MeetupProposeModal.vue'
+import TeamChatSearchModal from '@/components/team-chat/TeamChatSearchModal.vue'
 import type { components } from '@/types/api'
 
 type Sport = components['schemas']['SportResponseDto']
@@ -33,6 +35,20 @@ const actionError = ref('')
 
 // Captain-visible: pending invitations/requests
 const teamInvitations = ref<TeamInvitation[]>([])
+
+// Viewer's own teams (used for proposing a meetup / starting a team chat)
+const myTeams = ref<Team[]>([])
+const selectedProposingTeamId = ref<string>('')
+const proposeModalOpen = ref(false)
+const chatPickerOpen = ref(false)
+const chatPickerError = ref('')
+
+const isMyOwnTeam = computed(() => myTeams.value.some((t) => t.id === teamId.value))
+const myOtherTeams = computed(() => myTeams.value.filter((t) => t.id !== teamId.value))
+const canProposeMeetup = computed(
+  () => !isMyOwnTeam.value && myOtherTeams.value.length > 0 && !!team.value,
+)
+const canStartTeamChat = computed(() => isMyOwnTeam.value || myOtherTeams.value.length > 0)
 
 const currentUserId = computed(() => {
   const user = (authStore as any).user
@@ -195,6 +211,38 @@ async function leaveTeam() {
   }
 }
 
+async function loadMyTeams() {
+  try {
+    const { data, error: err } = await apiClient.GET('/v1/teams')
+    if (err) return
+    myTeams.value = (data ?? []).filter(
+      (t) => t.captainId === currentUserId.value || t.members.some((m) => m.sub === currentUserId.value),
+    )
+  } catch {
+    // Non-critical
+  }
+}
+
+function openProposeModal() {
+  const defaultTeam = myOtherTeams.value[0]
+  if (!defaultTeam) return
+  selectedProposingTeamId.value = defaultTeam.id
+  proposeModalOpen.value = true
+}
+
+function openTeamChatPicker() {
+  chatPickerError.value = ''
+  if (isMyOwnTeam.value) {
+    router.push(`/teams/${teamId.value}/chats`)
+    return
+  }
+  // Viewer is only on other teams — let them pick which of their teams initiates
+  const fromTeam = myOtherTeams.value[0]
+  if (!fromTeam) return
+  selectedProposingTeamId.value = fromTeam.id
+  chatPickerOpen.value = true
+}
+
 onMounted(async () => {
   setHeader({ title: 'Team', backRoute: '/team' })
   try {
@@ -204,7 +252,7 @@ onMounted(async () => {
   } catch {
     // Non-critical
   }
-  loadTeam()
+  await Promise.all([loadTeam(), loadMyTeams()])
 })
 </script>
 
@@ -336,6 +384,54 @@ onMounted(async () => {
           Team Settings
         </UButton>
 
+        <UButton
+          v-if="isMyOwnTeam"
+          icon="i-lucide-message-circle"
+          color="primary"
+          variant="soft"
+          @click="router.push(`/teams/${team.id}/chats`)"
+        >
+          Team Chats
+        </UButton>
+
+        <UButton
+          v-if="!isMyOwnTeam && canStartTeamChat"
+          icon="i-lucide-message-circle"
+          color="primary"
+          variant="soft"
+          @click="openTeamChatPicker"
+        >
+          Message Team
+        </UButton>
+
+        <UButton
+          icon="i-lucide-calendar"
+          color="neutral"
+          variant="outline"
+          @click="router.push(`/teams/${team.id}/meetups`)"
+        >
+          Meetups
+        </UButton>
+
+        <UButton
+          v-if="canProposeMeetup"
+          icon="i-lucide-calendar-plus"
+          color="primary"
+          @click="openProposeModal"
+        >
+          Propose Meetup
+        </UButton>
+
+        <UButton
+          v-if="isCaptain"
+          icon="i-lucide-shield-ban"
+          color="neutral"
+          variant="outline"
+          @click="router.push(`/teams/${team.id}/blocks`)"
+        >
+          Blocked Teams
+        </UButton>
+
         <UButton v-if="!isCaptain" color="primary" :loading="actionLoading" @click="requestToJoin">
           Request to Join
         </UButton>
@@ -350,6 +446,31 @@ onMounted(async () => {
           Leave Team
         </UButton>
       </div>
+
+      <UAlert
+        v-if="chatPickerError"
+        color="error"
+        :title="chatPickerError"
+        icon="i-lucide-circle-alert"
+        :close="{ color: 'error', variant: 'link', icon: 'i-lucide-x' }"
+        @close="chatPickerError = ''"
+      />
     </section>
+
+    <MeetupProposeModal
+      v-if="team && selectedProposingTeamId"
+      v-model:open="proposeModalOpen"
+      :proposing-team-id="selectedProposingTeamId"
+      :receiving-team-id="team.id"
+      :receiving-team-name="team.name"
+      @proposed="router.push(`/teams/${selectedProposingTeamId}/meetups`)"
+    />
+
+    <TeamChatSearchModal
+      v-if="selectedProposingTeamId"
+      v-model:open="chatPickerOpen"
+      :from-team-id="selectedProposingTeamId"
+      @error="(msg) => (chatPickerError = msg)"
+    />
   </PageLayout>
 </template>

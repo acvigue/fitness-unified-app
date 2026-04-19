@@ -19,6 +19,10 @@ import TournamentManageView from '@/views/TournamentManageView.vue'
 import AchievementsView from '@/views/AchievementsView.vue'
 import TeamDetailView from '@/views/TeamDetailView.vue'
 import TeamSettingsView from '@/views/TeamSettingsView.vue'
+import TeamMeetupsView from '@/views/TeamMeetupsView.vue'
+import TeamBlocksView from '@/views/TeamBlocksView.vue'
+import TeamChatsView from '@/views/TeamChatsView.vue'
+import TeamChatDetailView from '@/views/TeamChatDetailView.vue'
 import NotificationsView from '@/views/NotificationsView.vue'
 import VideosView from '@/views/VideosView.vue'
 import VideoDetailView from '@/views/VideoDetailView.vue'
@@ -63,6 +67,26 @@ const router = createRouter({
       path: '/teams/:id/settings',
       name: 'team-settings',
       component: TeamSettingsView,
+    },
+    {
+      path: '/teams/:id/meetups',
+      name: 'team-meetups',
+      component: TeamMeetupsView,
+    },
+    {
+      path: '/teams/:id/blocks',
+      name: 'team-blocks',
+      component: TeamBlocksView,
+    },
+    {
+      path: '/teams/:id/chats',
+      name: 'team-chats',
+      component: TeamChatsView,
+    },
+    {
+      path: '/teams/:id/chats/:chatId',
+      name: 'team-chat-detail',
+      component: TeamChatDetailView,
     },
     {
       path: '/tournaments',

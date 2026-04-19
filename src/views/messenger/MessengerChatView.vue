@@ -4,13 +4,21 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useMessengerStore } from '@/stores/messenger'
 import { useAuthStore } from '@/stores/auth/auth'
+import { useOrganizationStore } from '@/stores/organization'
 import { ENV } from '@/config/environment'
 import { getErrorMessage } from '@/lib/api/errors'
 import ChatSearchModal from '@/components/messenger/ChatSearchModal.vue'
+import AnnouncementSettingsModal from '@/components/messenger/AnnouncementSettingsModal.vue'
 import type { components } from '@/types/api'
 
 type MediaUploadResponse = components['schemas']['MediaUploadResponseDto']
 type SearchMessageHit = components['schemas']['SearchMessageHitDto']
+type ChatResponse = components['schemas']['ChatResponseDto']
+type AnnouncementChat = ChatResponse & {
+  type: 'ANNOUNCEMENT'
+  organizationId?: string
+  writeRoles?: ('MEMBER' | 'STAFF' | 'ADMIN')[]
+}
 
 interface PendingAttachment {
   id: string
@@ -25,8 +33,10 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const messengerStore = useMessengerStore()
+const orgStore = useOrganizationStore()
 const messageInput = ref('')
 const showSearchModal = ref(false)
+const showAnnouncementSettings = ref(false)
 const messagesContainer = ref<HTMLElement | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const attachments = ref<PendingAttachment[]>([])
@@ -54,7 +64,7 @@ onUnmounted(() => {
 const chatName = computed(() => {
   const chat = messengerStore.activeChat
   if (!chat) return 'Chat'
-  if (chat.chat.type === 'GROUP' && chat.chat.name) {
+  if ((chat.chat.type === 'GROUP' || isAnnouncement.value) && chat.chat.name) {
     return chat.chat.name as unknown as string
   }
   const other = chat.chat.members.find((m) => m.id !== messengerStore.currentUserId)
@@ -63,12 +73,58 @@ const chatName = computed(() => {
 
 const isGroup = computed(() => messengerStore.activeChat?.chat.type === 'GROUP')
 
+const rawChat = computed(() => messengerStore.activeChat?.chat as unknown as ChatResponse | null)
+
+const isAnnouncement = computed(() => rawChat.value?.type === 'ANNOUNCEMENT')
+
+const announcementChat = computed<AnnouncementChat | null>(() => {
+  if (!isAnnouncement.value || !rawChat.value) return null
+  return rawChat.value as AnnouncementChat
+})
+
+const announcementOrgId = computed<string | null>(() => {
+  const orgId = announcementChat.value?.organizationId as unknown
+  return typeof orgId === 'string' ? orgId : null
+})
+
+const currentUserOrgRole = computed<'MEMBER' | 'STAFF' | 'ADMIN' | null>(() => {
+  if (!announcementOrgId.value) return null
+  const membership = orgStore.memberships.find((m) => m.organizationId === announcementOrgId.value)
+  return membership?.role ?? null
+})
+
+const canPostAnnouncement = computed(() => {
+  if (!isAnnouncement.value) return true
+  const writeRoles = announcementChat.value?.writeRoles
+  if (!writeRoles || !currentUserOrgRole.value) return false
+  return writeRoles.includes(currentUserOrgRole.value)
+})
+
+const canManageAnnouncement = computed(() => {
+  if (!isAnnouncement.value || !announcementOrgId.value) return false
+  return currentUserOrgRole.value === 'STAFF' || currentUserOrgRole.value === 'ADMIN'
+})
+
+const canSendInChat = computed(() => {
+  if (isAnnouncement.value) return canPostAnnouncement.value
+  return true
+})
+
 const otherUserId = computed(() => {
   const chat = messengerStore.activeChat?.chat
   if (!chat || chat.type === 'GROUP') return null
+  if (isAnnouncement.value) return null
   const other = chat.members.find((m) => m.id !== messengerStore.currentUserId)
   return other?.id || null
 })
+
+function handleAnnouncementUpdated(chat: ChatResponse) {
+  messengerStore.upsertChat(chat)
+}
+
+function handleAnnouncementDeleted(chatId: string) {
+  messengerStore.removeChat(chatId)
+}
 
 const chatMessages = computed(() => {
   return messengerStore.activeMessages.map((msg) => ({
@@ -216,21 +272,32 @@ async function handleSearchSelect(hit: SearchMessageHit) {
       >
         <UIcon name="i-lucide-arrow-left" class="text-lg" />
       </RouterLink>
-      <UAvatar :icon="isGroup ? 'i-lucide-users' : 'i-lucide-user'" size="sm" />
+      <UAvatar
+        :icon="isAnnouncement ? 'i-lucide-megaphone' : isGroup ? 'i-lucide-users' : 'i-lucide-user'"
+        size="sm"
+      />
       <span class="font-medium text-sm flex-1">{{ chatName }}</span>
 
-      <UDropdown v-if="otherUserId" :items="profileDropdownItems">
-        <!-- <UButton icon="i-lucide-more-vertical" variant="ghost" color="neutral" size="sm" square /> -->
-        <UButton
-          v-if="otherUserId"
-          icon="i-lucide-user"
-          variant="ghost"
-          color="neutral"
-          size="sm"
-          square
-          @click="router.push({ path: `/profile/${otherUserId}`, query: { name: chatName } })"
-        />
-      </UDropdown>
+      <UButton
+        v-if="otherUserId"
+        icon="i-lucide-user"
+        variant="ghost"
+        color="neutral"
+        size="sm"
+        square
+        @click="router.push({ path: `/profile/${otherUserId}`, query: { name: chatName } })"
+      />
+
+      <UButton
+        v-if="canManageAnnouncement"
+        icon="i-lucide-settings"
+        variant="ghost"
+        color="neutral"
+        size="sm"
+        square
+        title="Channel settings"
+        @click="showAnnouncementSettings = true"
+      />
 
       <UButton
         icon="i-lucide-search"
@@ -241,6 +308,15 @@ async function handleSearchSelect(hit: SearchMessageHit) {
         @click="showSearchModal = true"
       />
     </div>
+
+    <UAlert
+      v-if="isAnnouncement && !canPostAnnouncement"
+      icon="i-lucide-megaphone"
+      color="warning"
+      title="Read-only channel"
+      description="Only authorized roles can post in this announcement channel."
+      class="mx-4 mt-3"
+    />
 
     <!-- Messages area -->
     <div ref="messagesContainer" class="flex-1 min-h-0 overflow-y-auto">
@@ -298,7 +374,7 @@ async function handleSearchSelect(hit: SearchMessageHit) {
     </div>
 
     <!-- Input bar -->
-    <div class="shrink-0 border-t border-white/10">
+    <div v-if="canSendInChat" class="shrink-0 border-t border-white/10">
       <!-- Attachment previews -->
       <div v-if="attachments.length" class="flex gap-2 px-3 pt-3 overflow-x-auto">
         <div
@@ -372,6 +448,13 @@ async function handleSearchSelect(hit: SearchMessageHit) {
       v-model:open="showSearchModal"
       :chat-id="chatId"
       @select="handleSearchSelect"
+    />
+    <AnnouncementSettingsModal
+      v-if="announcementChat"
+      v-model:open="showAnnouncementSettings"
+      :chat="announcementChat"
+      @updated="handleAnnouncementUpdated"
+      @deleted="handleAnnouncementDeleted"
     />
   </div>
 </template>
