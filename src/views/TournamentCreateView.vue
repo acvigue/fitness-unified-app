@@ -79,7 +79,7 @@ async function createTournament() {
       body: {
         name: form.name.trim(),
         sportId: selectedSport.value.id,
-        organizationId: org.id,
+        organizationId: org.organizationId,
         format: form.format,
         maxTeams: form.maxTeams,
         startDate: new Date(form.startDate).toISOString(),
