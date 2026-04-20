@@ -17,7 +17,8 @@ export function useNavigationItems() {
     { label: 'Achievements', icon: 'i-lucide-award', to: '/achievements' },
     { label: 'Messenger', icon: 'i-lucide-message-circle', to: '/messenger' },
     { label: 'Profile', icon: 'i-lucide-user', to: '/profile' },
-	{ label: 'Videos', icon: 'i-lucide-list-video', to: '/videos' },
+	  { label: 'Videos', icon: 'i-lucide-list-video', to: '/videos' },
+    { label: 'Gym', icon: 'i-lucide-dumbbell', to: '/gyms' },
   ]
 
   const sidebarItems = computed(() =>
