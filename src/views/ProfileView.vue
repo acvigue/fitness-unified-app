@@ -9,6 +9,7 @@ import router from '@/router'
 import type { components } from '@/types/api'
 
 type UserAchievement = components['schemas']['UserAchievementResponseDto']
+type UserTournaments = components['schemas']['TournamentResponseDto']
 
 const { t } = useI18n()
 const { setHeader } = usePageHeader()
@@ -19,10 +20,12 @@ const error = ref('')
 
 // Featured achievements editing
 const earnedAchievements = ref<UserAchievement[]>([])
+const tournamentHistory = ref<UserTournaments[]>([])
 const editingFeatured = ref(false)
 const selectedFeaturedIds = ref<string[]>([])
 const savingFeatured = ref(false)
 const featuredMessage = ref('')
+
 
 onMounted(async () => {
   setHeader({
@@ -34,6 +37,8 @@ onMounted(async () => {
     if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
     profile.value = profileData
     selectedFeaturedIds.value = (profile.value?.featuredAchievements ?? []).map((a: any) => a.id)
+    tournamentHistory.value = profile.value.tournaments
+    console.log(tournamentHistory.value)
   } catch (err) {
     error.value = 'Failed to load profile'
     console.error(err)
@@ -44,6 +49,31 @@ onMounted(async () => {
 
 const moveToReportsPage = () => {
   router.push('/report')
+}
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case 'OPEN':
+      return 'success'
+    case 'UPCOMING':
+      return 'info'
+    case 'INPROGRESS':
+      return 'warning'
+    case 'COMPLETED':
+      return 'neutral'
+    case 'CLOSED':
+      return 'error'
+    default:
+      return 'neutral'
+  }
 }
 
 const primaryPicture = computed(() => {
@@ -142,7 +172,55 @@ async function saveFeatured() {
       <!-- Tournaments -->
       <div class="bg-white/5 p-4 rounded-lg">
         <p class="text-white/70 text-sm">Tournaments</p>
-        <p class="text-white/50">None played yet.</p>
+        <div v-if="tournamentHistory.length > 0">
+          <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <button
+              v-for="tournament in tournamentHistory"
+              :key="tournament.id"
+              type="button"
+              class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10"
+              @click="router.push(`/tournaments/${tournament.id}`)"
+            >
+              <div class="flex items-start justify-between gap-2">
+                <p class="font-medium truncate">{{ tournament.name }}</p>
+                <UBadge :color="getStatusColor(tournament.status)" variant="soft" size="xs">
+                  {{ tournament.status }}
+                </UBadge>
+              </div>
+
+              <div class="mt-3 flex items-center gap-2 text-sm text-white/60">
+                <UIcon name="i-lucide-calendar" class="text-xs" />
+                <span>{{ formatDate(tournament.startDate) }}</span>
+              </div>
+
+              <div class="mt-1.5 flex items-center gap-2 text-sm text-white/60">
+                <UIcon name="i-lucide-dumbbell" class="text-xs" />
+                <span
+                >{{ tournament.sport?.icon || '' }} {{ tournament.sport?.name || 'Unknown' }}</span
+                >
+                <UBadge variant="subtle" color="neutral" size="xs">
+                  {{ tournament.format === 'ROUND_ROBIN' ? 'Round Robin' : 'Elimination' }}
+                </UBadge>
+              </div>
+
+              <div class="mt-3 flex items-center gap-2">
+                <div class="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    class="h-full rounded-full bg-primary transition-all"
+                    :style="{
+                  width: `${Math.min((tournament.teams.length / tournament.maxTeams) * 100, 100)}%`,
+                }"
+                  />
+                </div>
+                <span class="text-xs text-white/50">
+              {{ tournament.teams.length }}/{{ tournament.maxTeams }} teams
+            </span>
+              </div>
+            </button>
+          </div>        </div>
+        <div v-else>
+          <p class="text-white/50">None played yet.</p>
+        </div>
       </div>
 
       <!-- Featured Achievements -->
