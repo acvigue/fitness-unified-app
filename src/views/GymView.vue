@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useHead } from '@unhead/vue'
+import { useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 
@@ -8,11 +9,8 @@ useHead({
   title: 'Gyms',
 })
 
+const router = useRouter()
 const { setHeader } = usePageHeader()
-
-setHeader({
-  title: 'Gyms',
-})
 
 type SlotStatus = 'closed' | 'open' | 'empty' | 'occupied'
 
@@ -44,14 +42,14 @@ type GymLocation = {
   events: CalendarEvent[]
 }
 
-const days: { key: DayKey; label: string }[] = [
-  { key: 'monday', label: 'Mon' },
-  { key: 'tuesday', label: 'Tue' },
-  { key: 'wednesday', label: 'Wed' },
-  { key: 'thursday', label: 'Thu' },
-  { key: 'friday', label: 'Fri' },
-  { key: 'saturday', label: 'Sat' },
-  { key: 'sunday', label: 'Sun' },
+const dayOrder: { key: DayKey; short: string }[] = [
+  { key: 'monday', short: 'Mon' },
+  { key: 'tuesday', short: 'Tue' },
+  { key: 'wednesday', short: 'Wed' },
+  { key: 'thursday', short: 'Thu' },
+  { key: 'friday', short: 'Fri' },
+  { key: 'saturday', short: 'Sat' },
+  { key: 'sunday', short: 'Sun' },
 ]
 
 const startHour = 6
@@ -59,8 +57,11 @@ const endHour = 22
 const hourHeight = 72
 const totalHours = endHour - startHour
 const calendarHeight = totalHours * hourHeight
-
 const timeLabels = Array.from({ length: totalHours + 1 }, (_, i) => startHour + i)
+
+// Start from the week containing 2026-04-19, which is Sunday.
+// We convert it to the Monday of that week.
+const weekStart = ref(getStartOfWeek(new Date('2026-04-19')))
 
 const gymLocations = ref<GymLocation[]>([
   {
@@ -70,9 +71,8 @@ const gymLocations = ref<GymLocation[]>([
     description: 'Main basketball and volleyball court area.',
     openHours: '6:00 AM - 10:00 PM',
     events: [
+      { id: 'm1', day: 'monday', startHour: 6, endHour: 8, status: 'open', title: 'Open Court' },
 
-
-      { id: 'su4', day: 'sunday', startHour: 18, endHour: 22, status: 'closed', title: 'Closed' },
     ],
   },
   {
@@ -82,9 +82,9 @@ const gymLocations = ref<GymLocation[]>([
     description: 'Indoor multi-purpose court for casual play and practice.',
     openHours: '7:00 AM - 9:00 PM',
     events: [
+      { id: 'n4', day: 'tuesday', startHour: 7, endHour: 11, status: 'open', title: 'Open Court' },
 
-      { id: 'n12', day: 'thursday', startHour: 13, endHour: 18, status: 'open', title: 'Open Court' },
-
+      { id: 'n21', day: 'sunday', startHour: 16, endHour: 21, status: 'closed', title: 'Closed' },
     ],
   },
 ])
@@ -94,6 +94,49 @@ const selectedGymId = ref(gymLocations.value[0]?.id ?? '')
 const selectedGym = computed(() => {
   return gymLocations.value.find((gym) => gym.id === selectedGymId.value) ?? null
 })
+
+const weekDays = computed(() =>
+  dayOrder.map((day, index) => {
+    const date = new Date(weekStart.value)
+    date.setDate(weekStart.value.getDate() + index)
+
+    return {
+      key: day.key,
+      short: day.short,
+      date,
+      label: `${date.getMonth() + 1}/${date.getDate()} (${day.short})`,
+    }
+  }),
+)
+
+const weekRangeLabel = computed(() => {
+  const start = weekDays.value[0]?.date
+  const end = weekDays.value[6]?.date
+  if (!start || !end) return ''
+
+  return `${start.getMonth() + 1}/${start.getDate()} - ${end.getMonth() + 1}/${end.getDate()}`
+})
+
+function getStartOfWeek(date: Date) {
+  const result = new Date(date)
+  const day = result.getDay() // Sun=0, Mon=1...
+  const diff = day === 0 ? -6 : 1 - day
+  result.setDate(result.getDate() + diff)
+  result.setHours(0, 0, 0, 0)
+  return result
+}
+
+function goToPreviousWeek() {
+  const next = new Date(weekStart.value)
+  next.setDate(next.getDate() - 7)
+  weekStart.value = next
+}
+
+function goToNextWeek() {
+  const next = new Date(weekStart.value)
+  next.setDate(next.getDate() + 7)
+  weekStart.value = next
+}
 
 function getEventsForDay(day: DayKey) {
   return selectedGym.value?.events.filter((event) => event.day === day) ?? []
@@ -129,6 +172,16 @@ function getEventClasses(status: SlotStatus) {
       return 'bg-white/5 border-white/10 text-white/70'
   }
 }
+
+setHeader({
+  title: 'Gyms',
+  actions: [
+    {
+      icon: 'i-lucide-plus',
+      onClick: () => router.push('/gyms/create'),
+    },
+  ],
+})
 </script>
 
 <template>
@@ -169,16 +222,36 @@ function getEventClasses(status: SlotStatus) {
         </div>
       </div>
 
-      <!-- Google-calendar-style weekly schedule -->
+      <!-- Weekly calendar -->
       <div
         v-if="selectedGym"
         class="rounded-lg border border-white/10 bg-white/5 p-4"
       >
-        <div class="mb-4 flex flex-wrap items-center gap-2">
-          <UBadge color="neutral" variant="soft">Closed</UBadge>
-          <UBadge color="success" variant="soft">Open</UBadge>
-          <UBadge color="info" variant="soft">Empty</UBadge>
-          <UBadge color="warning" variant="soft">Occupied</UBadge>
+        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-2">
+            <UButton
+              icon="i-lucide-chevron-left"
+              color="neutral"
+              variant="outline"
+              size="sm"
+              @click="goToPreviousWeek"
+            />
+            <UButton
+              icon="i-lucide-chevron-right"
+              color="neutral"
+              variant="outline"
+              size="sm"
+              @click="goToNextWeek"
+            />
+            <span class="text-sm font-medium text-white/70">{{ weekRangeLabel }}</span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <UBadge color="neutral" variant="soft">Closed</UBadge>
+            <UBadge color="success" variant="soft">Open</UBadge>
+            <UBadge color="info" variant="soft">Empty</UBadge>
+            <UBadge color="warning" variant="soft">Occupied</UBadge>
+          </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -188,17 +261,18 @@ function getEventClasses(status: SlotStatus) {
               class="grid border-b border-white/10"
               style="grid-template-columns: 80px repeat(7, minmax(140px, 1fr));"
             >
-              <div class="h-14" />
+              <div class="h-16" />
               <div
-                v-for="day in days"
+                v-for="day in weekDays"
                 :key="day.key"
-                class="flex h-14 items-center justify-center border-l border-white/10 text-sm font-medium text-white/70"
+                class="flex h-16 flex-col items-center justify-center border-l border-white/10 px-2 text-center"
               >
-                {{ day.label }}
+                <span class="text-sm font-medium text-white/80">{{ day.short }}</span>
+                <span class="text-xs text-white/50">{{ day.label }}</span>
               </div>
             </div>
 
-            <!-- Calendar body -->
+            <!-- Body -->
             <div
               class="grid"
               :style="{
@@ -220,11 +294,10 @@ function getEventClasses(status: SlotStatus) {
 
               <!-- Day columns -->
               <div
-                v-for="day in days"
+                v-for="day in weekDays"
                 :key="day.key"
                 class="relative border-l border-white/10"
               >
-                <!-- Hour lines -->
                 <div
                   v-for="hour in totalHours"
                   :key="hour"
@@ -232,7 +305,6 @@ function getEventClasses(status: SlotStatus) {
                   :style="{ top: `${(hour - 1) * hourHeight}px` }"
                 />
 
-                <!-- Events -->
                 <div
                   v-for="event in getEventsForDay(day.key)"
                   :key="event.id"

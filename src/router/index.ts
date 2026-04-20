@@ -28,6 +28,7 @@ import VideosView from '@/views/VideosView.vue'
 import VideoDetailView from '@/views/VideoDetailView.vue'
 import VideoCreateView from '@/views/VideoCreateView.vue'
 import GymView from '@/views/GymView.vue'
+import GymCreateView from '@/views/GymCreateView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 
@@ -181,7 +182,12 @@ const router = createRouter({
       path: '/gyms',
       name: 'gyms',
       component: GymView,
-  },
+    },
+  {
+      path: '/gyms/create',
+      name: 'gym-create',
+      component: GymCreateView,
+    },
   ],
 })
 
