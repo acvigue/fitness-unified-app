@@ -44,6 +44,10 @@ onMounted(async () => {
 const primaryPicture = computed(() => {
   return profile.value?.pictures?.find((p: any) => p.isPrimary)?.url || ''
 })
+
+const moveToComparePage = () => {
+  router.push(`/profile/compare/${userId.value}`)
+}
 </script>
 
 <template>
@@ -115,6 +119,9 @@ const primaryPicture = computed(() => {
           </div>
         </div>
         <p v-else class="text-white/50 text-sm">No featured achievements.</p>
+      </div>
+      <div class="flex justify-center">
+        <UButton @click="moveToComparePage" color="primary" variant="soft"> Compare Profiles </UButton>
       </div>
     </div>
   </PageLayout>

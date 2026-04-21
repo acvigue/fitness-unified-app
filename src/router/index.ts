@@ -31,6 +31,7 @@ import GymView from '@/views/GymView.vue'
 import GymCreateView from '@/views/GymCreateView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
+import ProfileCompareView from "@/views/ProfileCompareView.vue";
 
 const router = createRouter({
   history: createWebHistory('/'),
@@ -151,6 +152,12 @@ const router = createRouter({
       path: '/profile/:userId',
       name: 'user-profile',
       component: UserProfileView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/profile/compare/:userId',
+      name: 'user-profile-compare',
+      component: ProfileCompareView,
       meta: { requiresAuth: true },
     },
     {
