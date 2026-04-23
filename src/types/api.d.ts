@@ -573,6 +573,24 @@ export interface paths {
         patch: operations["UserController_updateProfile_v1"];
         trace?: never;
     };
+    "/v1/user/profile/privacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Update current user profile privacy */
+        get: operations["UserController_getProfilePrivacy_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update current user profile privacy */
+        patch: operations["UserController_updateProfilePrivacy_v1"];
+        trace?: never;
+    };
     "/v1/user/sessions/enrich": {
         parameters: {
             query?: never;
@@ -2301,6 +2319,28 @@ export interface components {
              */
             featuredAchievementIds?: string[];
         };
+        UpdateUserProfilePrivacyDto: {
+            /**
+             * @description Privacy Setting for Bio's
+             * @example false
+             */
+            privateBio: boolean;
+            /**
+             * @description Privacy Setting for Favorite Sports
+             * @example false
+             */
+            privateSports: boolean;
+            /**
+             * @description Privacy Setting for Tournaments
+             * @example false
+             */
+            privateTournaments: boolean;
+            /**
+             * @description Privacy Setting for Featured Achievements
+             * @example false
+             */
+            privateAchievements: boolean;
+        };
         EnrichSessionDto: {
             /** @description The refresh token for the current session */
             refreshToken: string;
@@ -2926,6 +2966,10 @@ export interface components {
             sportId: string;
             /** @description Video url */
             url: string;
+        };
+        PaginatedVideoResponseDto: {
+            data: components["schemas"]["VideoResponseDto"][];
+            meta: components["schemas"]["PaginationMetaDto"];
         };
         VideoUpdateDto: {
             /**
@@ -4830,6 +4874,48 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserProfileResponseDto"];
+                };
+            };
+        };
+    };
+    UserController_getProfilePrivacy_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateUserProfilePrivacyDto"];
+                };
+            };
+        };
+    };
+    UserController_updateProfilePrivacy_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserProfilePrivacyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateUserProfilePrivacyDto"];
                 };
             };
         };
@@ -7600,7 +7686,12 @@ export interface operations {
     };
     VideoController_findAll_v1: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Filter by sport ID */
+                sportId?: string;
+                per_page?: number;
+                page?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -7612,7 +7703,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["VideoResponseDto"][];
+                    "application/json": components["schemas"]["PaginatedVideoResponseDto"];
                 };
             };
             /** @description Unauthorized - invalid or missing token */
