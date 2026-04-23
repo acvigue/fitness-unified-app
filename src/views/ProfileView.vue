@@ -18,6 +18,12 @@ const profile = ref<any>(null)
 const loading = ref(true)
 const error = ref('')
 
+const hidingBio = ref(false)
+const hidingSports = ref(false)
+const hidingTournaments = ref(false)
+const hidingAchievements = ref(false)
+
+
 // Featured achievements editing
 const earnedAchievements = ref<UserAchievement[]>([])
 const tournamentHistory = ref<UserTournaments[]>([])
@@ -44,6 +50,18 @@ onMounted(async () => {
     console.error(err)
   } finally {
     loading.value = false
+  }
+  try {
+    const { data: profileData, error: profileErr } = await apiClient.GET('/v1/user/profile/privacy')
+    if (profileErr ) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
+    hidingBio.value = profileData.privateBio
+    hidingSports.value = profileData.privateSports
+    hidingTournaments.value = profileData.privateTournaments
+    hidingAchievements.value = profileData.privateAchievements
+    console.log(hidingBio.value,hidingSports.value,hidingTournaments.value,hidingAchievements.value)
+  } catch (err) {
+    error.value = 'Failed to load profile'
+    console.error(err)
   }
 })
 
@@ -148,13 +166,15 @@ async function saveFeatured() {
       <!-- Bio -->
       <div class="bg-white/5 p-4 rounded-lg">
         <p class="text-white/70 text-sm mb-1">Bio</p>
-        <p class="text-white">{{ profile.bio || 'no bio' }}</p>
+        <p v-if="hidingBio" class="text-white">Bio is Hidden</p>
+        <p v-else class="text-white">{{ profile.bio || 'no bio' }}</p>
       </div>
 
       <!-- Favorite Sports -->
       <div class="bg-white/5 p-4 rounded-lg">
         <p class="text-white/70 text-sm mb-2">Favorite Sports</p>
-        <div class="flex flex-wrap gap-2">
+        <p v-if="hidingSports" class="text-white">Tournament History is Hidden</p>
+        <div v-else class="flex flex-wrap gap-2">
           <UBadge
             v-for="sport in profile.favoriteSports"
             :key="sport.id"
@@ -172,7 +192,8 @@ async function saveFeatured() {
       <!-- Tournaments -->
       <div class="bg-white/5 p-4 rounded-lg">
         <p class="text-white/70 text-sm">Tournaments</p>
-        <div v-if="tournamentHistory.length > 0">
+        <p v-if="hidingTournaments" class="text-white">Tournament History is Hidden</p>
+        <div v-else-if="tournamentHistory.length > 0">
           <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             <button
               v-for="tournament in tournamentHistory"
@@ -227,7 +248,8 @@ async function saveFeatured() {
       <div class="bg-white/5 p-4 rounded-lg">
         <div class="flex items-center justify-between mb-2">
           <p class="text-white/70 text-sm">Featured Achievements</p>
-          <UButton size="xs" variant="ghost" color="neutral" @click="startEditFeatured">
+          <p v-if="hidingSports" class="text-white">Tournament History is Hidden</p>
+          <UButton v-else size="xs" variant="ghost" color="neutral" @click="startEditFeatured">
             {{ editingFeatured ? 'Cancel' : 'Edit' }}
           </UButton>
         </div>

@@ -149,6 +149,27 @@
           </div>
         </div>
       </UCard>
+      <UCard class="bg-white/5">
+        <div class="flex flex-col gap-5">
+        <p class="text-xs uppercase tracking-[0.3em] text-white/60">
+           Profile Privacy
+        </p>
+        <p class="text-sm mt-2"> Hide Bio From Other Users</p>
+        <URadioGroup v-model="value1" :items="items" />
+        <p class="text-sm mt-2"> Hide Favorite Sports From Other Users</p>
+        <URadioGroup v-model="value2" :items="items" />
+        <p class="text-sm mt-2"> Hide Tournament History From Other Users</p>
+        <URadioGroup v-model="value3" :items="items" />
+        <p class="text-sm mt-2"> Hide Featured Achievements From Other Users</p>
+        <URadioGroup v-model="value4" :items="items" />
+        <div class="flex justify-end">
+          <UButton color="primary" :loading="saving2" @click="savePrivacy">
+            Save Privacy
+          </UButton>
+        </div>
+        </div>
+      </UCard>
+
 
       <!-- Language Section -->
       <UCard class="bg-white/5">
@@ -392,6 +413,11 @@ const appChannel = ENV.appChannel
 const profileError = ref('')
 const showSaveSuccess = ref(false)
 const showSaveInfo = ref(false)
+const items = ref(['Yes', 'No'])
+const value1 = ref('No')
+const value2 = ref('No')
+const value3 = ref('No')
+const value4 = ref('No')
 
 // Theme
 const themeOptions = computed(() => [
@@ -479,6 +505,7 @@ const handleAccountAction = async () => {
 const profile = ref<UserProfile>({ userId: '', bio: '', favoriteSports: [], pictures: [] })
 const profileForm = reactive({ bio: '', favoriteSports: [] as Sport[] })
 const saving = ref(false)
+const saving2 = ref(false)
 const originalProfile = ref('')
 
 // Name
@@ -707,6 +734,38 @@ async function saveProfile() {
     profileError.value = error.message || 'Failed to update profile'
   } finally {
     saving.value = false
+  }
+}
+
+async function savePrivacy() {
+  profileError.value = ''
+  showSaveSuccess.value = false
+  showSaveInfo.value = false
+
+  saving2.value = true
+  const bio = value1.value !== "No"
+  const sports = value1.value !== "No"
+  const tournaments = value1.value !== "No"
+  const achievements = value4.value !== "No"
+
+  try {
+    const { data: updatedProfile, error: updateErr } = await apiClient.PATCH('/v1/user/profile/privacy', {
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        privateBio: bio,
+        privateSports: sports,
+        privateTournaments: tournaments,
+        privateAchievements: achievements,
+      },
+    })
+    if (updateErr) throw new Error(getErrorMessage(updateErr, 'Failed to update profile'))
+    console.log(updatedProfile)
+    showSaveSuccess.value = true
+  } catch (error: any) {
+    console.error('Update failed', error)
+    profileError.value = error.message || 'Failed to update profile'
+  } finally {
+    saving2.value = false
   }
 }
 
