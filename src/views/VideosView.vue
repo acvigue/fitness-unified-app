@@ -88,7 +88,7 @@ function formatDate(dateStr: string) {
 onMounted(() => {
   setHeader({
     title: 'Videos',
-    actions: { icon: 'i-lucide-plus', onClick: () => router.push('/videos/create') }
+    actions: [{ icon: 'i-lucide-plus', onClick: () => router.push('/videos/create') }]
   })
   loadSports()
   loadVideos()
