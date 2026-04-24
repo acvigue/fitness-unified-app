@@ -307,8 +307,10 @@ watch(
               color="primary"
               icon="i-lucide-upload"
               @click="
-                pickerOpen = false
-                router.push('/videos/create')
+                () => {
+                  pickerOpen = false
+                  router.push('/videos/create')
+                }
               "
             >
               Upload a video
