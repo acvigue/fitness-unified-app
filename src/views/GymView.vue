@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
@@ -26,6 +26,29 @@ const gyms = ref<GymSummary[]>([])
 const loading = ref(false)
 const error = ref('')
 const selectedGymId = ref<string>('')
+const searchTerm = ref('')
+const sortBy = ref<'name' | 'location'>('name')
+
+const filteredGyms = computed(() => {
+  const term = searchTerm.value.trim().toLowerCase()
+  const list = term
+    ? gyms.value.filter(
+        (g) =>
+          g.name.toLowerCase().includes(term) ||
+          (g.location?.toLowerCase().includes(term) ?? false),
+      )
+    : gyms.value.slice()
+
+  return list.sort((a, b) => {
+    if (sortBy.value === 'location') {
+      const aLoc = a.location ?? ''
+      const bLoc = b.location ?? ''
+      const cmp = aLoc.localeCompare(bLoc)
+      if (cmp !== 0) return cmp
+    }
+    return a.name.localeCompare(b.name)
+  })
+})
 
 const selectedGym = computed(() => gyms.value.find((g) => g.id === selectedGymId.value) ?? null)
 
@@ -51,6 +74,16 @@ async function loadGyms() {
     loading.value = false
   }
 }
+
+watch(filteredGyms, (list) => {
+  if (list.length === 0) {
+    selectedGymId.value = ''
+    return
+  }
+  if (!list.some((g) => g.id === selectedGymId.value)) {
+    selectedGymId.value = list[0].id
+  }
+})
 
 onMounted(() => {
   setHeader({
@@ -92,17 +125,38 @@ onMounted(() => {
 
       <template v-else>
         <UCard class="bg-white/5">
-          <UFormField label="Location">
-            <USelect
-              v-model="selectedGymId"
-              :items="
-                gyms.map((gym) => ({
-                  label: gym.name + (gym.location ? ` · ${gym.location}` : ''),
-                  value: gym.id,
-                }))
-              "
+          <div class="flex flex-col gap-3">
+            <UInput
+              v-model="searchTerm"
+              icon="i-lucide-search"
+              placeholder="Search by name or location"
             />
-          </UFormField>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <UFormField label="Sort by">
+                <USelect
+                  v-model="sortBy"
+                  :items="[
+                    { label: 'Name', value: 'name' },
+                    { label: 'Location', value: 'location' },
+                  ]"
+                />
+              </UFormField>
+              <UFormField label="Location">
+                <USelect
+                  v-model="selectedGymId"
+                  :items="
+                    filteredGyms.map((gym) => ({
+                      label: gym.name + (gym.location ? ` · ${gym.location}` : ''),
+                      value: gym.id,
+                    }))
+                  "
+                />
+              </UFormField>
+            </div>
+            <p v-if="filteredGyms.length === 0" class="text-xs text-white/50">
+              No gyms match this search.
+            </p>
+          </div>
         </UCard>
 
         <UCard v-if="selectedGym" class="bg-white/5">

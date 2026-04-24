@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useToastStore } from '@/stores/toast'
+import { useAuthStore } from '@/stores/auth/auth'
 import type { components } from '@/types/api'
 
 type Slot = components['schemas']['GymSlotResponseDto']
@@ -12,17 +13,39 @@ const props = defineProps<{
 }>()
 
 const toast = useToastStore()
+const authStore = useAuthStore()
 
 const slots = ref<Slot[]>([])
 const loading = ref(false)
 const error = ref('')
 const statusFilter = ref<'ALL' | 'AVAILABLE' | 'RESERVED' | 'CLOSED'>('ALL')
-const dayOffset = ref(0)
+
+function toDateInputValue(d: Date) {
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const selectedDate = ref(toDateInputValue(new Date()))
+
+const isCaptain = ref(false)
+
+async function loadCaptainStatus() {
+  const sub = authStore.user?.sub
+  if (!sub) {
+    isCaptain.value = false
+    return
+  }
+  const { data } = await apiClient.GET('/v1/teams')
+  isCaptain.value = (data ?? []).some((t) => t.captainId === sub)
+}
 
 const windowFrom = computed(() => {
+  const [y, m, day] = selectedDate.value.split('-').map((n) => Number(n))
   const d = new Date()
+  d.setFullYear(y, (m ?? 1) - 1, day ?? 1)
   d.setHours(0, 0, 0, 0)
-  d.setDate(d.getDate() + dayOffset.value)
   return d
 })
 
@@ -31,6 +54,16 @@ const windowTo = computed(() => {
   d.setDate(d.getDate() + 1)
   return d
 })
+
+function shiftDay(delta: number) {
+  const d = new Date(windowFrom.value)
+  d.setDate(d.getDate() + delta)
+  selectedDate.value = toDateInputValue(d)
+}
+
+function goToday() {
+  selectedDate.value = toDateInputValue(new Date())
+}
 
 const rangeLabel = computed(() =>
   windowFrom.value.toLocaleDateString(undefined, {
@@ -124,10 +157,16 @@ async function confirmCloseSlot() {
 }
 
 watch(
-  () => [props.gymId, statusFilter.value, dayOffset.value] as const,
+  () => [props.gymId, statusFilter.value, selectedDate.value] as const,
   () => load(),
   { immediate: true },
 )
+
+onMounted(() => {
+  loadCaptainStatus().catch(() => {
+    isCaptain.value = false
+  })
+})
 </script>
 
 <template>
@@ -145,33 +184,36 @@ watch(
             color="neutral"
             icon="i-lucide-chevron-left"
             aria-label="Previous day"
-            @click="dayOffset -= 1"
+            @click="shiftDay(-1)"
           />
-          <UButton size="xs" variant="outline" color="neutral" @click="dayOffset = 0">
-            Today
-          </UButton>
+          <UButton size="xs" variant="outline" color="neutral" @click="goToday"> Today </UButton>
           <UButton
             size="xs"
             variant="outline"
             color="neutral"
             icon="i-lucide-chevron-right"
             aria-label="Next day"
-            @click="dayOffset += 1"
+            @click="shiftDay(1)"
           />
         </div>
       </div>
 
-      <UFormField label="Status">
-        <USelect
-          v-model="statusFilter"
-          :items="[
-            { label: 'All', value: 'ALL' },
-            { label: 'Available', value: 'AVAILABLE' },
-            { label: 'Reserved', value: 'RESERVED' },
-            { label: 'Closed', value: 'CLOSED' },
-          ]"
-        />
-      </UFormField>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <UFormField label="Date">
+          <UInput v-model="selectedDate" type="date" icon="i-lucide-calendar" />
+        </UFormField>
+        <UFormField label="Status">
+          <USelect
+            v-model="statusFilter"
+            :items="[
+              { label: 'All', value: 'ALL' },
+              { label: 'Available', value: 'AVAILABLE' },
+              { label: 'Reserved', value: 'RESERVED' },
+              { label: 'Closed', value: 'CLOSED' },
+            ]"
+          />
+        </UFormField>
+      </div>
 
       <UAlert v-if="error" color="error" :title="error" icon="i-lucide-circle-alert" />
 
@@ -208,6 +250,7 @@ watch(
               {{ slot.status }}
             </UBadge>
             <UDropdown
+              v-if="isCaptain"
               :items="[
                 [
                   {
