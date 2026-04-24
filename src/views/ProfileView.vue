@@ -44,7 +44,6 @@ onMounted(async () => {
     profile.value = profileData
     selectedFeaturedIds.value = (profile.value?.featuredAchievements ?? []).map((a: any) => a.id)
     tournamentHistory.value = profile.value.tournaments
-    console.log(tournamentHistory.value)
   } catch (err) {
     error.value = 'Failed to load profile'
     console.error(err)
@@ -58,7 +57,6 @@ onMounted(async () => {
     hidingSports.value = profileData.privateSports
     hidingTournaments.value = profileData.privateTournaments
     hidingAchievements.value = profileData.privateAchievements
-    console.log(hidingBio.value,hidingSports.value,hidingTournaments.value,hidingAchievements.value)
   } catch (err) {
     error.value = 'Failed to load profile'
     console.error(err)
@@ -173,7 +171,7 @@ async function saveFeatured() {
       <!-- Favorite Sports -->
       <div class="bg-white/5 p-4 rounded-lg">
         <p class="text-white/70 text-sm mb-2">Favorite Sports</p>
-        <p v-if="hidingSports" class="text-white">Tournament History is Hidden</p>
+        <p v-if="hidingSports" class="text-white">Favorite Sports is Hidden</p>
         <div v-else class="flex flex-wrap gap-2">
           <UBadge
             v-for="sport in profile.favoriteSports"
@@ -248,8 +246,7 @@ async function saveFeatured() {
       <div class="bg-white/5 p-4 rounded-lg">
         <div class="flex items-center justify-between mb-2">
           <p class="text-white/70 text-sm">Featured Achievements</p>
-          <p v-if="hidingSports" class="text-white">Tournament History is Hidden</p>
-          <UButton v-else size="xs" variant="ghost" color="neutral" @click="startEditFeatured">
+          <UButton v-if="!hidingSports" size="xs" variant="ghost" color="neutral" @click="startEditFeatured">
             {{ editingFeatured ? 'Cancel' : 'Edit' }}
           </UButton>
         </div>
@@ -265,7 +262,8 @@ async function saveFeatured() {
 
         <!-- Display mode -->
         <template v-if="!editingFeatured">
-          <div v-if="profile?.featuredAchievements?.length" class="grid gap-2 sm:grid-cols-2">
+          <p v-if="hidingSports" class="text-white">Featured Achievements is Hidden</p>
+          <div v-else-if="profile?.featuredAchievements?.length" class="grid gap-2 sm:grid-cols-2">
             <div
               v-for="ua in profile.featuredAchievements"
               :key="ua.id"

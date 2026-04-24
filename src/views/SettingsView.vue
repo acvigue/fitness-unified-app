@@ -427,7 +427,7 @@ const themeOptions = computed(() => [
 
 const currentTheme = ref(localStorage.getItem('theme') || 'dark')
 
-onMounted(() => {
+onMounted(async () => {
   setHeader({
     title: t('settings.settings'),
     backRoute: '/',
@@ -437,6 +437,25 @@ onMounted(() => {
     document.documentElement.classList.add('dark')
   } else {
     document.documentElement.classList.remove('dark')
+  }
+  try {
+    const { data: privacyData, error: profileErr } = await apiClient.GET('/v1/user/profile/privacy')
+    if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to update name'))
+    if (privacyData.privateBio === true){
+        value1.value = "Yes";
+    }
+    if (privacyData.privateSports === true){
+      value2.value = "Yes";
+    }
+    if (privacyData.privateTournaments === true){
+      value3.value = "Yes";
+    }
+    if (privacyData.privateAchievements === true){
+      value4.value = "Yes";
+    }
+    console.log(privacyData)
+  } catch (err: any) {
+    profileError.value = err.message || 'Failed to update name'
   }
 })
 
@@ -744,12 +763,12 @@ async function savePrivacy() {
 
   saving2.value = true
   const bio = value1.value !== "No"
-  const sports = value1.value !== "No"
-  const tournaments = value1.value !== "No"
+  const sports = value2.value !== "No"
+  const tournaments = value3.value !== "No"
   const achievements = value4.value !== "No"
 
   try {
-    const { data: updatedProfile, error: updateErr } = await apiClient.PATCH('/v1/user/profile/privacy', {
+    const { error: updateErr } = await apiClient.PATCH('/v1/user/profile/privacy', {
       headers: { 'Content-Type': 'application/json' },
       body: {
         privateBio: bio,
@@ -759,8 +778,6 @@ async function savePrivacy() {
       },
     })
     if (updateErr) throw new Error(getErrorMessage(updateErr, 'Failed to update profile'))
-    console.log(updatedProfile)
-    showSaveSuccess.value = true
   } catch (error: any) {
     console.error('Update failed', error)
     profileError.value = error.message || 'Failed to update profile'
