@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import SportsPickerModal from '@/components/SportsPickerModal.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
-import { useOrganizationStore } from '@/stores/organization'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/types/api'
@@ -16,12 +15,13 @@ useHead({ title: 'Create Video' })
 
 const router = useRouter()
 const { setHeader } = usePageHeader()
-const orgStore = useOrganizationStore()
 
 const form = reactive({
   name: '',
   description: '',
   url: '',
+  mimeType: 'video/mp4',
+  size: 0,
 })
 const selectedSport = ref<Sport | null>(null)
 const sportsPickerOpen = ref(false)
@@ -43,7 +43,9 @@ async function createVideo() {
         name: form.name.trim(),
         sportId: selectedSport.value.id,
         description: form.description,
-		url: form.url
+        url: form.url,
+        mimeType: form.mimeType,
+        size: form.size,
       },
     })
 

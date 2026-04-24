@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
@@ -27,7 +27,6 @@ const error = ref('')
 const sports = ref<Sport[]>([])
 
 const filterSportId = ref('all')
-const filterStatus = ref('all')
 const page = ref(1)
 
 
@@ -77,12 +76,10 @@ function goToPage(p: number) {
   loadVideos()
 }
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
+function sportLabel(sportId: string) {
+  const sport = sports.value.find((s) => s.id === sportId)
+  if (!sport) return 'Unknown'
+  return `${sport.icon || ''} ${sport.name}`.trim()
 }
 
 onMounted(() => {
@@ -149,16 +146,14 @@ onMounted(() => {
           class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10"
           @click="router.push(`/videos/${video.id}`)"
         >
-          <div class="mt-3 flex items-center gap-2 text-sm text-white/60">
-            <UIcon name="i-lucide-calendar" class="text-xs" />
-            <span>{{ formatDate(video.updatedAt) }}</span>
-          </div>
+          <p class="font-medium truncate">{{ video.name }}</p>
+          <p v-if="video.description" class="mt-1 text-xs text-white/50 line-clamp-2">
+            {{ video.description }}
+          </p>
 
-          <div class="mt-1.5 flex items-center gap-2 text-sm text-white/60">
+          <div class="mt-3 flex items-center gap-2 text-sm text-white/60">
             <UIcon name="i-lucide-dumbbell" class="text-xs" />
-            <span
-              >{{ video.sport?.icon || '' }} {{ video.sport?.name || 'Unknown' }}</span
-            >
+            <span>{{ sportLabel(video.sportId) }}</span>
           </div>
         </button>
       </div>

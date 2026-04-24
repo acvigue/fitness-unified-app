@@ -4,6 +4,7 @@ import { useHead } from '@unhead/vue'
 import { useRoute, useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import TournamentBracket from '@/components/TournamentBracket.vue'
+import TournamentRecapsSection from '@/components/tournament/TournamentRecapsSection.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
@@ -515,6 +516,12 @@ onUnmounted(() => {
       <div v-if="showBracket && bracketLoading && !bracket" class="flex justify-center p-4">
         <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-6" />
       </div>
+
+      <TournamentRecapsSection
+        :tournament-id="tournament.id"
+        :is-completed="tournament.status === 'COMPLETED'"
+        :can-manage="!!isOrgManager"
+      />
 
       <!-- Standings Table (round robin) -->
       <UCard v-if="isRoundRobin && standings && standings.standings.length > 0" class="bg-white/5">

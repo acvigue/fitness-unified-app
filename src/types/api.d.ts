@@ -2030,7 +2030,7 @@ export interface components {
              * Format: date-time
              * @description Timestamp the notification was marked read
              */
-            readAt?: Record<string, never> | null;
+            readAt?: string | null;
             /**
              * @description Whether the notification has been dismissed
              * @example false
