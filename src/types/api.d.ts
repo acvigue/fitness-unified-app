@@ -107,6 +107,75 @@ export interface paths {
         patch: operations["NotificationController_dismiss_v1"];
         trace?: never;
     };
+    "/v1/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Mark a notification as read */
+        patch: operations["NotificationController_markRead_v1"];
+        trace?: never;
+    };
+    "/v1/teams/{teamId}/broadcasts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List broadcasts for a team (members only) */
+        get: operations["BroadcastController_listForTeam_v1"];
+        put?: never;
+        /** Send a broadcast to all team members (captain only) */
+        post: operations["BroadcastController_broadcast_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcasts/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark a broadcast as read */
+        post: operations["BroadcastController_markRead_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcasts/{id}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get delivery and read stats for a broadcast (captain only) */
+        get: operations["BroadcastController_getStats_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/chats": {
         parameters: {
             query?: never;
@@ -227,6 +296,381 @@ export interface paths {
         patch: operations["ChatController_updateAnnouncementChat_v1"];
         trace?: never;
     };
+    "/v1/users/{userId}/block": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Block a user */
+        post: operations["UserBlockController_block_v1"];
+        /** Unblock a previously blocked user */
+        delete: operations["UserBlockController_unblock_v1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/users/me/blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List users the current user has blocked */
+        get: operations["UserBlockController_listMyBlocks_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/engagement/track": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["EngagementController_trackEvent_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/engagement/user/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["EngagementController_getUserEngagement_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/engagement/profile-views/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["EngagementController_getProfileViews_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/engagement/messages-sent/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["EngagementController_getMessagesSent_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/moderation/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List inter-team messages for moderation (dept manager only) */
+        get: operations["ModerationController_listMessages_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/moderation/messages/{id}/flag": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Flag a message and hide it from conversations */
+        post: operations["ModerationController_flagMessage_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/moderation/messages/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a message and log to audit trail */
+        delete: operations["ModerationController_deleteMessage_v1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/moderation/users/{userId}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suspend a user for a set duration */
+        post: operations["ModerationController_suspend_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/moderation/users/{userId}/unsuspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke an active suspension */
+        post: operations["ModerationController_unsuspend_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/moderation/users/{userId}/ban": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Permanently ban a user */
+        post: operations["ModerationController_ban_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/moderation/users/{userId}/unban": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke an active ban */
+        post: operations["ModerationController_unban_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/moderation/users/{userId}/restrict": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply partial action restrictions to a user */
+        post: operations["ModerationController_restrict_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/moderation/users/{userId}/unrestrict": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Lift one or more partial restrictions */
+        post: operations["ModerationController_unrestrict_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/gyms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all gyms */
+        get: operations["GymController_findAll_v1"];
+        put?: never;
+        /** Create a new gym with optional recurring weekly rules */
+        post: operations["GymController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/gyms/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Query gym slot availability by gym, date range, or status */
+        get: operations["GymController_listAvailability_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/gyms/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the current user’s watched gyms */
+        get: operations["GymController_listSubscriptions_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/gyms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one gym by ID including recurring weekly rules */
+        get: operations["GymController_findOne_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a gym */
+        delete: operations["GymController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update a gym and optionally replace recurring weekly rules */
+        patch: operations["GymController_update_v1"];
+        trace?: never;
+    };
+    "/v1/gyms/{id}/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create an availability slot for a gym (org member only) */
+        post: operations["GymController_createSlot_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/gyms/{id}/slots/{slotId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a gym slot status (team captain only) */
+        patch: operations["GymController_updateSlotStatus_v1"];
+        trace?: never;
+    };
+    "/v1/gyms/{id}/subscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Subscribe to gym availability alerts */
+        post: operations["GymController_subscribe_v1"];
+        /** Unsubscribe from gym availability alerts */
+        delete: operations["GymController_unsubscribe_v1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/health": {
         parameters: {
             query?: never;
@@ -268,7 +712,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List all meetups for a team */
+        /** List meetups for a team (optionally filter by status) */
         get: operations["MeetupController_getTeamMeetups_v1"];
         put?: never;
         post?: never;
@@ -580,7 +1024,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Update current user profile privacy */
+        /** Get current user profile privacy */
         get: operations["UserController_getProfilePrivacy_v1"];
         put?: never;
         post?: never;
@@ -589,6 +1033,23 @@ export interface paths {
         head?: never;
         /** Update current user profile privacy */
         patch: operations["UserController_updateProfilePrivacy_v1"];
+        trace?: never;
+    };
+    "/v1/user/profile/user/privacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update current user profile privacy */
+        patch: operations["UserController_getUserProfilePrivacy_v1"];
         trace?: never;
     };
     "/v1/user/sessions/enrich": {
@@ -676,6 +1137,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/users/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Compare two student profiles side-by-side */
+        get: operations["UsersController_compareProfiles_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/users/{userId}/profile": {
         parameters: {
             query?: never;
@@ -686,6 +1164,24 @@ export interface paths {
         /** Get another user’s profile by ID */
         get: operations["UsersController_getUserProfile_v1"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reminders/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the current user’s reminder preferences */
+        get: operations["ReminderController_list_v1"];
+        /** Create or replace reminder preferences (global or per tournament) */
+        put: operations["ReminderController_upsert_v1"];
         post?: never;
         delete?: never;
         options?: never;
@@ -717,7 +1213,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get all reports */
+        /** Get all reports (organization admins only) */
         get: operations["ReportController_findAll_v1"];
         put?: never;
         post?: never;
@@ -785,7 +1281,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List all available teams */
+        /** List or search teams */
         get: operations["TeamController_findAll_v1"];
         put?: never;
         /** Create a team and assign creator as captain */
@@ -1179,6 +1675,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/tournaments/{id}/seed-bracket": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Seed single-elimination bracket from round robin standings (org manager only) */
+        post: operations["TournamentController_seedBracketFromStandings_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tournaments/{id}/recaps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List recap videos for a tournament */
+        get: operations["TournamentController_listRecaps_v1"];
+        put?: never;
+        /** Link a recap video to a completed tournament (org manager only) */
+        post: operations["TournamentController_addRecap_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tournaments/{id}/recaps/{recapId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a recap video (org manager only) */
+        delete: operations["TournamentController_removeRecap_v1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/tournaments/{id}/matches/{matchId}/result": {
         parameters: {
             query?: never;
@@ -1316,6 +1864,24 @@ export interface paths {
         head?: never;
         /** Update video (uploader only) */
         patch: operations["VideoController_update_v1"];
+        trace?: never;
+    };
+    "/v1/videos/{id}/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the current user’s playback progress for a video */
+        get: operations["VideoController_getProgress_v1"];
+        put?: never;
+        /** Record or update playback progress for a video */
+        post: operations["VideoController_updateProgress_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -1456,6 +2022,15 @@ export interface components {
              * @example You have been invited to join Team Alpha
              */
             content: string;
+            /** @description Additional structured metadata for client routing/actions */
+            metadata?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Format: date-time
+             * @description Timestamp the notification was marked read
+             */
+            readAt?: Record<string, never> | null;
             /**
              * @description Whether the notification has been dismissed
              * @example false
@@ -1466,6 +2041,30 @@ export interface components {
              * @description Creation timestamp
              */
             createdAt: string;
+        };
+        CreateBroadcastDto: {
+            /**
+             * @description Broadcast message content
+             * @example Practice at 6pm tonight!
+             */
+            content: string;
+        };
+        BroadcastResponseDto: {
+            id: string;
+            teamId: string;
+            authorId: string;
+            content: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        BroadcastStatsResponseDto: {
+            broadcastId: string;
+            /** @description Number of recipients who received the broadcast */
+            delivered: number;
+            /** @description Number of recipients who marked the broadcast as read */
+            read: number;
+            /** @description Total recipients at time of dispatch */
+            total: number;
         };
         ChatMemberDto: {
             /**
@@ -1772,6 +2371,206 @@ export interface components {
              *     ]
              */
             writeRoles?: ("MEMBER" | "STAFF" | "ADMIN")[];
+        };
+        TrackEngagementDto: {
+            userId: string;
+            /** @enum {string} */
+            type: "MESSAGE_SENT" | "PROFILE_VIEW" | "TEAM_JOIN" | "TEAM_LEAVE" | "CHAT_CREATED" | "TOURNAMENT_JOIN" | "TEAM_CHAT_MESSAGE" | "MEETUP_ATTENDED" | "INTER_TEAM_INTERACTION";
+            targetUserId?: string;
+            teamId?: string;
+            chatId?: string;
+            metadata?: Record<string, never>;
+        };
+        FlagMessageDto: {
+            reason?: string;
+        };
+        DeleteMessageDto: {
+            reason: string;
+        };
+        SuspendUserDto: {
+            /**
+             * @description Suspension duration in hours
+             * @example 24
+             */
+            durationHours: number;
+            /** @description Reason for the suspension */
+            reason: string;
+        };
+        BanUserDto: {
+            reason: string;
+        };
+        RestrictUserDto: {
+            actions: ("MESSAGING" | "TEAM_JOIN" | "TOURNAMENT_REGISTER")[];
+            /** @description Duration in hours */
+            durationHours: number;
+            reason: string;
+        };
+        UnrestrictUserDto: {
+            actions: ("MESSAGING" | "TEAM_JOIN" | "TOURNAMENT_REGISTER")[];
+        };
+        WeeklyAvailabilityRuleDto: {
+            /**
+             * @description Day of week where 0=Monday and 6=Sunday
+             * @example 0
+             */
+            dayOfWeek: number;
+            /**
+             * @description Start time in 30-minute increments
+             * @example 08:00
+             */
+            startTime: string;
+            /**
+             * @description End time in 30-minute increments
+             * @example 17:30
+             */
+            endTime: string;
+            /**
+             * @description Whether this recurring time range is open
+             * @example true
+             */
+            isOpen: boolean;
+        };
+        CreateGymDto: {
+            /**
+             * @description Gym name
+             * @example Corec Main Gym
+             */
+            name: string;
+            /**
+             * @description Organization ID that owns this gym
+             * @example clr1abc2d0000
+             */
+            organizationId: string;
+            /**
+             * @description Gym description
+             * @example Main basketball and volleyball court area
+             */
+            description?: string;
+            /**
+             * @description Gym location
+             * @example Building A, Floor 1
+             */
+            location?: string;
+            /**
+             * @description Maximum recommended capacity
+             * @example 100
+             */
+            capacity?: number;
+            /**
+             * @description Whether the gym is active
+             * @default true
+             * @example true
+             */
+            isActive: boolean;
+            /**
+             * @description Recurring weekly schedule rules. Use merged ranges rather than individual cells.
+             * @example [
+             *       {
+             *         "dayOfWeek": 0,
+             *         "startTime": "08:00",
+             *         "endTime": "12:00",
+             *         "isOpen": true
+             *       },
+             *       {
+             *         "dayOfWeek": 0,
+             *         "startTime": "12:00",
+             *         "endTime": "13:00",
+             *         "isOpen": false
+             *       },
+             *       {
+             *         "dayOfWeek": 0,
+             *         "startTime": "13:00",
+             *         "endTime": "17:00",
+             *         "isOpen": true
+             *       }
+             *     ]
+             */
+            weeklyRules?: components["schemas"]["WeeklyAvailabilityRuleDto"][];
+        };
+        GymSlotResponseDto: {
+            id: string;
+            gymId: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            /** @enum {string} */
+            status: "AVAILABLE" | "RESERVED" | "CLOSED";
+            reservedByTeamId?: Record<string, never> | null;
+            note?: Record<string, never> | null;
+        };
+        UpdateGymDto: {
+            /**
+             * @description Gym name
+             * @example Corec Main Gym
+             */
+            name?: string;
+            /**
+             * @description Organization ID that owns this gym
+             * @example clr1abc2d0000
+             */
+            organizationId?: string;
+            /**
+             * @description Gym description
+             * @example Main basketball and volleyball court area
+             */
+            description?: string;
+            /**
+             * @description Gym location
+             * @example Building A, Floor 1
+             */
+            location?: string;
+            /**
+             * @description Maximum recommended capacity
+             * @example 100
+             */
+            capacity?: number;
+            /**
+             * @description Whether the gym is active
+             * @default true
+             * @example true
+             */
+            isActive: boolean;
+            /**
+             * @description Recurring weekly schedule rules. Use merged ranges rather than individual cells.
+             * @example [
+             *       {
+             *         "dayOfWeek": 0,
+             *         "startTime": "08:00",
+             *         "endTime": "12:00",
+             *         "isOpen": true
+             *       },
+             *       {
+             *         "dayOfWeek": 0,
+             *         "startTime": "12:00",
+             *         "endTime": "13:00",
+             *         "isOpen": false
+             *       },
+             *       {
+             *         "dayOfWeek": 0,
+             *         "startTime": "13:00",
+             *         "endTime": "17:00",
+             *         "isOpen": true
+             *       }
+             *     ]
+             */
+            weeklyRules?: components["schemas"]["WeeklyAvailabilityRuleDto"][];
+        };
+        CreateGymSlotDto: {
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            /** @enum {string} */
+            status?: "AVAILABLE" | "RESERVED" | "CLOSED";
+        };
+        UpdateGymSlotStatusDto: {
+            /** @enum {string} */
+            status: "AVAILABLE" | "RESERVED" | "CLOSED";
+            /** @description Team that reserved the slot, if applicable */
+            reservedByTeamId?: string;
+            /** @description Additional note for the status change */
+            note?: string;
         };
         HealthResponseDto: {
             /**
@@ -2341,6 +3140,13 @@ export interface components {
              */
             privateAchievements: boolean;
         };
+        UserLookupQueryDto: {
+            /**
+             * @description Search term to look up users by email, name, or username
+             * @example john
+             */
+            q: string;
+        };
         EnrichSessionDto: {
             /** @description The refresh token for the current session */
             refreshToken: string;
@@ -2454,6 +3260,55 @@ export interface components {
              */
             message: string;
         };
+        UserComparisonStatsDto: {
+            /**
+             * @description Total tournaments participated in
+             * @example 12
+             */
+            tournamentCount: number;
+            /**
+             * @description Total unlocked achievements
+             * @example 7
+             */
+            achievementCount: number;
+            /**
+             * @description Featured achievements on profile
+             * @example 3
+             */
+            featuredAchievementCount: number;
+            /**
+             * @description Favorite sports count
+             * @example 2
+             */
+            favoriteSportsCount: number;
+        };
+        ComparisonSideDto: {
+            profile: components["schemas"]["UserProfileResponseDto"];
+            stats: components["schemas"]["UserComparisonStatsDto"];
+        };
+        ProfileComparisonResponseDto: {
+            a: components["schemas"]["ComparisonSideDto"];
+            b: components["schemas"]["ComparisonSideDto"];
+        };
+        ReminderPreferenceResponseDto: {
+            id: string;
+            tournamentId: string | null;
+            intervalsMinutes: number[];
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UpdateReminderPreferenceDto: {
+            /**
+             * @description Reminder intervals in minutes before tournament start
+             * @example [
+             *       1440,
+             *       60
+             *     ]
+             */
+            intervalsMinutes: number[];
+            /** @description Tournament ID for a per-tournament override. Omit for a global default applying to all tournaments. */
+            tournamentId?: string;
+        };
         CreateReportDto: {
             /**
              * @description ID of the user being reported
@@ -2461,12 +3316,22 @@ export interface components {
              */
             reportedId: string;
             /**
+             * @description ID of the specific offending message (optional)
+             * @example msg-abc123
+             */
+            messageId?: string;
+            /**
              * @description Reason for the report
              * @example Inappropriate behavior
              */
             reason?: string;
         };
         ReportResponseDto: {
+            /**
+             * @description Report ID
+             * @example rep-123
+             */
+            id: string;
             /**
              * @description Reporter User ID
              * @example wejfe023r2343
@@ -2477,11 +3342,13 @@ export interface components {
              * @example wejfe023r2343
              */
             reportedId: string;
+            /** @description ID of the specific reported message, if any */
+            messageId?: string;
             /**
-             * @description Reason For Report
-             * @example They Harassed Me
+             * @description Reason for report
+             * @example They harassed me
              */
-            reason: string;
+            reason?: string;
             /**
              * @description Status
              * @example Banned
@@ -2863,6 +3730,44 @@ export interface components {
             /** @description Team standings sorted by wins then point differential */
             standings: components["schemas"]["TeamStandingDto"][];
         };
+        VideoResponseDto: {
+            /**
+             * @description Video ID
+             * @example cm123abc456def789ghi0001
+             */
+            id: string;
+            /**
+             * @description Video name
+             * @example Cool Video
+             */
+            name: string;
+            /**
+             * @description Video description
+             * @example Cool stuff happens
+             */
+            description: string;
+            /** @description Video uploader user ID */
+            uploaderId: string;
+            /**
+             * @description Sport ID (UUID)
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            sportId: string;
+            /** @description Video url */
+            url: string;
+        };
+        TournamentRecapResponseDto: {
+            id: string;
+            tournamentId: string;
+            uploadedById: string;
+            /** Format: date-time */
+            createdAt: string;
+            video: components["schemas"]["VideoResponseDto"];
+        };
+        CreateTournamentRecapDto: {
+            /** @description ID of an existing video to link as the recap */
+            videoId: string;
+        };
         RecordMatchResultDto: {
             /**
              * @description Score for team 1
@@ -2940,32 +3845,16 @@ export interface components {
              * @example 123.123.123
              */
             url: string;
-        };
-        VideoResponseDto: {
             /**
-             * @description Video ID
-             * @example cm123abc456def789ghi0001
+             * @description Video MIME type
+             * @example video/mp4
              */
-            id: string;
+            mimeType: string;
             /**
-             * @description Video name
-             * @example Cool Video
+             * @description Video size in bytes
+             * @example 1048576
              */
-            name: string;
-            /**
-             * @description Video description
-             * @example Cool stuff happens
-             */
-            description: string;
-            /** @description Video uploader user ID */
-            uploaderId: string;
-            /**
-             * @description Sport ID (UUID)
-             * @example 550e8400-e29b-41d4-a716-446655440000
-             */
-            sportId: string;
-            /** @description Video url */
-            url: string;
+            size: number;
         };
         PaginatedVideoResponseDto: {
             data: components["schemas"]["VideoResponseDto"][];
@@ -2992,6 +3881,25 @@ export interface components {
              * @example 123.123.123
              */
             url: string;
+        };
+        UpdateVideoProgressDto: {
+            /**
+             * @description Current playback position in seconds
+             * @example 45
+             */
+            positionSeconds: number;
+            /**
+             * @description Whether the user has completed the video
+             * @default false
+             */
+            completed: boolean;
+        };
+        VideoProgressResponseDto: {
+            videoId: string;
+            positionSeconds: number;
+            completed: boolean;
+            /** Format: date-time */
+            updatedAt: string;
         };
     };
     responses: never;
@@ -3258,6 +4166,276 @@ export interface operations {
             };
             /** @description Unauthorized - invalid or missing token */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    NotificationController_markRead_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BroadcastController_listForTeam_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BroadcastResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BroadcastController_broadcast_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBroadcastDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BroadcastResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Only team captains can broadcast */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BroadcastController_markRead_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Broadcast marked as read */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BroadcastController_getStats_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BroadcastStatsResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Only the team captain can view stats */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3694,6 +4872,879 @@ export interface operations {
             };
         };
     };
+    UserBlockController_block_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User blocked */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UserBlockController_unblock_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User unblocked */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UserBlockController_listMyBlocks_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    EngagementController_trackEvent_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrackEngagementDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EngagementController_getUserEngagement_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EngagementController_getProfileViews_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EngagementController_getMessagesSent_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationController_listMessages_v1: {
+        parameters: {
+            query?: {
+                q?: string;
+                from?: string;
+                to?: string;
+                teamId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ModerationController_flagMessage_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlagMessageDto"];
+            };
+        };
+        responses: {
+            /** @description Message flagged */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ModerationController_deleteMessage_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteMessageDto"];
+            };
+        };
+        responses: {
+            /** @description Message deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ModerationController_suspend_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SuspendUserDto"];
+            };
+        };
+        responses: {
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ModerationController_unsuspend_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ModerationController_ban_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BanUserDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationController_unban_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ModerationController_restrict_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RestrictUserDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationController_unrestrict_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UnrestrictUserDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GymController_findAll_v1: {
+        parameters: {
+            query?: {
+                /** @description Filter gyms by organization ID */
+                organizationId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GymController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGymDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GymController_listAvailability_v1: {
+        parameters: {
+            query?: {
+                /** @description Start of window (inclusive) */
+                from?: string;
+                /** @description End of window (exclusive) */
+                to?: string;
+                status?: "AVAILABLE" | "RESERVED" | "CLOSED";
+                /** @description Filter to a single gym */
+                gymId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GymSlotResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GymController_listSubscriptions_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GymController_findOne_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GymController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GymController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGymDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GymController_createSlot_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGymSlotDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GymSlotResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description You are not a member of this gym’s organization */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GymController_updateSlotStatus_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGymSlotStatusDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GymSlotResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Only team captains can update slot status */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GymController_subscribe_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    GymController_unsubscribe_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
     HealthController_getHealth_v1: {
         parameters: {
             query?: never;
@@ -3775,7 +5826,9 @@ export interface operations {
     };
     MeetupController_getTeamMeetups_v1: {
         parameters: {
-            query?: never;
+            query?: {
+                status?: "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
+            };
             header?: never;
             path: {
                 teamId: string;
@@ -4920,6 +6973,29 @@ export interface operations {
             };
         };
     };
+    UserController_getUserProfilePrivacy_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserLookupQueryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateUserProfilePrivacyDto"];
+                };
+            };
+        };
+    };
     UserController_enrichSession_v1: {
         parameters: {
             query?: never;
@@ -5128,6 +7204,66 @@ export interface operations {
             };
         };
     };
+    UsersController_compareProfiles_v1: {
+        parameters: {
+            query: {
+                /** @description First user id */
+                a: string;
+                /** @description Second user id */
+                b: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileComparisonResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
     UsersController_getUserProfile_v1: {
         parameters: {
             query?: never;
@@ -5158,6 +7294,84 @@ export interface operations {
             };
             /** @description Resource not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ReminderController_list_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderPreferenceResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ReminderController_upsert_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReminderPreferenceDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderPreferenceResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5398,7 +7612,12 @@ export interface operations {
     };
     TeamController_findAll_v1: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Filter by team name (case-insensitive) */
+                q?: string;
+                /** @description Filter by sport */
+                sportId?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -7309,6 +9528,247 @@ export interface operations {
             };
         };
     };
+    TournamentController_seedBracketFromStandings_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TournamentBracketResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Requires STAFF or ADMIN role in the organization */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TournamentController_listRecaps_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TournamentRecapResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TournamentController_addRecap_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTournamentRecapDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TournamentRecapResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Requires STAFF or ADMIN role in the organization */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TournamentController_removeRecap_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                recapId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recap removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Requires STAFF or ADMIN role in the organization */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
     TournamentController_recordMatchResult_v1: {
         parameters: {
             query?: never;
@@ -7923,6 +10383,106 @@ export interface operations {
             };
             /** @description You are not the video uploader */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VideoController_getProgress_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoProgressResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VideoController_updateProgress_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateVideoProgressDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VideoProgressResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
