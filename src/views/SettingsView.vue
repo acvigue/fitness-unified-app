@@ -198,25 +198,6 @@
         </div>
       </UCard>
 
-      <!-- Light Section -->
-      <UCard class="bg-white/5">
-        <div class="flex flex-col gap-4">
-          <div>
-            <p class="text-xs uppercase tracking-[0.3em] text-white/60">
-              {{ t('settings.theme') }}
-            </p>
-            <p class="text-sm text-white/60">{{ t('settings.themeDesc') }}</p>
-          </div>
-          <USelectMenu
-            v-model="currentTheme"
-            :items="themeOptions"
-            value-key="value"
-            :searchable="false"
-            @update:model-value="changeTheme"
-          />
-        </div>
-      </UCard>
-
       <!-- Sessions Section -->
       <UCard class="bg-white/5">
         <div class="flex flex-col gap-4">
@@ -551,25 +532,11 @@ const value2 = ref('No')
 const value3 = ref('No')
 const value4 = ref('No')
 
-// Theme
-const themeOptions = computed(() => [
-  { label: t('settings.light'), value: 'light' },
-  { label: t('settings.dark'), value: 'dark' },
-])
-
-const currentTheme = ref(localStorage.getItem('theme') || 'dark')
-
 onMounted(async () => {
   setHeader({
     title: t('settings.settings'),
     backRoute: '/',
   })
-  // Apply saved theme
-  if (currentTheme.value === 'dark') {
-    document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
-  }
   try {
     const { data: privacyData, error: profileErr } = await apiClient.GET('/v1/user/profile/privacy')
     if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to update name'))
@@ -946,16 +913,6 @@ async function savePrivacy() {
     toast.error('Failed to update privacy', msg)
   } finally {
     saving2.value = false
-  }
-}
-
-function changeTheme(value: string) {
-  currentTheme.value = value
-  localStorage.setItem('theme', value)
-  if (value === 'dark') {
-    document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
   }
 }
 </script>
