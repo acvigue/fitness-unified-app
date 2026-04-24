@@ -33,6 +33,8 @@ import MyReportsView from '@/views/MyReportsView.vue'
 import ReminderPreferencesView from '@/views/ReminderPreferencesView.vue'
 import GymSubscriptionsView from '@/views/GymSubscriptionsView.vue'
 import TeamBroadcastsView from '@/views/TeamBroadcastsView.vue'
+import ModerationMessagesView from '@/views/moderation/ModerationMessagesView.vue'
+import ModerationUsersView from '@/views/moderation/ModerationUsersView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 import ProfileCompareView from "@/views/ProfileCompareView.vue";
@@ -223,6 +225,16 @@ const router = createRouter({
       path: '/settings/gym-subscriptions',
       name: 'gym-subscriptions',
       component: GymSubscriptionsView,
+    },
+    {
+      path: '/moderation/messages',
+      name: 'moderation-messages',
+      component: ModerationMessagesView,
+    },
+    {
+      path: '/moderation/users',
+      name: 'moderation-users',
+      component: ModerationUsersView,
     },
   ],
 })

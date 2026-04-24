@@ -358,6 +358,41 @@
         </div>
       </UCard>
 
+      <UCard class="bg-white/5">
+        <div class="space-y-3">
+          <div>
+            <p class="text-xs uppercase tracking-[0.3em] text-white/60">Moderation</p>
+            <p class="text-sm text-white/60">
+              Department-manager tools. Access is server-enforced.
+            </p>
+          </div>
+          <div class="flex flex-col gap-2">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-messages-square"
+              trailing-icon="i-lucide-chevron-right"
+              block
+              class="justify-between"
+              :to="{ name: 'moderation-messages' }"
+            >
+              Manage messages
+            </UButton>
+            <UButton
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-shield"
+              trailing-icon="i-lucide-chevron-right"
+              block
+              class="justify-between"
+              :to="{ name: 'moderation-users' }"
+            >
+              Manage users
+            </UButton>
+          </div>
+        </div>
+      </UCard>
+
       <!-- About Section  -->
       <UCard class="bg-white/5">
         <div class="space-y-3">
