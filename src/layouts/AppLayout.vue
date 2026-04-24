@@ -17,6 +17,12 @@ const showNavigation = computed(() => {
 
 <template>
   <UApp>
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[1001] focus:px-3 focus:py-2 focus:rounded-md focus:bg-[var(--ui-color-primary-500)] focus:text-white focus:shadow-lg"
+    >
+      Skip to main content
+    </a>
     <div class="h-full flex flex-row">
       <!-- Desktop sidebar (lg+) -->
       <AppSidebar v-if="showNavigation" class="hidden lg:flex" />
@@ -24,6 +30,7 @@ const showNavigation = computed(() => {
       <!-- Main content area -->
       <div class="flex-1 min-w-0 flex flex-col h-full">
         <div
+          id="main-content"
           class="flex-1 min-h-0 flex flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)]"
           :class="
             showNavigation

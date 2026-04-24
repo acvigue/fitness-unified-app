@@ -6,16 +6,23 @@ const { items, isActive } = useNavigationItems()
 
 <template>
   <nav
+    aria-label="Primary"
     class="flex items-center justify-around bg-[rgba(9,9,11,0.95)] backdrop-blur-xl border-t border-white/10 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-[env(safe-area-inset-left)]"
   >
     <RouterLink
       v-for="item in items"
       :key="item.to"
       :to="item.to"
-      class="flex flex-col items-center justify-center gap-1 flex-1 py-1 no-underline transition-colors duration-150"
-      :class="isActive(item.to) ? 'text-[var(--ui-color-primary-500)]' : 'text-white/50'"
+      :aria-label="item.label"
+      :aria-current="isActive(item.to) ? 'page' : undefined"
+      class="flex flex-col items-center justify-center gap-1 flex-1 py-1 no-underline transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-color-primary-500)] rounded-md"
+      :class="
+        isActive(item.to)
+          ? 'text-[var(--ui-color-primary-500)]'
+          : 'text-white/50 hover:text-white/80'
+      "
     >
-      <UIcon :name="item.icon" class="text-xl" />
+      <UIcon :name="item.icon" class="text-xl" aria-hidden="true" />
       <span class="text-[0.625rem] font-medium leading-none">{{ item.label }}</span>
     </RouterLink>
   </nav>

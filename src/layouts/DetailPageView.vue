@@ -6,6 +6,7 @@
         variant="ghost"
         icon="i-lucide-chevron-left"
         size="sm"
+        aria-label="Go back"
         @click="router.back()"
       >
         Back

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useHead } from '@unhead/vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useNotificationStore } from '@/stores/notifications'
 import { useNotificationRouting } from '@/composables/useNotificationRouting'
+import { useToastStore } from '@/stores/toast'
+import { getErrorMessage } from '@/lib/api/errors'
 
 useHead({
   title: 'Notifications',
@@ -13,6 +15,15 @@ useHead({
 const { setHeader } = usePageHeader()
 const notificationStore = useNotificationStore()
 const { open } = useNotificationRouting()
+const toast = useToastStore()
+
+const confirmMarkAllOpen = ref(false)
+const confirmDeleteOpen = ref(false)
+const pendingDeleteId = ref<string | null>(null)
+const pendingDeleteTitle = ref('')
+const busy = ref(false)
+
+const hasUnread = computed(() => notificationStore.unreadCount > 0)
 
 const NOTIFICATION_ICONS: Record<string, string> = {
   TEAM_INVITE: 'i-lucide-user-plus',
@@ -57,37 +68,111 @@ function formatDate(dateStr: string) {
   if (diffHours < 24) return `${diffHours}h ago`
   const diffDays = Math.floor(diffHours / 24)
   if (diffDays < 7) return `${diffDays}d ago`
-  return date.toLocaleDateString()
+  return date.toLocaleString()
+}
+
+async function refresh() {
+  try {
+    await notificationStore.fetchNotifications()
+  } catch (e) {
+    toast.error('Could not load notifications', getErrorMessage(e))
+  }
+}
+
+function askDelete(id: string, title: string) {
+  pendingDeleteId.value = id
+  pendingDeleteTitle.value = title
+  confirmDeleteOpen.value = true
+}
+
+async function confirmDelete() {
+  if (!pendingDeleteId.value) return
+  busy.value = true
+  try {
+    await notificationStore.dismiss(pendingDeleteId.value)
+    toast.success('Notification dismissed')
+  } catch (e) {
+    toast.error('Could not dismiss notification', getErrorMessage(e))
+  } finally {
+    busy.value = false
+    confirmDeleteOpen.value = false
+    pendingDeleteId.value = null
+    pendingDeleteTitle.value = ''
+  }
+}
+
+async function confirmMarkAll() {
+  busy.value = true
+  try {
+    const unread = notificationStore.unreadNotifications.slice()
+    await Promise.all(unread.map((n) => notificationStore.markRead(n.id)))
+    toast.success('All notifications marked as read')
+  } catch (e) {
+    toast.error('Could not mark all as read', getErrorMessage(e))
+  } finally {
+    busy.value = false
+    confirmMarkAllOpen.value = false
+  }
 }
 
 onMounted(() => {
   setHeader({ title: 'Notifications' })
-  notificationStore.fetchNotifications()
+  refresh()
 })
 </script>
 
 <template>
   <PageLayout>
     <section class="flex flex-col gap-4 px-5 py-6">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between gap-2">
         <p class="text-sm text-white/60">{{ notificationStore.unreadCount }} unread</p>
-        <UButton
-          size="sm"
-          variant="ghost"
-          color="neutral"
-          icon="i-lucide-refresh-cw"
-          :loading="notificationStore.loading"
-          @click="notificationStore.fetchNotifications()"
-        >
-          Refresh
-        </UButton>
+        <div class="flex items-center gap-1">
+          <UButton
+            v-if="hasUnread"
+            size="sm"
+            variant="ghost"
+            color="neutral"
+            icon="i-lucide-check-check"
+            aria-label="Mark all notifications as read"
+            @click="confirmMarkAllOpen = true"
+          >
+            Mark all read
+          </UButton>
+          <UButton
+            size="sm"
+            variant="ghost"
+            color="neutral"
+            icon="i-lucide-refresh-cw"
+            :loading="notificationStore.loading"
+            aria-label="Refresh notifications"
+            @click="refresh"
+          />
+        </div>
       </div>
 
       <div
-        v-if="notificationStore.notifications.length === 0"
-        class="rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
+        v-if="notificationStore.loading && notificationStore.notifications.length === 0"
+        class="flex flex-col gap-2"
       >
-        No notifications yet.
+        <div
+          v-for="i in 4"
+          :key="i"
+          class="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 p-4"
+        >
+          <div class="size-5 rounded-full bg-white/10 animate-pulse shrink-0" />
+          <div class="flex-1 min-w-0 flex flex-col gap-2">
+            <div class="h-3 w-1/3 rounded bg-white/10 animate-pulse" />
+            <div class="h-3 w-2/3 rounded bg-white/5 animate-pulse" />
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-else-if="notificationStore.notifications.length === 0"
+        class="flex flex-col items-center gap-2 rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
+      >
+        <UIcon name="i-lucide-bell-off" class="size-8 text-white/40" />
+        <p>You're all caught up</p>
       </div>
 
       <div v-else class="flex flex-col gap-2">
@@ -130,10 +215,47 @@ onMounted(() => {
             variant="ghost"
             color="neutral"
             icon="i-lucide-x"
-            @click.stop="notificationStore.dismiss(notification.id)"
+            :aria-label="`Dismiss notification: ${notification.title}`"
+            @click.stop="askDelete(notification.id, notification.title)"
           />
         </button>
       </div>
     </section>
+
+    <UModal v-model:open="confirmMarkAllOpen">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div>
+            <h2 class="text-lg font-semibold">Mark all as read?</h2>
+            <p class="text-sm text-white/60 mt-1">
+              This will mark {{ notificationStore.unreadCount }} notifications as read.
+            </p>
+          </div>
+          <div class="flex gap-2 justify-end">
+            <UButton variant="ghost" color="neutral" @click="confirmMarkAllOpen = false"
+              >Cancel</UButton
+            >
+            <UButton color="primary" :loading="busy" @click="confirmMarkAll">Mark all read</UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal v-model:open="confirmDeleteOpen">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div>
+            <h2 class="text-lg font-semibold">Dismiss notification?</h2>
+            <p class="text-sm text-white/60 mt-1 truncate">{{ pendingDeleteTitle }}</p>
+          </div>
+          <div class="flex gap-2 justify-end">
+            <UButton variant="ghost" color="neutral" @click="confirmDeleteOpen = false"
+              >Cancel</UButton
+            >
+            <UButton color="error" :loading="busy" @click="confirmDelete">Dismiss</UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </PageLayout>
 </template>

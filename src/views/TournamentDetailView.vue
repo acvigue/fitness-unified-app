@@ -10,6 +10,7 @@ import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
+import { useToastStore } from '@/stores/toast'
 import type { components } from '@/types/api'
 
 type Tournament = components['schemas']['TournamentResponseDto']
@@ -24,6 +25,7 @@ const router = useRouter()
 const { setHeader } = usePageHeader()
 const authStore = useAuthStore()
 const orgStore = useOrganizationStore()
+const toast = useToastStore()
 
 const tournament = ref<Tournament | null>(null)
 const loading = ref(true)
@@ -103,7 +105,7 @@ const showBracket = computed(
 )
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString(undefined, {
+  return new Date(dateStr).toLocaleString(undefined, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -148,10 +150,12 @@ async function loadTournament() {
         ? [
             {
               icon: 'i-lucide-pencil',
+              label: 'Edit tournament',
               onClick: () => router.push(`/tournaments/${tournamentId.value}/edit`),
             },
             {
               icon: 'i-lucide-settings',
+              label: 'Manage tournament',
               onClick: () => router.push(`/tournaments/${tournamentId.value}/manage`),
             },
           ]
@@ -223,23 +227,32 @@ async function generateBracket() {
       params: { path: { id: tournamentId.value } },
     })
     if (err) {
-      actionError.value = getErrorMessage(err, 'Failed to generate bracket')
+      const msg = getErrorMessage(err, 'Failed to generate bracket')
+      actionError.value = msg
+      toast.error('Could not generate', msg)
       return
     }
     bracket.value = data
-    actionMessage.value = isRoundRobin.value
+    const successMsg = isRoundRobin.value
       ? 'Fixtures generated successfully!'
       : 'Bracket generated successfully!'
+    actionMessage.value = successMsg
+    toast.success(successMsg)
     await loadTournament()
     if (isRoundRobin.value) await loadStandings()
   } catch (e) {
-    actionError.value = e instanceof Error ? e.message : 'Failed to generate bracket'
+    const msg = getErrorMessage(e, 'Failed to generate bracket')
+    actionError.value = msg
+    toast.error('Could not generate', msg)
   } finally {
     generatingBracket.value = false
   }
 }
 
 const seedingBracket = ref(false)
+const seedModalOpen = ref(false)
+const withdrawModalOpen = ref(false)
+const pendingWithdrawTeamId = ref<string | null>(null)
 
 const canSeedBracket = computed(
   () =>
@@ -252,15 +265,19 @@ const canSeedBracket = computed(
     ),
 )
 
+const pendingWithdrawTeamName = computed(() => {
+  const id = pendingWithdrawTeamId.value
+  if (!id) return ''
+  return myRegisteredTeams.value.find((t) => t.id === id)?.name ?? ''
+})
+
+function openSeedConfirm() {
+  if (!canSeedBracket.value) return
+  seedModalOpen.value = true
+}
+
 async function seedBracket() {
   if (!canSeedBracket.value) return
-  if (
-    !confirm(
-      'Seed single-elimination bracket from current standings? This removes round-robin matches.',
-    )
-  ) {
-    return
-  }
   seedingBracket.value = true
   actionError.value = ''
   try {
@@ -268,14 +285,20 @@ async function seedBracket() {
       params: { path: { id: tournamentId.value } },
     })
     if (err) {
-      actionError.value = getErrorMessage(err, 'Failed to seed bracket')
+      const msg = getErrorMessage(err, 'Failed to seed bracket')
+      actionError.value = msg
+      toast.error('Could not seed bracket', msg)
       return
     }
     actionMessage.value = 'Bracket seeded from standings.'
+    toast.success('Bracket seeded from standings')
+    seedModalOpen.value = false
     await loadTournament()
     await loadBracket()
   } catch (e) {
-    actionError.value = e instanceof Error ? e.message : 'Failed to seed bracket'
+    const msg = getErrorMessage(e, 'Failed to seed bracket')
+    actionError.value = msg
+    toast.error('Could not seed bracket', msg)
   } finally {
     seedingBracket.value = false
   }
@@ -333,21 +356,32 @@ async function joinTournament() {
       params: { path: { id: tournamentId.value, teamId: selectedTeamId.value } },
     })
     if (err) {
-      actionError.value = getErrorMessage(err, 'Failed to join tournament')
+      const msg = getErrorMessage(err, 'Failed to join tournament')
+      actionError.value = msg
+      toast.error('Could not join tournament', msg)
       return
     }
     actionMessage.value = 'Team registered for tournament!'
+    toast.success('Team registered for tournament')
     selectedTeamId.value = ''
     await loadTournament()
   } catch (e) {
-    actionError.value = e instanceof Error ? e.message : 'Failed to join'
+    const msg = getErrorMessage(e, 'Failed to join')
+    actionError.value = msg
+    toast.error('Could not join tournament', msg)
   } finally {
     actionLoading.value = false
   }
 }
 
-async function withdrawTeam(teamId: string) {
-  if (!tournament.value) return
+function openWithdrawConfirm(teamId: string) {
+  pendingWithdrawTeamId.value = teamId
+  withdrawModalOpen.value = true
+}
+
+async function confirmWithdrawTeam() {
+  const teamId = pendingWithdrawTeamId.value
+  if (!teamId || !tournament.value) return
   actionLoading.value = true
   actionMessage.value = ''
   actionError.value = ''
@@ -356,13 +390,20 @@ async function withdrawTeam(teamId: string) {
       params: { path: { id: tournamentId.value, teamId } },
     })
     if (err) {
-      actionError.value = getErrorMessage(err, 'Failed to withdraw')
+      const msg = getErrorMessage(err, 'Failed to withdraw')
+      actionError.value = msg
+      toast.error('Could not withdraw team', msg)
       return
     }
     actionMessage.value = 'Team withdrawn from tournament'
+    toast.success('Team withdrawn from tournament')
+    withdrawModalOpen.value = false
+    pendingWithdrawTeamId.value = null
     await loadTournament()
   } catch (e) {
-    actionError.value = e instanceof Error ? e.message : 'Failed to withdraw'
+    const msg = getErrorMessage(e, 'Failed to withdraw')
+    actionError.value = msg
+    toast.error('Could not withdraw team', msg)
   } finally {
     actionLoading.value = false
   }
@@ -558,6 +599,13 @@ onUnmounted(() => {
         <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-6" />
       </div>
 
+      <UCard v-if="showBracket && !bracket && !bracketLoading" class="bg-white/5">
+        <div class="flex flex-col items-center gap-2 py-4 text-center">
+          <UIcon name="i-lucide-git-branch" class="size-8 text-white/30" />
+          <p class="text-sm text-white/60">No matches scheduled yet.</p>
+        </div>
+      </UCard>
+
       <TournamentRecapsSection
         :tournament-id="tournament.id"
         :is-completed="tournament.status === 'COMPLETED'"
@@ -579,7 +627,7 @@ onUnmounted(() => {
                 variant="soft"
                 icon="i-lucide-git-branch"
                 :loading="seedingBracket"
-                @click="seedBracket"
+                @click="openSeedConfirm"
               >
                 Seed bracket
               </UButton>
@@ -688,8 +736,9 @@ onUnmounted(() => {
               size="sm"
               color="error"
               variant="soft"
-              :loading="actionLoading"
-              @click="withdrawTeam(team.id)"
+              :loading="actionLoading && pendingWithdrawTeamId === team.id"
+              :disabled="actionLoading"
+              @click="openWithdrawConfirm(team.id)"
             >
               Withdraw
             </UButton>
@@ -744,25 +793,27 @@ onUnmounted(() => {
 
           <div v-if="selectedMatch" class="flex flex-col gap-4">
             <div class="flex items-center gap-4">
-              <div class="flex-1">
-                <p class="text-sm font-medium mb-1">{{ selectedMatch.team1?.name }}</p>
+              <UFormField :label="selectedMatch.team1?.name || 'Team 1'" class="flex-1">
                 <UInput
                   v-model.number="resultForm.team1Score"
                   type="number"
                   :min="0"
                   placeholder="Score"
+                  :aria-label="`${selectedMatch.team1?.name || 'Team 1'} score`"
+                  class="w-full"
                 />
-              </div>
+              </UFormField>
               <span class="text-white/40 text-lg font-bold pt-5">vs</span>
-              <div class="flex-1">
-                <p class="text-sm font-medium mb-1">{{ selectedMatch.team2?.name }}</p>
+              <UFormField :label="selectedMatch.team2?.name || 'Team 2'" class="flex-1">
                 <UInput
                   v-model.number="resultForm.team2Score"
                   type="number"
                   :min="0"
                   placeholder="Score"
+                  :aria-label="`${selectedMatch.team2?.name || 'Team 2'} score`"
+                  class="w-full"
                 />
-              </div>
+              </UFormField>
             </div>
 
             <p class="text-xs text-white/40">
@@ -786,6 +837,63 @@ onUnmounted(() => {
                 Submit Result
               </UButton>
             </div>
+          </div>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal v-model:open="seedModalOpen">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-git-branch" class="size-5 text-primary" />
+            <h2 class="text-lg font-semibold">Seed bracket from standings?</h2>
+          </div>
+          <p class="text-sm text-white/70">
+            This generates a single-elimination bracket using the current round-robin standings.
+            Existing round-robin matches will be removed.
+          </p>
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              :disabled="seedingBracket"
+              @click="seedModalOpen = false"
+            >
+              Cancel
+            </UButton>
+            <UButton color="primary" :loading="seedingBracket" @click="seedBracket">
+              Seed bracket
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal v-model:open="withdrawModalOpen">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-log-out" class="size-5 text-red-400" />
+            <h2 class="text-lg font-semibold">Withdraw team?</h2>
+          </div>
+          <p class="text-sm text-white/70">
+            Remove
+            <span class="font-medium text-white">{{ pendingWithdrawTeamName || 'this team' }}</span>
+            from the tournament? You can re-register while registration is still open.
+          </p>
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              :disabled="actionLoading"
+              @click="withdrawModalOpen = false"
+            >
+              Cancel
+            </UButton>
+            <UButton color="error" :loading="actionLoading" @click="confirmWithdrawTeam">
+              Withdraw
+            </UButton>
           </div>
         </div>
       </template>

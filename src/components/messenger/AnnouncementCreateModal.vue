@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useOrganizationStore } from '@/stores/organization'
+import { useToastStore } from '@/stores/toast'
 import type { components } from '@/types/api'
 
 type OrgRole = 'MEMBER' | 'STAFF' | 'ADMIN'
@@ -17,6 +18,7 @@ const open = defineModel<boolean>('open', { default: false })
 
 const router = useRouter()
 const orgStore = useOrganizationStore()
+const toast = useToastStore()
 
 const form = reactive({
   organizationId: '',
@@ -77,14 +79,19 @@ async function submit() {
       },
     })
     if (apiError) {
-      error.value = getErrorMessage(apiError, 'Failed to create announcement channel')
+      const msg = getErrorMessage(apiError, 'Failed to create announcement channel')
+      error.value = msg
+      toast.error('Create failed', msg)
       return
     }
     emit('created', data)
+    toast.success('Announcement channel created')
     open.value = false
     router.push(`/messenger/${data.id}`)
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Failed to create announcement channel'
+    const msg = getErrorMessage(e, 'Failed to create announcement channel')
+    error.value = msg
+    toast.error('Create failed', msg)
   } finally {
     submitting.value = false
   }
@@ -129,6 +136,7 @@ async function submit() {
                 size="sm"
                 :variant="form.writeRoles.includes(r.value) ? 'solid' : 'outline'"
                 :color="form.writeRoles.includes(r.value) ? 'primary' : 'neutral'"
+                :aria-pressed="form.writeRoles.includes(r.value)"
                 @click="toggleRole(r.value)"
               >
                 {{ r.label }}

@@ -8,6 +8,7 @@
           variant="ghost"
           icon="i-lucide-arrow-left"
           square
+          aria-label="Go back"
           @click="router.push(backRoute)"
         />
         <h1 class="text-xl font-semibold">{{ title }}</h1>
@@ -20,6 +21,7 @@
           variant="ghost"
           :icon="action.icon"
           square
+          :aria-label="action.label"
           @click="action.onClick"
         />
         <NotificationBell />

@@ -45,7 +45,7 @@ function progressPercent(achievement: UserAchievement) {
 
 function formatDate(dateStr: string | null | undefined | Record<string, never>) {
   if (!dateStr || typeof dateStr !== 'string') return ''
-  return new Date(dateStr).toLocaleDateString(undefined, {
+  return new Date(dateStr).toLocaleString(undefined, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -81,8 +81,15 @@ onMounted(() => {
 
 <template>
   <PageLayout>
-    <div v-if="loading" class="flex justify-center p-8">
-      <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-8" />
+    <div v-if="loading" class="flex flex-col gap-3 px-5 py-6">
+      <div class="h-20 rounded-lg border border-white/10 bg-white/5 animate-pulse" />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          v-for="i in 6"
+          :key="i"
+          class="h-24 rounded-lg border border-white/10 bg-white/5 animate-pulse"
+        />
+      </div>
     </div>
 
     <div v-else-if="error" class="p-5">
@@ -103,6 +110,7 @@ onMounted(() => {
             color="neutral"
             icon="i-lucide-refresh-cw"
             :loading="loading"
+            aria-label="Refresh achievements"
             @click="loadData"
           />
         </div>
@@ -197,9 +205,10 @@ onMounted(() => {
       <!-- Empty state -->
       <div
         v-if="totalCount === 0"
-        class="rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
+        class="flex flex-col items-center gap-2 rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
       >
-        No achievements available yet. Participate in tournaments to earn achievements!
+        <UIcon name="i-lucide-award" class="size-8 text-white/40" />
+        <p>Complete workouts to earn your first achievement</p>
       </div>
     </section>
   </PageLayout>

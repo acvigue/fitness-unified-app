@@ -47,10 +47,14 @@ async function load() {
     const { data, error: err } = await apiClient.GET('/v1/reminders/preferences')
     if (err) {
       error.value = getErrorMessage(err, 'Failed to load preferences')
+      toast.error('Could not load reminder preferences', error.value)
       return
     }
     preferences.value = data ?? []
     hydrate()
+  } catch (e) {
+    error.value = getErrorMessage(e, 'Failed to load preferences')
+    toast.error('Could not load reminder preferences', error.value)
   } finally {
     loading.value = false
   }
@@ -68,6 +72,8 @@ async function saveGlobal() {
     }
     toast.success('Reminder preferences saved')
     await load()
+  } catch (e) {
+    toast.error('Could not save reminders', getErrorMessage(e, 'Save failed'))
   } finally {
     saving.value = false
   }
@@ -115,6 +121,7 @@ onMounted(() => {
               <span class="text-sm">{{ choice.label }}</span>
               <USwitch
                 :model-value="globalPreference.includes(choice.value)"
+                :aria-label="`Reminder ${choice.label}`"
                 @update:model-value="toggleInterval(choice.value)"
               />
             </label>
@@ -142,7 +149,12 @@ onMounted(() => {
               :key="p.id"
               class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm"
             >
-              <p class="text-white/70 truncate">Tournament: {{ p.tournamentId }}</p>
+              <RouterLink
+                :to="`/tournaments/${p.tournamentId}`"
+                class="text-primary hover:underline truncate block"
+              >
+                View tournament
+              </RouterLink>
               <p class="text-xs text-white/50">{{ p.intervalsMinutes.join(' min, ') }} min</p>
             </li>
           </ul>

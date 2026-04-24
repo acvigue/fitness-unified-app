@@ -10,7 +10,13 @@
             </p>
             <p class="text-lg font-medium">{{ accountLabel }}</p>
           </div>
-          <UButton color="primary" variant="ghost" icon="i-lucide-log-out" @click="handleLogout">
+          <UButton
+            color="primary"
+            variant="ghost"
+            icon="i-lucide-log-out"
+            aria-label="Log out"
+            @click="logoutConfirmOpen = true"
+          >
             {{ t('settings.logout') }}
           </UButton>
         </div>
@@ -64,6 +70,9 @@
               <button
                 v-for="pic in profile.pictures"
                 :key="pic.id"
+                type="button"
+                :aria-label="pic.isPrimary ? 'Primary profile picture' : 'Set as primary picture'"
+                :aria-pressed="pic.isPrimary"
                 class="relative shrink-0 rounded-full transition-all"
                 :class="
                   pic.isPrimary
@@ -75,6 +84,8 @@
                 <UAvatar :src="pic.url" :alt="(pic.alt as unknown as string) || ''" size="3xl" />
               </button>
               <button
+                type="button"
+                aria-label="Upload profile picture"
                 class="shrink-0 size-13 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-neutral-700 transition-colors"
                 :disabled="uploading"
                 @click="($refs.fileInput as HTMLInputElement).click()"
@@ -457,6 +468,34 @@
       :selected="profileForm.favoriteSports"
       @update="onSportsUpdated"
     />
+
+    <!-- Logout Confirm Modal -->
+    <UModal v-model:open="logoutConfirmOpen">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-log-out" class="size-5 text-primary-400" />
+            <h2 class="text-lg font-semibold">{{ t('settings.logout') }}</h2>
+          </div>
+          <p class="text-sm text-white/70">
+            You will need to sign in again to access your account.
+          </p>
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              :disabled="loggingOut"
+              @click="logoutConfirmOpen = false"
+            >
+              {{ t('settings.cancel') }}
+            </UButton>
+            <UButton color="primary" :loading="loggingOut" @click="handleLogout">
+              {{ t('settings.logout') }}
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </PageLayout>
 </template>
 
@@ -471,6 +510,7 @@ import { useAuthStore } from '@/stores/auth/auth'
 import { ENV } from '@/config/environment'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
+import { useToastStore } from '@/stores/toast'
 import type { components } from '@/types/api'
 
 type UserProfile = components['schemas']['UserProfileResponseDto']
@@ -489,6 +529,10 @@ useHead({
 const authStore = useAuthStore()
 const router = useRouter()
 const { setHeader } = usePageHeader()
+const toast = useToastStore()
+
+const logoutConfirmOpen = ref(false)
+const loggingOut = ref(false)
 
 const accountLabel = computed(() =>
   authStore.isLoggedIn ? t('settings.signedin') : t('settings.nsignedin'),
@@ -548,8 +592,17 @@ onMounted(async () => {
 })
 
 const handleLogout = async () => {
-  await authStore.logout()
-  router.replace('/login')
+  if (loggingOut.value) return
+  loggingOut.value = true
+  try {
+    await authStore.logout()
+    logoutConfirmOpen.value = false
+    router.replace('/login')
+  } catch (error: unknown) {
+    toast.error('Logout failed', getErrorMessage(error, 'Please try again.'))
+  } finally {
+    loggingOut.value = false
+  }
 }
 
 // Modal state
@@ -603,8 +656,10 @@ const handleAccountAction = async () => {
     router.replace('/login')
   } catch (err: unknown) {
     console.error('Action failed', err)
-    confirmModal.value.error = err instanceof Error ? err.message : t('settings.actionFailed')
+    const msg = err instanceof Error ? err.message : t('settings.actionFailed')
+    confirmModal.value.error = msg
     confirmModal.value.loading = false
+    toast.error(confirmModal.value.title, msg)
   }
 }
 
@@ -643,8 +698,11 @@ async function saveName() {
     if (nameErr) throw new Error(getErrorMessage(nameErr, 'Failed to update name'))
     originalName.value = { firstName: nameForm.firstName, lastName: nameForm.lastName }
     nameSuccess.value = true
+    toast.success(t('settings.nameSaved'))
   } catch (err: unknown) {
-    profileError.value = err instanceof Error ? err.message : 'Failed to update name'
+    const msg = err instanceof Error ? err.message : 'Failed to update name'
+    profileError.value = msg
+    toast.error('Failed to update name', msg)
   } finally {
     savingName.value = false
   }
@@ -791,8 +849,10 @@ async function revokeSession(id: string) {
       return
     }
     sessions.value = sessions.value.filter((s) => s.id !== id)
+    toast.success('Session revoked')
   } catch (error) {
     console.error('Failed to revoke session', error)
+    toast.error('Failed to revoke session', getErrorMessage(error, 'Please try again.'))
   } finally {
     revokingSessionId.value = null
   }
@@ -805,8 +865,10 @@ async function revokeAllSessions() {
     if (revokeAllErr)
       throw new Error(getErrorMessage(revokeAllErr, 'Failed to revoke all sessions'))
     sessions.value = []
+    toast.success('All sessions revoked')
   } catch (error) {
     console.error('Failed to revoke all sessions', error)
+    toast.error('Failed to revoke all sessions', getErrorMessage(error, 'Please try again.'))
   } finally {
     revokingAll.value = false
   }
@@ -843,9 +905,12 @@ async function saveProfile() {
     pendingPictureIds.value = []
     originalProfile.value = serializeForm()
     showSaveSuccess.value = true
+    toast.success('Profile saved')
   } catch (error: unknown) {
     console.error('Update failed', error)
-    profileError.value = error instanceof Error ? error.message : 'Failed to update profile'
+    const msg = error instanceof Error ? error.message : 'Failed to update profile'
+    profileError.value = msg
+    toast.error('Failed to update profile', msg)
   } finally {
     saving.value = false
   }
@@ -872,10 +937,13 @@ async function savePrivacy() {
         privateAchievements: achievements,
       },
     })
-    if (updateErr) throw new Error(getErrorMessage(updateErr, 'Failed to update profile'))
+    if (updateErr) throw new Error(getErrorMessage(updateErr, 'Failed to update privacy'))
+    toast.success('Privacy saved')
   } catch (error: unknown) {
     console.error('Update failed', error)
-    profileError.value = error instanceof Error ? error.message : 'Failed to update profile'
+    const msg = error instanceof Error ? error.message : 'Failed to update privacy'
+    profileError.value = msg
+    toast.error('Failed to update privacy', msg)
   } finally {
     saving2.value = false
   }

@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
+import { useToastStore } from '@/stores/toast'
 import type { components } from '@/types/api'
 
 type SearchMessageHit = components['schemas']['SearchMessageHitDto']
@@ -16,6 +17,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const toast = useToastStore()
 const open = defineModel<boolean>('open', { default: false })
 
 const searchTerm = ref('')
@@ -48,9 +50,10 @@ watch(searchTerm, (term) => {
       if (searchError) throw new Error(getErrorMessage(searchError, 'Failed to search messages'))
       results.value = searchData.hits
       total.value = searchData.total
-    } catch {
+    } catch (e) {
       results.value = []
       total.value = 0
+      toast.error('Search failed', getErrorMessage(e, 'Failed to search messages'))
     } finally {
       loading.value = false
     }
@@ -101,11 +104,16 @@ function highlightMatch(content: string, query: string) {
           :placeholder="t('messenger.searchplaceholder')"
           icon="i-lucide-search"
           autofocus
+          aria-label="Search messages"
         />
 
-        <div class="max-h-80 overflow-y-auto -mx-2">
+        <div class="max-h-80 overflow-y-auto -mx-2" role="listbox" aria-label="Search results">
           <div v-if="loading" class="flex justify-center py-4">
-            <UIcon name="i-lucide-loader-2" class="size-5 animate-spin text-white/50" />
+            <UIcon
+              name="i-lucide-loader-2"
+              class="size-5 animate-spin text-white/50"
+              aria-label="Searching"
+            />
           </div>
 
           <template v-else-if="results.length">
@@ -115,7 +123,9 @@ function highlightMatch(content: string, query: string) {
             <button
               v-for="hit in results"
               :key="hit.id"
-              class="w-full flex flex-col gap-0.5 px-3 py-2.5 rounded-lg text-left transition-colors hover:bg-white/5"
+              type="button"
+              role="option"
+              class="w-full flex flex-col gap-0.5 px-3 py-2.5 rounded-lg text-left transition-colors hover:bg-white/5 focus:bg-white/5 focus:outline-none"
               @click="selectHit(hit)"
             >
               <div class="flex items-center justify-between gap-2">
@@ -130,12 +140,17 @@ function highlightMatch(content: string, query: string) {
             </button>
           </template>
 
-          <p
+          <div
             v-else-if="searchTerm.length >= 2 && !loading"
-            class="text-center text-sm text-white/40 py-4"
+            class="flex flex-col items-center gap-2 py-6 text-white/40"
           >
-            {{ t('messenger.nosearchresults') }}
-          </p>
+            <UIcon name="i-lucide-search-x" class="size-6" aria-hidden="true" />
+            <p class="text-sm">{{ t('messenger.nosearchresults') }}</p>
+          </div>
+          <div v-else-if="!searchTerm" class="flex flex-col items-center gap-2 py-6 text-white/40">
+            <UIcon name="i-lucide-search" class="size-6" aria-hidden="true" />
+            <p class="text-sm">Type at least 2 characters to search.</p>
+          </div>
         </div>
       </div>
     </template>

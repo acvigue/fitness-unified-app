@@ -6,6 +6,7 @@ import PageLayout from '@/layouts/PageLayout.vue'
 import SportsPickerModal from '@/components/SportsPickerModal.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useOrganizationStore } from '@/stores/organization'
+import { useToastStore } from '@/stores/toast'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/types/api'
@@ -17,6 +18,7 @@ useHead({ title: 'Create Tournament' })
 const router = useRouter()
 const { setHeader } = usePageHeader()
 const orgStore = useOrganizationStore()
+const toast = useToastStore()
 
 const form = reactive({
   name: '',
@@ -28,6 +30,12 @@ const selectedSport = ref<Sport | null>(null)
 const sportsPickerOpen = ref(false)
 const creating = ref(false)
 const error = ref('')
+const touched = reactive({
+  name: false,
+  sport: false,
+  startDate: false,
+  maxTeams: false,
+})
 
 const FORMAT_OPTIONS = [
   { label: 'Single Elimination', value: 'SINGLE_ELIMINATION' },
@@ -59,9 +67,58 @@ watch(
   },
 )
 
+// --- Validation (inline) ---
+const nameError = computed(() => {
+  if (!touched.name) return ''
+  if (!form.name.trim()) return 'Tournament name is required'
+  if (form.name.trim().length > 120) return 'Name must be 120 characters or fewer'
+  return ''
+})
+
+const sportError = computed(() => {
+  if (!touched.sport) return ''
+  if (!selectedSport.value) return 'Please choose a sport'
+  return ''
+})
+
+const startDateError = computed(() => {
+  if (!touched.startDate) return ''
+  if (!form.startDate) return 'Start date is required'
+  const parsed = new Date(form.startDate)
+  if (isNaN(parsed.getTime())) return 'Invalid date'
+  if (parsed.getTime() < Date.now() - 60_000) return 'Start date cannot be in the past'
+  return ''
+})
+
+const maxTeamsError = computed(() => {
+  if (!touched.maxTeams) return ''
+  if (!Number.isInteger(form.maxTeams) || form.maxTeams < 2) {
+    return 'Max teams must be a positive integer (at least 2)'
+  }
+  return ''
+})
+
+const formValid = computed(
+  () =>
+    !!form.name.trim() &&
+    !!selectedSport.value &&
+    !!form.startDate &&
+    Number.isInteger(form.maxTeams) &&
+    form.maxTeams >= 2 &&
+    new Date(form.startDate).getTime() >= Date.now() - 60_000,
+)
+
+function markAllTouched() {
+  touched.name = true
+  touched.sport = true
+  touched.startDate = true
+  touched.maxTeams = true
+}
+
 async function createTournament() {
-  if (!form.name.trim() || !selectedSport.value || !form.startDate) {
-    error.value = 'Name, sport, and start date are required'
+  markAllTouched()
+  if (!formValid.value) {
+    error.value = 'Please fix the errors above before continuing.'
     return
   }
 
@@ -78,7 +135,7 @@ async function createTournament() {
     const { data, error: err } = await apiClient.POST('/v1/tournaments', {
       body: {
         name: form.name.trim(),
-        sportId: selectedSport.value.id,
+        sportId: selectedSport.value!.id,
         organizationId: org.organizationId,
         format: form.format,
         maxTeams: form.maxTeams,
@@ -88,12 +145,15 @@ async function createTournament() {
 
     if (err) {
       error.value = getErrorMessage(err, 'Failed to create tournament')
+      toast.error('Could not create tournament', error.value)
       return
     }
 
+    toast.success('Tournament created', form.name.trim())
     router.push(`/tournaments/${data.id}`)
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Failed to create tournament'
+    error.value = getErrorMessage(e, 'Failed to create tournament')
+    toast.error('Could not create tournament', error.value)
   } finally {
     creating.value = false
   }
@@ -123,11 +183,17 @@ onMounted(() => {
             <p class="text-sm text-white/60">Create a tournament for your organization.</p>
           </div>
 
-          <UFormField label="Tournament Name">
-            <UInput v-model="form.name" placeholder="Spring Championship 2026" />
+          <UFormField label="Tournament Name" required :error="nameError">
+            <UInput
+              v-model="form.name"
+              placeholder="Spring Championship 2026"
+              :disabled="creating"
+              aria-label="Tournament name"
+              @blur="touched.name = true"
+            />
           </UFormField>
 
-          <UFormField label="Sport">
+          <UFormField label="Sport" required :error="sportError">
             <div class="flex flex-wrap gap-2">
               <UBadge v-if="selectedSport" color="primary" variant="soft" class="gap-1.5">
                 {{ selectedSport.icon }} {{ selectedSport.name }}
@@ -137,7 +203,14 @@ onMounted(() => {
                 variant="outline"
                 color="neutral"
                 icon="i-lucide-plus"
-                @click="sportsPickerOpen = true"
+                :disabled="creating"
+                :aria-label="selectedSport ? 'Change selected sport' : 'Select a sport'"
+                @click="
+                  () => {
+                    touched.sport = true
+                    sportsPickerOpen = true
+                  }
+                "
               >
                 {{ selectedSport ? 'Change Sport' : 'Select Sport' }}
               </UButton>
@@ -145,18 +218,40 @@ onMounted(() => {
           </UFormField>
 
           <UFormField label="Format">
-            <USelect v-model="form.format" :items="FORMAT_OPTIONS" />
+            <USelect
+              v-model="form.format"
+              :items="FORMAT_OPTIONS"
+              :disabled="creating"
+              aria-label="Tournament format"
+            />
           </UFormField>
 
-          <UFormField label="Max Teams">
-            <USelect v-model="form.maxTeams" :items="maxTeamOptions" />
+          <UFormField label="Max Teams" required :error="maxTeamsError">
+            <USelect
+              v-model="form.maxTeams"
+              :items="maxTeamOptions"
+              :disabled="creating"
+              aria-label="Maximum number of teams"
+              @change="touched.maxTeams = true"
+            />
           </UFormField>
 
-          <UFormField label="Start Date">
-            <UInput v-model="form.startDate" type="datetime-local" />
+          <UFormField label="Start Date" required :error="startDateError">
+            <UInput
+              v-model="form.startDate"
+              type="datetime-local"
+              :disabled="creating"
+              aria-label="Tournament start date and time"
+              @blur="touched.startDate = true"
+            />
           </UFormField>
 
-          <UButton color="primary" :loading="creating" @click="createTournament">
+          <UButton
+            color="primary"
+            :loading="creating"
+            :disabled="creating"
+            @click="createTournament"
+          >
             Create Tournament
           </UButton>
         </div>

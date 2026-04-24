@@ -6,6 +6,7 @@ import PageLayout from '@/layouts/PageLayout.vue'
 import SportsPickerModal from '@/components/SportsPickerModal.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useAuthStore } from '@/stores/auth/auth'
+import { useToastStore } from '@/stores/toast'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/types/api'
@@ -20,6 +21,7 @@ useHead({ title: 'Teams' })
 const router = useRouter()
 const { setHeader } = usePageHeader()
 const authStore = useAuthStore()
+const toast = useToastStore()
 
 const currentUserId = computed(() => {
   const user = authStore.user as { sub?: string; id?: string } | null | undefined
@@ -29,11 +31,14 @@ const currentUserId = computed(() => {
 const teams = ref<Team[]>([])
 const sports = ref<Sport[]>([])
 const myInvitations = ref<TeamInvitation[]>([])
+const invitationTeamNames = ref<Record<string, string>>({})
 
 const loadingTeams = ref(false)
 const actionLoading = ref(false)
-const errorMessage = ref('')
-const successMessage = ref('')
+
+const declineConfirmOpen = ref(false)
+const pendingDeclineId = ref('')
+const pendingDeclineLabel = ref('')
 
 // Create team modal
 const createModalOpen = ref(false)
@@ -51,11 +56,6 @@ function getSportName(sportId: string) {
   return sport ? `${sport.icon || ''} ${sport.name}`.trim() : ''
 }
 
-function setMessages(success = '', error = '') {
-  successMessage.value = success
-  errorMessage.value = error
-}
-
 function openCreateModal() {
   createForm.name = ''
   createForm.description = ''
@@ -66,7 +66,6 @@ function openCreateModal() {
 
 async function loadTeams() {
   loadingTeams.value = true
-  setMessages()
   try {
     const query: Record<string, string> = {}
     if (teamSearch.value.trim()) query.q = teamSearch.value.trim()
@@ -74,12 +73,12 @@ async function loadTeams() {
       params: { query: Object.keys(query).length > 0 ? query : undefined },
     })
     if (error) {
-      setMessages('', getErrorMessage(error, 'Failed to load teams'))
+      toast.error('Failed to load teams', getErrorMessage(error))
       return
     }
     teams.value = data ?? []
   } catch (e) {
-    setMessages('', e instanceof Error ? e.message : 'Failed to load teams')
+    toast.error('Failed to load teams', getErrorMessage(e))
   } finally {
     loadingTeams.value = false
   }
@@ -95,11 +94,41 @@ function onSearchInput() {
 
 async function loadMyInvitations() {
   try {
-    const { data } = await apiClient.GET('/v1/teams/invitations/mine')
+    const { data, error } = await apiClient.GET('/v1/teams/invitations/mine')
+    if (error) {
+      toast.error('Failed to load invitations', getErrorMessage(error))
+      return
+    }
     myInvitations.value = (data ?? []).filter((i) => i.status === 'PENDING')
-  } catch {
-    // Non-critical
+    // Resolve team names for any invitations whose team isn't already loaded
+    const missingTeamIds = Array.from(
+      new Set(
+        myInvitations.value
+          .map((i) => i.teamId)
+          .filter((id) => !teams.value.some((t) => t.id === id) && !invitationTeamNames.value[id]),
+      ),
+    )
+    await Promise.all(
+      missingTeamIds.map(async (id) => {
+        try {
+          const { data: t } = await apiClient.GET('/v1/teams/{id}', {
+            params: { path: { id } },
+          })
+          if (t) invitationTeamNames.value[id] = t.name
+        } catch {
+          // If single team lookup fails, fall back to generic label
+        }
+      }),
+    )
+  } catch (e) {
+    toast.error('Failed to load invitations', getErrorMessage(e))
   }
+}
+
+function invitationTeamLabel(teamId: string) {
+  const loaded = teams.value.find((t) => t.id === teamId)
+  if (loaded) return loaded.name
+  return invitationTeamNames.value[teamId] ?? 'Team'
 }
 
 async function createTeam() {
@@ -132,39 +161,47 @@ async function createTeam() {
 
 async function acceptInvitation(invitationId: string) {
   actionLoading.value = true
-  setMessages()
   try {
     const { error } = await apiClient.PATCH('/v1/teams/invitations/{invitationId}/accept', {
       params: { path: { invitationId } },
     })
     if (error) {
-      setMessages('', getErrorMessage(error, 'Failed to accept'))
+      toast.error('Failed to accept invitation', getErrorMessage(error))
       return
     }
-    setMessages('Invitation accepted')
+    toast.success('Invitation accepted')
     await Promise.all([loadMyInvitations(), loadTeams()])
   } catch (e) {
-    setMessages('', e instanceof Error ? e.message : 'Failed to accept')
+    toast.error('Failed to accept invitation', getErrorMessage(e))
   } finally {
     actionLoading.value = false
   }
 }
 
-async function declineInvitation(invitationId: string) {
+function requestDeclineInvitation(invitationId: string, teamId: string) {
+  pendingDeclineId.value = invitationId
+  pendingDeclineLabel.value = invitationTeamLabel(teamId)
+  declineConfirmOpen.value = true
+}
+
+async function confirmDeclineInvitation() {
+  const invitationId = pendingDeclineId.value
+  if (!invitationId) return
   actionLoading.value = true
-  setMessages()
   try {
     const { error } = await apiClient.PATCH('/v1/teams/invitations/{invitationId}/decline', {
       params: { path: { invitationId } },
     })
     if (error) {
-      setMessages('', getErrorMessage(error, 'Failed to decline'))
+      toast.error('Failed to decline invitation', getErrorMessage(error))
       return
     }
-    setMessages('Invitation declined')
+    toast.success('Invitation declined')
+    declineConfirmOpen.value = false
+    pendingDeclineId.value = ''
     await loadMyInvitations()
   } catch (e) {
-    setMessages('', e instanceof Error ? e.message : 'Failed to decline')
+    toast.error('Failed to decline invitation', getErrorMessage(e))
   } finally {
     actionLoading.value = false
   }
@@ -179,8 +216,8 @@ onMounted(async () => {
     const { data: sportsData, error: sportsError } = await apiClient.GET('/v1/sports')
     if (sportsError) throw new Error(getErrorMessage(sportsError, 'Failed to load sports'))
     sports.value = sportsData
-  } catch {
-    // Non-critical
+  } catch (e) {
+    toast.warning('Could not load sports', getErrorMessage(e))
   }
   await Promise.all([loadTeams(), loadMyInvitations()])
 })
@@ -189,24 +226,6 @@ onMounted(async () => {
 <template>
   <PageLayout>
     <section class="flex flex-col gap-5 px-5 py-6">
-      <!-- Alerts -->
-      <UAlert
-        v-if="errorMessage"
-        color="error"
-        :title="errorMessage"
-        icon="i-lucide-circle-alert"
-        :close="{ color: 'error', variant: 'link', icon: 'i-lucide-x' }"
-        @close="errorMessage = ''"
-      />
-      <UAlert
-        v-if="successMessage"
-        color="success"
-        :title="successMessage"
-        icon="i-lucide-circle-check"
-        :close="{ color: 'success', variant: 'link', icon: 'i-lucide-x' }"
-        @close="successMessage = ''"
-      />
-
       <!-- Pending Invitations -->
       <UCard v-if="myInvitations.length > 0" class="bg-white/5">
         <div class="flex flex-col gap-3">
@@ -216,10 +235,16 @@ onMounted(async () => {
             :key="inv.id"
             class="flex items-center justify-between rounded-lg border border-white/10 p-3"
           >
-            <div class="min-w-0">
+            <button
+              type="button"
+              class="min-w-0 flex flex-col items-start text-left"
+              @click="router.push(`/teams/${inv.teamId}`)"
+            >
               <p class="text-sm font-medium truncate">Team invitation</p>
-              <p class="text-xs text-white/50">Team: {{ inv.teamId }}</p>
-            </div>
+              <p class="text-xs text-white/50 truncate">
+                {{ invitationTeamLabel(inv.teamId) }}
+              </p>
+            </button>
             <div class="flex gap-2 shrink-0">
               <UButton
                 size="xs"
@@ -234,7 +259,7 @@ onMounted(async () => {
                 color="error"
                 variant="soft"
                 :loading="actionLoading"
-                @click="declineInvitation(inv.id)"
+                @click="requestDeclineInvitation(inv.id, inv.teamId)"
               >
                 Decline
               </UButton>
@@ -277,6 +302,7 @@ onMounted(async () => {
             variant="ghost"
             color="neutral"
             icon="i-lucide-refresh-cw"
+            aria-label="Refresh teams"
             :loading="loadingTeams"
             @click="loadTeams"
           />
@@ -296,13 +322,21 @@ onMounted(async () => {
 
         <div
           v-else-if="otherTeams.length === 0 && myTeams.length === 0"
-          class="rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
+          class="flex flex-col items-center gap-3 rounded-lg border border-dashed border-white/10 p-8 text-center"
         >
-          No teams found yet. Tap + to create one!
+          <UIcon name="i-lucide-users" class="size-10 text-white/30" />
+          <p class="text-sm text-white/60">No teams yet — be the first to create one.</p>
+          <UButton size="sm" color="primary" icon="i-lucide-plus" @click="openCreateModal">
+            Create Team
+          </UButton>
         </div>
 
-        <div v-else-if="otherTeams.length === 0" class="text-sm text-white/40 text-center py-4">
-          No other teams found.
+        <div
+          v-else-if="otherTeams.length === 0"
+          class="flex flex-col items-center gap-2 rounded-lg border border-dashed border-white/10 p-6 text-center"
+        >
+          <UIcon name="i-lucide-search-x" class="size-6 text-white/30" />
+          <p class="text-sm text-white/50">No other teams match your search.</p>
         </div>
 
         <div v-else class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -383,5 +417,39 @@ onMounted(async () => {
       :selected="createSelectedSport ? [createSelectedSport] : []"
       @update="(s: Sport[]) => (createSelectedSport = s[0] ?? null)"
     />
+
+    <!-- Decline invitation confirm -->
+    <UModal v-model:open="declineConfirmOpen">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="flex items-start gap-3">
+            <div class="rounded-full bg-error/10 p-2 shrink-0">
+              <UIcon name="i-lucide-x" class="size-5 text-error" />
+            </div>
+            <div class="flex flex-col gap-1 min-w-0">
+              <h2 class="text-lg font-semibold">Decline invitation?</h2>
+              <p class="text-sm text-white/60">
+                Decline the invitation to
+                <span class="text-white/80">{{ pendingDeclineLabel }}</span
+                >?
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-2 justify-end">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              :disabled="actionLoading"
+              @click="declineConfirmOpen = false"
+            >
+              Cancel
+            </UButton>
+            <UButton color="error" :loading="actionLoading" @click="confirmDeclineInvitation">
+              Decline
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </PageLayout>
 </template>

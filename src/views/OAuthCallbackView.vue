@@ -19,6 +19,17 @@
         <UIcon name="i-lucide-circle-alert" class="mx-auto h-12 w-12 text-red-400" />
         <p class="font-medium text-red-400">{{ t('login.authfailed') }}</p>
         <p class="text-sm text-white/50">{{ errorMessage }}</p>
+        <div class="flex justify-center pt-2">
+          <UButton
+            color="primary"
+            variant="soft"
+            icon="i-lucide-arrow-left"
+            aria-label="Back to login"
+            @click="backToLogin"
+          >
+            Back to login
+          </UButton>
+        </div>
       </div>
     </div>
   </FullPageLayout>
@@ -41,6 +52,14 @@ const router = useRouter()
 const processing = ref(true)
 const success = ref(false)
 const errorMessage = ref<string | null>(null)
+
+const backToLogin = () => {
+  if (!Capacitor.isNativePlatform() && window.opener) {
+    window.close()
+    return
+  }
+  router.replace('/login')
+}
 
 onMounted(async () => {
   console.log('[OAuth Callback] Starting callback processing')

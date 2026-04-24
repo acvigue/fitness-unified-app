@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
+import { useOrganizationStore } from '@/stores/organization'
+import { useToastStore } from '@/stores/toast'
+import { apiClient } from '@/lib/api/client'
+import { getErrorMessage } from '@/lib/api/errors'
 
 useHead({
   title: 'Create Gym',
@@ -11,9 +15,33 @@ useHead({
 
 const router = useRouter()
 const { setHeader } = usePageHeader()
+const orgStore = useOrganizationStore()
+const toast = useToastStore()
 
 setHeader({
   title: 'Create Gym',
+})
+
+const submitting = ref(false)
+const submitError = ref('')
+const touched = reactive({ name: false })
+
+const orgOptions = computed(() =>
+  orgStore.memberships.map((m) => ({
+    label: m.organizationName ?? m.organizationId,
+    value: m.organizationId,
+  })),
+)
+const hasSingleOrg = computed(() => orgStore.memberships.length === 1)
+const hasAnyOrg = computed(() => orgStore.memberships.length > 0)
+
+onMounted(async () => {
+  if (!orgStore.initialized) {
+    await orgStore.fetchMemberships()
+  }
+  if (hasSingleOrg.value) {
+    form.organizationId = orgStore.memberships[0].organizationId
+  }
 })
 
 type PaintMode = 'open' | 'closed'
@@ -265,14 +293,31 @@ function buildPayload() {
   }
 }
 
-function onCreateGym() {
-  if (!isValid.value) return
+async function onCreateGym() {
+  touched.name = true
+  if (!isValid.value || submitting.value) return
 
-  const payload = buildPayload()
-  console.log('Create gym payload:', payload)
-
-  // Replace this later with your API call
-  router.push('/gyms')
+  submitting.value = true
+  submitError.value = ''
+  try {
+    const { error: err } = await apiClient.POST('/v1/gyms', {
+      body: buildPayload(),
+    })
+    if (err) {
+      const message = getErrorMessage(err, 'Failed to create gym')
+      submitError.value = message
+      toast.error('Could not create gym', message)
+      return
+    }
+    toast.success('Gym created')
+    router.push('/gyms')
+  } catch (e) {
+    const message = getErrorMessage(e, 'Failed to create gym')
+    submitError.value = message
+    toast.error('Could not create gym', message)
+  } finally {
+    submitting.value = false
+  }
 }
 </script>
 
@@ -297,20 +342,59 @@ function onCreateGym() {
       <!-- Basic form -->
       <UCard class="bg-white/5">
         <div class="grid gap-5 lg:grid-cols-2">
-          <UFormField label="Gym name" required>
-            <UInput v-model="form.name" placeholder="Corec Main Gym" size="lg" />
+          <UFormField
+            label="Gym name"
+            required
+            :error="touched.name && !form.name.trim() ? 'Name is required' : undefined"
+          >
+            <UInput
+              v-model="form.name"
+              placeholder="Corec Main Gym"
+              size="lg"
+              aria-label="Gym name"
+              @blur="touched.name = true"
+            />
           </UFormField>
 
-          <UFormField label="Organization ID" required>
-            <UInput v-model="form.organizationId" placeholder="org_123" size="lg" />
+          <UFormField
+            v-if="!hasSingleOrg"
+            label="Organization"
+            required
+            :error="
+              hasAnyOrg && !form.organizationId
+                ? 'Organization is required'
+                : !hasAnyOrg
+                  ? 'You must belong to an organization to create a gym'
+                  : undefined
+            "
+          >
+            <USelect
+              v-model="form.organizationId"
+              :items="orgOptions"
+              :disabled="!hasAnyOrg"
+              size="lg"
+              placeholder="Select an organization"
+              aria-label="Organization"
+            />
           </UFormField>
 
           <UFormField label="Location">
-            <UInput v-model="form.location" placeholder="CoRec West Wing" size="lg" />
+            <UInput
+              v-model="form.location"
+              placeholder="CoRec West Wing"
+              size="lg"
+              aria-label="Location"
+            />
           </UFormField>
 
           <UFormField label="Capacity">
-            <UInput v-model="form.capacity" type="number" placeholder="120" size="lg" />
+            <UInput
+              v-model="form.capacity"
+              type="number"
+              placeholder="120"
+              size="lg"
+              aria-label="Capacity"
+            />
           </UFormField>
 
           <div class="lg:col-span-2">
@@ -535,10 +619,19 @@ function onCreateGym() {
       </div>
 
       <!-- Actions -->
-      <div class="flex items-center justify-end gap-3">
-        <UButton color="neutral" variant="outline" @click="onCancel"> Cancel </UButton>
+      <UAlert v-if="submitError" color="error" :title="submitError" icon="i-lucide-circle-alert" />
 
-        <UButton icon="i-lucide-plus" :disabled="!isValid" @click="onCreateGym">
+      <div class="flex items-center justify-end gap-3">
+        <UButton color="neutral" variant="outline" :disabled="submitting" @click="onCancel">
+          Cancel
+        </UButton>
+
+        <UButton
+          icon="i-lucide-plus"
+          :disabled="!isValid || submitting"
+          :loading="submitting"
+          @click="onCreateGym"
+        >
           Create Gym
         </UButton>
       </div>

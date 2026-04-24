@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useAuthStore } from '@/stores/auth/auth'
+import { useToastStore } from '@/stores/toast'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import UserLink from '@/components/UserLink.vue'
@@ -23,6 +24,9 @@ const route = useRoute()
 const router = useRouter()
 const { setHeader } = usePageHeader()
 const authStore = useAuthStore()
+const toast = useToastStore()
+
+const leaveConfirmOpen = ref(false)
 
 const teamId = computed(() => route.params.id as string)
 const team = ref<Team | null>(null)
@@ -116,12 +120,16 @@ async function loadTeam() {
 
 async function loadTeamInvitations() {
   try {
-    const { data } = await apiClient.GET('/v1/teams/{id}/invitations', {
+    const { data, error: err } = await apiClient.GET('/v1/teams/{id}/invitations', {
       params: { path: { id: teamId.value } },
     })
+    if (err) {
+      toast.error('Failed to load join requests', getErrorMessage(err))
+      return
+    }
     teamInvitations.value = data ?? []
-  } catch {
-    // Non-critical
+  } catch (e) {
+    toast.error('Failed to load join requests', getErrorMessage(e))
   }
 }
 
@@ -187,8 +195,11 @@ async function declineRequest(invitationId: string) {
   }
 }
 
-async function leaveTeam() {
-  if (!window.confirm('Are you sure you want to leave this team?')) return
+function requestLeaveTeam() {
+  leaveConfirmOpen.value = true
+}
+
+async function confirmLeaveTeam() {
   actionLoading.value = true
   actionMessage.value = ''
   actionError.value = ''
@@ -203,9 +214,11 @@ async function leaveTeam() {
       )
       return
     }
+    leaveConfirmOpen.value = false
+    toast.success('Left team')
     router.push('/team')
   } catch (e) {
-    actionError.value = e instanceof Error ? e.message : 'Failed to leave team'
+    actionError.value = getErrorMessage(e, 'Failed to leave team')
   } finally {
     actionLoading.value = false
   }
@@ -214,13 +227,16 @@ async function leaveTeam() {
 async function loadMyTeams() {
   try {
     const { data, error: err } = await apiClient.GET('/v1/teams')
-    if (err) return
+    if (err) {
+      toast.warning('Could not load your teams', getErrorMessage(err))
+      return
+    }
     myTeams.value = (data ?? []).filter(
       (t) =>
         t.captainId === currentUserId.value || t.members.some((m) => m.sub === currentUserId.value),
     )
-  } catch {
-    // Non-critical
+  } catch (e) {
+    toast.warning('Could not load your teams', getErrorMessage(e))
   }
 }
 
@@ -250,8 +266,8 @@ onMounted(async () => {
     const { data: sportsData, error: sportsError } = await apiClient.GET('/v1/sports')
     if (sportsError) throw new Error(getErrorMessage(sportsError, 'Failed to load sports'))
     sports.value = sportsData
-  } catch {
-    // Non-critical
+  } catch (e) {
+    toast.warning('Could not load sports', getErrorMessage(e))
   }
   await Promise.all([loadTeam(), loadMyTeams()])
 })
@@ -316,7 +332,13 @@ onMounted(async () => {
             <UBadge color="neutral" variant="soft" size="xs">{{ memberUserIds.length }}</UBadge>
           </div>
 
-          <div class="flex flex-col gap-2">
+          <div
+            v-if="memberUserIds.length === 0"
+            class="rounded-lg border border-dashed border-white/10 p-6 text-center text-sm text-white/50"
+          >
+            No members yet.
+          </div>
+          <div v-else class="flex flex-col gap-2">
             <div
               v-for="userId in memberUserIds"
               :key="userId"
@@ -441,8 +463,9 @@ onMounted(async () => {
           v-if="isMember && !isCaptain"
           color="error"
           variant="soft"
+          icon="i-lucide-log-out"
           :loading="actionLoading"
-          @click="leaveTeam"
+          @click="requestLeaveTeam"
         >
           Leave Team
         </UButton>
@@ -473,5 +496,35 @@ onMounted(async () => {
       :from-team-id="selectedProposingTeamId"
       @error="(msg) => (chatPickerError = msg)"
     />
+
+    <!-- Leave Team confirm -->
+    <UModal v-model:open="leaveConfirmOpen">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="flex items-start gap-3">
+            <div class="rounded-full bg-error/10 p-2 shrink-0">
+              <UIcon name="i-lucide-log-out" class="size-5 text-error" />
+            </div>
+            <div class="flex flex-col gap-1 min-w-0">
+              <h2 class="text-lg font-semibold">Leave team?</h2>
+              <p class="text-sm text-white/60">Are you sure you want to leave this team?</p>
+            </div>
+          </div>
+          <div class="flex gap-2 justify-end">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              :disabled="actionLoading"
+              @click="leaveConfirmOpen = false"
+            >
+              Cancel
+            </UButton>
+            <UButton color="error" :loading="actionLoading" @click="confirmLeaveTeam">
+              Leave Team
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </PageLayout>
 </template>

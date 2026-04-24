@@ -5,6 +5,7 @@ import { usePageHeader } from '@/composables/usePageHeader'
 import { useI18n } from 'vue-i18n'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
+import { useToastStore } from '@/stores/toast'
 import router from '@/router'
 import type { components } from '@/types/api'
 
@@ -14,6 +15,7 @@ type UserProfile = components['schemas']['UserProfileResponseDto']
 
 const { t } = useI18n()
 const { setHeader } = usePageHeader()
+const toast = useToastStore()
 
 const profile = ref<UserProfile | null>(null)
 const loading = ref(true)
@@ -35,7 +37,12 @@ const featuredMessage = ref('')
 onMounted(async () => {
   setHeader({
     title: t('profile.profile'),
-    actions: [{ icon: 'i-lucide-trophy', onClick: () => router.push('/achievements') }],
+    actions: [
+      {
+        icon: 'i-lucide-trophy',
+        onClick: () => router.push('/achievements'),
+      },
+    ],
   })
   try {
     const { data: profileData, error: profileErr } = await apiClient.GET('/v1/user/profile')
@@ -44,22 +51,24 @@ onMounted(async () => {
     selectedFeaturedIds.value = (profile.value?.featuredAchievements ?? [])
       .map((a) => a.id)
       .filter((id): id is string => typeof id === 'string')
-    tournamentHistory.value = profile.value.tournaments
+    tournamentHistory.value = profile.value?.tournaments ?? []
   } catch (err) {
-    error.value = 'Failed to load profile'
+    const msg = getErrorMessage(err, 'Failed to load profile')
+    error.value = msg
+    toast.error('Failed to load profile', msg)
     console.error(err)
   } finally {
     loading.value = false
   }
   try {
-    const { data: profileData, error: profileErr } = await apiClient.GET('/v1/user/profile/privacy')
-    if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
-    hidingBio.value = profileData.privateBio
-    hidingSports.value = profileData.privateSports
-    hidingTournaments.value = profileData.privateTournaments
-    hidingAchievements.value = profileData.privateAchievements
+    const { data: privacyData, error: privacyErr } = await apiClient.GET('/v1/user/profile/privacy')
+    if (privacyErr) throw new Error(getErrorMessage(privacyErr, 'Failed to load privacy settings'))
+    hidingBio.value = privacyData.privateBio
+    hidingSports.value = privacyData.privateSports
+    hidingTournaments.value = privacyData.privateTournaments
+    hidingAchievements.value = privacyData.privateAchievements
   } catch (err) {
-    error.value = 'Failed to load profile'
+    // Non-fatal, defaults already set.
     console.error(err)
   }
 })
@@ -97,13 +106,26 @@ const primaryPicture = computed(() => {
   return profile.value?.pictures?.find((p) => p.isPrimary)?.url || ''
 })
 
+const displayName = computed(() => {
+  const p = profile.value
+  if (p?.firstName || p?.lastName) return [p.firstName, p.lastName].filter(Boolean).join(' ')
+  return 'User'
+})
+
+const avatarAlt = computed(() => `${displayName.value} profile picture`)
+
 async function startEditFeatured() {
+  if (editingFeatured.value) {
+    editingFeatured.value = false
+    return
+  }
   editingFeatured.value = true
   try {
-    const { data } = await apiClient.GET('/v1/achievements/me/earned')
+    const { data, error: err } = await apiClient.GET('/v1/achievements/me/earned')
+    if (err) throw new Error(getErrorMessage(err, 'Failed to load achievements'))
     earnedAchievements.value = data ?? []
-  } catch {
-    // Non-critical
+  } catch (e) {
+    toast.error('Could not load achievements', getErrorMessage(e))
   }
 }
 
@@ -113,6 +135,8 @@ function toggleFeatured(id: string) {
     selectedFeaturedIds.value.splice(idx, 1)
   } else if (selectedFeaturedIds.value.length < 5) {
     selectedFeaturedIds.value.push(id)
+  } else {
+    toast.warning('Maximum 5 featured achievements', 'Unselect one before adding another.')
   }
 }
 
@@ -128,12 +152,15 @@ async function saveFeatured() {
     })
     if (updateErr) throw new Error(getErrorMessage(updateErr, 'Failed to update profile'))
     const { data: refreshedProfile, error: refreshErr } = await apiClient.GET('/v1/user/profile')
-    if (refreshErr) throw new Error(getErrorMessage(refreshErr, 'Failed to load profile'))
+    if (refreshErr) throw new Error(getErrorMessage(refreshErr, 'Failed to reload profile'))
     profile.value = refreshedProfile
     editingFeatured.value = false
     featuredMessage.value = 'Featured achievements updated'
+    toast.success('Featured achievements updated')
   } catch (e) {
-    featuredMessage.value = e instanceof Error ? e.message : 'Failed to save'
+    const msg = getErrorMessage(e, 'Failed to save')
+    featuredMessage.value = msg
+    toast.error('Failed to save', msg)
   } finally {
     savingFeatured.value = false
   }
@@ -142,40 +169,62 @@ async function saveFeatured() {
 
 <template>
   <PageLayout>
-    <div v-if="loading" class="flex justify-center p-8">
-      <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-8" />
+    <!-- Loading skeleton -->
+    <div v-if="loading" class="flex flex-col gap-6 px-5 py-6">
+      <div class="flex justify-center">
+        <div class="size-24 rounded-full bg-white/5 animate-pulse" />
+      </div>
+      <div class="flex justify-center">
+        <div class="h-5 w-40 rounded bg-white/10 animate-pulse" />
+      </div>
+      <div v-for="n in 4" :key="n" class="bg-white/5 p-4 rounded-lg flex flex-col gap-3">
+        <div class="h-3 w-24 rounded bg-white/10 animate-pulse" />
+        <div class="h-4 w-full rounded bg-white/5 animate-pulse" />
+        <div class="h-4 w-3/4 rounded bg-white/5 animate-pulse" />
+      </div>
     </div>
-    <div v-else-if="error" class="text-red-500 p-4">
-      {{ error }}
+
+    <!-- Hard error -->
+    <div
+      v-else-if="error && !profile"
+      class="flex flex-col items-center justify-center text-center px-6 py-16 gap-4"
+    >
+      <div class="size-16 rounded-full bg-rose-500/15 flex items-center justify-center">
+        <UIcon name="i-lucide-triangle-alert" class="size-8 text-rose-400" />
+      </div>
+      <div>
+        <p class="text-white text-lg font-medium">Couldn't load your profile</p>
+        <p class="text-white/60 text-sm mt-1">{{ error }}</p>
+      </div>
     </div>
+
     <div v-else class="flex flex-col gap-6 px-5 py-6">
       <!-- Profile Picture -->
       <div class="flex justify-center">
-        <UAvatar :src="primaryPicture" alt="Profile" size="3xl" />
+        <UAvatar :src="primaryPicture" :alt="avatarAlt" size="3xl" />
       </div>
 
       <!-- Name -->
       <div class="text-center">
         <p class="text-white text-lg font-medium">
-          {{
-            profile?.firstName || profile?.lastName
-              ? [profile.firstName, profile.lastName].filter(Boolean).join(' ')
-              : 'User'
-          }}
+          {{ displayName }}
         </p>
       </div>
 
       <!-- Bio -->
       <div class="bg-white/5 p-4 rounded-lg">
         <p class="text-white/70 text-sm mb-1">Bio</p>
-        <p v-if="hidingBio" class="text-white">Bio is Hidden</p>
-        <p v-else class="text-white">{{ profile?.bio || 'no bio' }}</p>
+        <p v-if="hidingBio" class="text-white/50 italic">Your bio is hidden from others</p>
+        <p v-else-if="profile?.bio" class="text-white">{{ profile.bio }}</p>
+        <p v-else class="text-white/50 text-sm italic">No bio yet.</p>
       </div>
 
       <!-- Favorite Sports -->
       <div class="bg-white/5 p-4 rounded-lg">
         <p class="text-white/70 text-sm mb-2">Favorite Sports</p>
-        <p v-if="hidingSports" class="text-white">Favorite Sports is Hidden</p>
+        <p v-if="hidingSports" class="text-white/50 italic">
+          Your favorite sports are hidden from others
+        </p>
         <div v-else class="flex flex-wrap gap-2">
           <UBadge
             v-for="sport in profile?.favoriteSports"
@@ -185,7 +234,7 @@ async function saveFeatured() {
           >
             {{ sport.icon }} {{ sport.name }}
           </UBadge>
-          <p v-if="!profile?.favoriteSports?.length" class="text-white/50 text-sm">
+          <p v-if="!profile?.favoriteSports?.length" class="text-white/50 text-sm italic">
             No favorite sports added.
           </p>
         </div>
@@ -193,8 +242,10 @@ async function saveFeatured() {
 
       <!-- Tournaments -->
       <div class="bg-white/5 p-4 rounded-lg">
-        <p class="text-white/70 text-sm">Tournaments</p>
-        <p v-if="hidingTournaments" class="text-white">Tournament History is Hidden</p>
+        <p class="text-white/70 text-sm mb-2">Tournaments</p>
+        <p v-if="hidingTournaments" class="text-white/50 italic">
+          Your tournament history is hidden from others
+        </p>
         <div v-else-if="tournamentHistory.length > 0">
           <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             <button
@@ -218,10 +269,10 @@ async function saveFeatured() {
 
               <div class="mt-1.5 flex items-center gap-2 text-sm text-white/60">
                 <UIcon name="i-lucide-dumbbell" class="text-xs" />
-                <span
-                  >{{ tournament.sport?.icon || '' }}
-                  {{ tournament.sport?.name || 'Unknown' }}</span
-                >
+                <span>
+                  {{ tournament.sport?.icon || '' }}
+                  {{ tournament.sport?.name || 'Unknown' }}
+                </span>
                 <UBadge variant="subtle" color="neutral" size="xs">
                   {{ tournament.format === 'ROUND_ROBIN' ? 'Round Robin' : 'Elimination' }}
                 </UBadge>
@@ -243,9 +294,9 @@ async function saveFeatured() {
             </button>
           </div>
         </div>
-        <div v-else>
-          <p class="text-white/50">None played yet.</p>
-        </div>
+        <p v-else class="text-white/50 text-sm italic">
+          You haven't played in any tournaments yet.
+        </p>
       </div>
 
       <!-- Featured Achievements -->
@@ -253,10 +304,15 @@ async function saveFeatured() {
         <div class="flex items-center justify-between mb-2">
           <p class="text-white/70 text-sm">Featured Achievements</p>
           <UButton
-            v-if="!hidingSports"
+            v-if="!hidingAchievements"
             size="xs"
             variant="ghost"
             color="neutral"
+            :aria-label="
+              editingFeatured
+                ? 'Cancel editing featured achievements'
+                : 'Edit featured achievements'
+            "
             @click="startEditFeatured"
           >
             {{ editingFeatured ? 'Cancel' : 'Edit' }}
@@ -274,7 +330,9 @@ async function saveFeatured() {
 
         <!-- Display mode -->
         <template v-if="!editingFeatured">
-          <p v-if="hidingSports" class="text-white">Featured Achievements is Hidden</p>
+          <p v-if="hidingAchievements" class="text-white/50 italic">
+            Your achievements are hidden from others
+          </p>
           <div v-else-if="profile?.featuredAchievements?.length" class="grid gap-2 sm:grid-cols-2">
             <div
               v-for="ua in profile.featuredAchievements"
@@ -288,7 +346,7 @@ async function saveFeatured() {
               </div>
             </div>
           </div>
-          <p v-else class="text-white/50 text-sm">
+          <p v-else class="text-white/50 text-sm italic">
             No featured achievements. Tap Edit to select up to 5.
           </p>
         </template>
@@ -298,7 +356,7 @@ async function saveFeatured() {
           <p class="text-xs text-white/50 mb-2">
             Select up to 5 earned achievements to feature on your profile.
           </p>
-          <div v-if="earnedAchievements.length === 0" class="text-sm text-white/50">
+          <div v-if="earnedAchievements.length === 0" class="text-sm text-white/50 italic">
             No earned achievements yet. Participate in tournaments to earn them!
           </div>
           <div v-else class="flex flex-col gap-2">
@@ -332,19 +390,21 @@ async function saveFeatured() {
             </button>
           </div>
           <div class="flex justify-end mt-3 gap-2">
-            <UButton size="sm" variant="outline" color="neutral" @click="editingFeatured = false"
-              >Cancel</UButton
-            >
-            <UButton size="sm" color="primary" :loading="savingFeatured" @click="saveFeatured"
-              >Save</UButton
-            >
+            <UButton size="sm" variant="outline" color="neutral" @click="editingFeatured = false">
+              Cancel
+            </UButton>
+            <UButton size="sm" color="primary" :loading="savingFeatured" @click="saveFeatured">
+              Save
+            </UButton>
           </div>
         </template>
       </div>
 
       <!-- My Reports Button -->
       <div class="flex justify-center">
-        <UButton @click="moveToReportsPage" color="primary" variant="soft"> Report Users </UButton>
+        <UButton icon="i-lucide-flag" color="primary" variant="soft" @click="moveToReportsPage">
+          Report Users
+        </UButton>
       </div>
     </div>
   </PageLayout>

@@ -51,6 +51,7 @@ onMounted(() => {
             size="sm"
             square
             title="New announcement channel"
+            aria-label="New announcement channel"
             @click="showAnnouncementModal = true"
           />
           <UButton
@@ -59,12 +60,14 @@ onMounted(() => {
             color="neutral"
             size="sm"
             square
+            title="New chat"
+            aria-label="New chat"
             @click="showNewChatModal = true"
           />
         </div>
       </div>
 
-      <ConversationList />
+      <ConversationList @start-chat="showNewChatModal = true" />
     </div>
 
     <!-- Chat panel (nested route or empty state) -->
@@ -77,7 +80,7 @@ onMounted(() => {
       <!-- Desktop empty state when no chat selected -->
       <div v-else class="flex flex-1 items-center justify-center text-white/30">
         <div class="text-center">
-          <UIcon name="i-lucide-message-circle" class="text-4xl mb-3" />
+          <UIcon name="i-lucide-message-circle" class="text-4xl mb-3" aria-hidden="true" />
           <p class="text-sm">{{ t('messenger.selectconversation') }}</p>
         </div>
       </div>

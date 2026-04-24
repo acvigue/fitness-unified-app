@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
+import { useToastStore } from '@/stores/toast'
 import type { components } from '@/types/api'
 import { useMessengerStore } from '@/stores/messenger'
 import { useI18n } from 'vue-i18n'
@@ -12,6 +13,7 @@ type UserLookupItem = components['schemas']['UserLookupItemDto']
 const { t } = useI18n()
 const router = useRouter()
 const messengerStore = useMessengerStore()
+const toast = useToastStore()
 
 const open = defineModel<boolean>('open', { default: false })
 
@@ -39,8 +41,9 @@ watch(searchTerm, (term) => {
       })
       if (lookupError) throw new Error(getErrorMessage(lookupError, 'Failed to search users'))
       searchResults.value = lookupData.users
-    } catch {
+    } catch (e) {
       searchResults.value = []
+      toast.error('Search failed', getErrorMessage(e, 'Failed to search users'))
     } finally {
       searchLoading.value = false
     }
@@ -79,8 +82,10 @@ async function handleCreate() {
     searchResults.value = []
     searchTerm.value = ''
     router.push(`/messenger/${chat.id}`)
-  } catch {
-    error.value = t('messenger.createerror')
+  } catch (e) {
+    const msg = getErrorMessage(e, t('messenger.createerror'))
+    error.value = msg
+    toast.error('Chat creation failed', msg)
   } finally {
     creating.value = false
   }
@@ -98,17 +103,27 @@ async function handleCreate() {
           :placeholder="t('messenger.searchusers')"
           icon="i-lucide-search"
           autofocus
+          aria-label="Search users"
         />
 
         <!-- Selected users chips -->
-        <div v-if="selectedUsers.length" class="flex flex-wrap gap-2">
+        <div
+          v-if="selectedUsers.length"
+          class="flex flex-wrap gap-2"
+          aria-label="Selected recipients"
+        >
           <UBadge
             v-for="user in selectedUsers"
             :key="user.id"
             color="primary"
             variant="subtle"
             class="cursor-pointer"
+            role="button"
+            tabindex="0"
+            :aria-label="`Remove ${user.name || user.username}`"
             @click="removeUser(user)"
+            @keydown.enter.prevent="removeUser(user)"
+            @keydown.space.prevent="removeUser(user)"
           >
             {{ user.name || user.username }}
             <UIcon name="i-lucide-x" class="ml-1 size-3" />
@@ -116,14 +131,21 @@ async function handleCreate() {
         </div>
 
         <!-- Search results -->
-        <div class="max-h-60 overflow-y-auto -mx-2">
+        <div class="max-h-60 overflow-y-auto -mx-2" role="listbox" aria-label="Search results">
           <div v-if="searchLoading" class="flex justify-center py-4">
-            <UIcon name="i-lucide-loader-2" class="size-5 animate-spin text-white/50" />
+            <UIcon
+              name="i-lucide-loader-2"
+              class="size-5 animate-spin text-white/50"
+              aria-label="Searching"
+            />
           </div>
           <template v-else-if="searchResults.length">
             <button
               v-for="user in searchResults"
               :key="user.id"
+              type="button"
+              role="option"
+              :aria-selected="isSelected(user)"
               class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors"
               :class="isSelected(user) ? 'bg-primary/15' : 'hover:bg-white/5'"
               @click="toggleUser(user)"
@@ -144,18 +166,21 @@ async function handleCreate() {
           <p v-else-if="searchTerm.length >= 2" class="text-center text-sm text-white/40 py-4">
             {{ t('messenger.noresults') }}
           </p>
+          <p v-else class="text-center text-sm text-white/40 py-4">
+            Start typing to search people.
+          </p>
         </div>
 
         <p v-if="isGroup" class="text-xs text-white/50">
           {{ t('messenger.groupchatnote') }}
         </p>
 
-        <p v-if="error" class="text-xs text-red-400">{{ error }}</p>
+        <p v-if="error" class="text-xs text-red-400" role="alert">{{ error }}</p>
 
         <UButton
           block
           :loading="creating"
-          :disabled="selectedUsers.length === 0"
+          :disabled="selectedUsers.length === 0 || creating"
           @click="handleCreate"
         >
           {{ isGroup ? t('messenger.creategroup') : t('messenger.startchat') }}

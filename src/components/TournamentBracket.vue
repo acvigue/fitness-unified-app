@@ -72,8 +72,19 @@ function isDraw(match: TournamentMatch) {
   </div>
 
   <!-- Bracket Rounds -->
-  <div class="flex gap-4 overflow-x-auto pb-2">
-    <div v-for="round in rounds" :key="round.round" class="flex flex-col gap-3 min-w-56 shrink-0">
+  <div
+    role="region"
+    aria-label="Tournament bracket"
+    tabindex="0"
+    class="flex gap-4 overflow-x-auto pb-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary/40"
+  >
+    <div
+      v-for="round in rounds"
+      :key="round.round"
+      role="group"
+      :aria-label="`${round.label} round`"
+      class="flex flex-col gap-3 min-w-56 shrink-0"
+    >
       <p class="text-xs uppercase tracking-[0.3em] text-white/60 text-center">
         {{ round.label }}
       </p>
@@ -82,7 +93,8 @@ function isDraw(match: TournamentMatch) {
         <div
           v-for="match in round.matches"
           :key="match.id"
-          class="rounded-lg border border-white/10 overflow-hidden"
+          :aria-label="`Match ${match.matchNumber}: ${match.team1?.name ?? 'TBD'} vs ${match.team2?.name ?? 'TBD'}, status ${getMatchStatusLabel(match.status)}`"
+          class="rounded-lg border border-white/10 overflow-hidden focus-within:ring-1 focus-within:ring-primary/40"
           :class="match.status === 'BYE' ? 'opacity-50' : ''"
         >
           <!-- Match header -->
@@ -100,7 +112,7 @@ function isDraw(match: TournamentMatch) {
               match.winner?.id === match.team1?.id
                 ? 'bg-primary/10'
                 : isDraw(match)
-                  ? 'bg-white/[0.03]'
+                  ? 'bg-white/3'
                   : ''
             "
           >
@@ -131,7 +143,7 @@ function isDraw(match: TournamentMatch) {
               match.winner?.id === match.team2?.id
                 ? 'bg-primary/10'
                 : isDraw(match)
-                  ? 'bg-white/[0.03]'
+                  ? 'bg-white/3'
                   : ''
             "
           >

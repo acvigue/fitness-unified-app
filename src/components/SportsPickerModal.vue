@@ -3,11 +3,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
+import { useToastStore } from '@/stores/toast'
 import type { components } from '@/types/api'
 
 type Sport = components['schemas']['SportResponseDto']
 
 const { t } = useI18n()
+const toast = useToastStore()
 
 const open = defineModel<boolean>('open', { default: false })
 
@@ -30,8 +32,9 @@ onMounted(async () => {
     const { data: sportsData, error: sportsError } = await apiClient.GET('/v1/sports')
     if (sportsError) throw new Error(getErrorMessage(sportsError, 'Failed to load sports'))
     allSports.value = sportsData
-  } catch {
+  } catch (err) {
     allSports.value = []
+    toast.error('Failed to load sports', getErrorMessage(err, 'Please try again.'))
   } finally {
     loading.value = false
   }
@@ -91,10 +94,15 @@ function confirm() {
             color="primary"
             variant="subtle"
             class="cursor-pointer"
+            :aria-label="`Remove ${sport.name}`"
+            role="button"
+            tabindex="0"
             @click="toggleSport(sport)"
+            @keydown.enter.prevent="toggleSport(sport)"
+            @keydown.space.prevent="toggleSport(sport)"
           >
             {{ sport.icon }} {{ sport.name }}
-            <UIcon name="i-lucide-x" class="ml-1 size-3" />
+            <UIcon name="i-lucide-x" class="ml-1 size-3" aria-hidden="true" />
           </UBadge>
         </div>
 
@@ -107,6 +115,8 @@ function confirm() {
             <button
               v-for="sport in filteredSports"
               :key="sport.id"
+              type="button"
+              :aria-pressed="isSelected(sport)"
               class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors"
               :class="isSelected(sport) ? 'bg-primary/15' : 'hover:bg-white/5'"
               @click="toggleSport(sport)"
@@ -115,6 +125,7 @@ function confirm() {
                 :name="isSelected(sport) ? 'i-lucide-circle-check' : 'i-lucide-circle'"
                 class="size-4 shrink-0"
                 :class="isSelected(sport) ? 'text-primary' : 'text-white/30'"
+                aria-hidden="true"
               />
               <span class="text-sm font-medium"> {{ sport.icon }} {{ sport.name }} </span>
             </button>

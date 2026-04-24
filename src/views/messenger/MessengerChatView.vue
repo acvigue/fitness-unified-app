@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useMessengerStore } from '@/stores/messenger'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
+import { useToastStore } from '@/stores/toast'
 import { ENV } from '@/config/environment'
 import { getErrorMessage } from '@/lib/api/errors'
 import ChatSearchModal from '@/components/messenger/ChatSearchModal.vue'
@@ -34,6 +35,7 @@ const route = useRoute()
 const router = useRouter()
 const messengerStore = useMessengerStore()
 const orgStore = useOrganizationStore()
+const toast = useToastStore()
 const messageInput = ref('')
 const showSearchModal = ref(false)
 const showAnnouncementSettings = ref(false)
@@ -41,6 +43,8 @@ const messagesContainer = ref<HTMLElement | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const attachments = ref<PendingAttachment[]>([])
 const uploading = computed(() => attachments.value.some((a) => a.uploading))
+const messagesLoading = ref(false)
+const sending = ref(false)
 
 const chatId = computed(() => route.params.id as string)
 
@@ -50,7 +54,14 @@ watch(
     if (id) {
       messengerStore.setActiveChat(id)
       if (!messengerStore.messages.has(id)) {
-        await messengerStore.loadChatHistory(id)
+        messagesLoading.value = true
+        try {
+          await messengerStore.loadChatHistory(id)
+        } catch (e) {
+          toast.error('Failed to load messages', getErrorMessage(e, 'Please try again.'))
+        } finally {
+          messagesLoading.value = false
+        }
       }
     }
   },
@@ -203,7 +214,7 @@ async function handleFileSelect(event: Event) {
       const idx = attachments.value.findIndex((a) => a.id === id)
       if (idx !== -1)
         attachments.value[idx] = { ...attachments.value[idx], mediaId: media.id, uploading: false }
-    } catch {
+    } catch (e) {
       const idx = attachments.value.findIndex((a) => a.id === id)
       if (idx !== -1)
         attachments.value[idx] = {
@@ -211,6 +222,7 @@ async function handleFileSelect(event: Event) {
           error: 'Upload failed',
           uploading: false,
         }
+      toast.error('Upload failed', getErrorMessage(e, 'Failed to upload media'))
     }
   }
 
@@ -226,22 +238,31 @@ function removeAttachment(id: string) {
 }
 
 const canSend = computed(() => {
+  if (sending.value) return false
   const hasText = messageInput.value.trim().length > 0
   const hasMedia = attachments.value.some((a) => a.mediaId)
   const stillUploading = uploading.value
   return (hasText || hasMedia) && !stillUploading
 })
 
-function handleSubmit() {
+async function handleSubmit() {
   if (!canSend.value) return
   const mediaIds = attachments.value.filter((a) => a.mediaId).map((a) => a.mediaId!)
-  messengerStore.sendMessage(messageInput.value, mediaIds.length ? mediaIds : undefined)
-  messageInput.value = ''
-  attachments.value.forEach((a) => URL.revokeObjectURL(a.previewUrl))
-  attachments.value = []
-  if (typingTimeout) clearTimeout(typingTimeout)
-  if (chatId.value) messengerStore.emitTypingStop(chatId.value)
-  scrollToBottom()
+  const text = messageInput.value
+  sending.value = true
+  try {
+    await messengerStore.sendMessage(text, mediaIds.length ? mediaIds : undefined)
+    messageInput.value = ''
+    attachments.value.forEach((a) => URL.revokeObjectURL(a.previewUrl))
+    attachments.value = []
+    if (typingTimeout) clearTimeout(typingTimeout)
+    if (chatId.value) messengerStore.emitTypingStop(chatId.value)
+    scrollToBottom()
+  } catch (e) {
+    toast.error('Message failed to send', getErrorMessage(e, 'Please try again.'))
+  } finally {
+    sending.value = false
+  }
 }
 
 function isVideo(file: File) {
@@ -269,6 +290,7 @@ async function handleSearchSelect(hit: SearchMessageHit) {
       <RouterLink
         to="/messenger"
         class="lg:hidden text-white/70 hover:text-white transition-colors"
+        aria-label="Back to conversations"
       >
         <UIcon name="i-lucide-arrow-left" class="text-lg" />
       </RouterLink>
@@ -285,6 +307,8 @@ async function handleSearchSelect(hit: SearchMessageHit) {
         color="neutral"
         size="sm"
         square
+        title="View profile"
+        aria-label="View profile"
         @click="router.push({ path: `/profile/${otherUserId}`, query: { name: chatName } })"
       />
 
@@ -296,6 +320,7 @@ async function handleSearchSelect(hit: SearchMessageHit) {
         size="sm"
         square
         title="Channel settings"
+        aria-label="Channel settings"
         @click="showAnnouncementSettings = true"
       />
 
@@ -305,6 +330,8 @@ async function handleSearchSelect(hit: SearchMessageHit) {
         color="neutral"
         size="sm"
         square
+        title="Search messages"
+        aria-label="Search messages"
         @click="showSearchModal = true"
       />
     </div>
@@ -320,7 +347,23 @@ async function handleSearchSelect(hit: SearchMessageHit) {
 
     <!-- Messages area -->
     <div ref="messagesContainer" class="flex-1 min-h-0 overflow-y-auto">
+      <div
+        v-if="messagesLoading"
+        class="flex items-center justify-center py-8 text-white/40"
+        role="status"
+      >
+        <UIcon name="i-lucide-loader-2" class="size-5 animate-spin" aria-label="Loading messages" />
+      </div>
+      <div
+        v-else-if="!chatMessages.length"
+        class="flex flex-col items-center justify-center gap-2 py-12 text-white/40"
+      >
+        <UIcon name="i-lucide-message-square" class="size-8" aria-hidden="true" />
+        <p class="text-sm">No messages yet</p>
+        <p v-if="canSendInChat" class="text-xs">Say hello to get started.</p>
+      </div>
       <UChatMessages
+        v-else
         :messages="chatMessages"
         :user="{ side: 'right', variant: 'soft' }"
         :assistant="{ side: 'left', variant: 'soft' }"
@@ -383,7 +426,12 @@ async function handleSearchSelect(hit: SearchMessageHit) {
           class="relative shrink-0 size-16 rounded-lg overflow-hidden bg-white/5"
         >
           <video v-if="isVideo(att.file)" :src="att.previewUrl" class="size-full object-cover" />
-          <img v-else :src="att.previewUrl" class="size-full object-cover" />
+          <img
+            v-else
+            :src="att.previewUrl"
+            :alt="att.file.name || 'Attachment preview'"
+            class="size-full object-cover"
+          />
           <div
             v-if="att.uploading"
             class="absolute inset-0 flex items-center justify-center bg-black/50"
@@ -397,7 +445,9 @@ async function handleSearchSelect(hit: SearchMessageHit) {
             <UIcon name="i-lucide-alert-circle" class="size-4 text-red-400" />
           </div>
           <button
+            type="button"
             class="absolute top-0.5 right-0.5 size-4 rounded-full bg-black/60 flex items-center justify-center"
+            aria-label="Remove attachment"
             @click="removeAttachment(att.id)"
           >
             <UIcon name="i-lucide-x" class="size-2.5" />
@@ -421,6 +471,8 @@ async function handleSearchSelect(hit: SearchMessageHit) {
           color="neutral"
           size="sm"
           square
+          title="Attach media"
+          aria-label="Attach media"
           @click="openFilePicker"
         />
         <UTextarea
@@ -430,6 +482,7 @@ async function handleSearchSelect(hit: SearchMessageHit) {
           :rows="1"
           :maxrows="4"
           class="flex-1"
+          :aria-label="t('messenger.typemessage')"
           @update:model-value="onInputChange"
           @keydown.enter.exact.prevent="handleSubmit"
         />
@@ -439,7 +492,10 @@ async function handleSearchSelect(hit: SearchMessageHit) {
           :color="canSend ? 'primary' : 'neutral'"
           size="sm"
           square
+          :loading="sending"
           :disabled="!canSend"
+          title="Send message"
+          aria-label="Send message"
           @click="handleSubmit"
         />
       </div>

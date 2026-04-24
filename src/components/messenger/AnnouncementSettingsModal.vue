@@ -3,6 +3,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
+import { useToastStore } from '@/stores/toast'
 import type { components } from '@/types/api'
 
 type OrgRole = 'MEMBER' | 'STAFF' | 'ADMIN'
@@ -20,6 +21,7 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { default: false })
 
 const router = useRouter()
+const toast = useToastStore()
 
 const form = reactive({
   name: '',
@@ -28,6 +30,7 @@ const form = reactive({
 const saving = ref(false)
 const deleting = ref(false)
 const error = ref('')
+const showDeleteConfirm = ref(false)
 
 const roleOptions: { label: string; value: OrgRole }[] = [
   { label: 'Admins', value: 'ADMIN' },
@@ -69,20 +72,28 @@ async function save() {
       },
     })
     if (apiError) {
-      error.value = getErrorMessage(apiError, 'Failed to update channel')
+      const msg = getErrorMessage(apiError, 'Failed to update channel')
+      error.value = msg
+      toast.error('Update failed', msg)
       return
     }
     emit('updated', data)
+    toast.success('Channel updated')
     open.value = false
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Failed to update channel'
+    const msg = getErrorMessage(e, 'Failed to update channel')
+    error.value = msg
+    toast.error('Update failed', msg)
   } finally {
     saving.value = false
   }
 }
 
-async function remove() {
-  if (!window.confirm('Delete this announcement channel? This cannot be undone.')) return
+function requestDelete() {
+  showDeleteConfirm.value = true
+}
+
+async function confirmDelete() {
   deleting.value = true
   error.value = ''
   try {
@@ -90,14 +101,20 @@ async function remove() {
       params: { path: { chatId: props.chat.id } },
     })
     if (apiError) {
-      error.value = getErrorMessage(apiError, 'Failed to delete channel')
+      const msg = getErrorMessage(apiError, 'Failed to delete channel')
+      error.value = msg
+      toast.error('Delete failed', msg)
       return
     }
     emit('deleted', props.chat.id)
+    toast.success('Channel deleted')
+    showDeleteConfirm.value = false
     open.value = false
     router.push('/messenger')
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Failed to delete channel'
+    const msg = getErrorMessage(e, 'Failed to delete channel')
+    error.value = msg
+    toast.error('Delete failed', msg)
   } finally {
     deleting.value = false
   }
@@ -113,7 +130,7 @@ async function remove() {
         <UAlert v-if="error" color="error" :title="error" icon="i-lucide-circle-alert" />
 
         <UFormField label="Channel name">
-          <UInput v-model="form.name" />
+          <UInput v-model="form.name" autofocus />
         </UFormField>
 
         <UFormField label="Who can post?">
@@ -124,6 +141,7 @@ async function remove() {
               size="sm"
               :variant="form.writeRoles.includes(r.value) ? 'solid' : 'outline'"
               :color="form.writeRoles.includes(r.value) ? 'primary' : 'neutral'"
+              :aria-pressed="form.writeRoles.includes(r.value)"
               @click="toggleRole(r.value)"
             >
               {{ r.label }}
@@ -140,9 +158,41 @@ async function remove() {
             variant="soft"
             icon="i-lucide-trash-2"
             :loading="deleting"
-            @click="remove"
+            :disabled="deleting"
+            @click="requestDelete"
           >
             Delete
+          </UButton>
+        </div>
+      </div>
+    </template>
+  </UModal>
+
+  <UModal v-model:open="showDeleteConfirm">
+    <template #content>
+      <div class="p-6 flex flex-col gap-4">
+        <div class="flex items-start gap-3">
+          <div class="shrink-0 size-10 rounded-full bg-red-500/15 flex items-center justify-center">
+            <UIcon name="i-lucide-triangle-alert" class="text-red-400 size-5" />
+          </div>
+          <div class="flex-1">
+            <h3 class="text-base font-semibold">Delete announcement channel?</h3>
+            <p class="text-sm text-white/60 mt-1">
+              This permanently removes the channel and all its messages. This cannot be undone.
+            </p>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <UButton
+            variant="ghost"
+            color="neutral"
+            :disabled="deleting"
+            @click="showDeleteConfirm = false"
+          >
+            Cancel
+          </UButton>
+          <UButton color="error" :loading="deleting" @click="confirmDelete">
+            Delete channel
           </UButton>
         </div>
       </div>

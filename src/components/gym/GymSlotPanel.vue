@@ -82,17 +82,45 @@ function statusTone(status: Slot['status']) {
   }
 }
 
-async function updateStatus(slot: Slot, newStatus: 'AVAILABLE' | 'RESERVED' | 'CLOSED') {
+const closeConfirmOpen = ref(false)
+const closeConfirmLoading = ref(false)
+const pendingCloseSlot = ref<Slot | null>(null)
+
+async function performStatusUpdate(slot: Slot, newStatus: 'AVAILABLE' | 'RESERVED' | 'CLOSED') {
   const { error: err } = await apiClient.PATCH('/v1/gyms/{id}/slots/{slotId}/status', {
     params: { path: { id: props.gymId, slotId: slot.id } },
     body: { status: newStatus },
   })
   if (err) {
     toast.error('Could not update slot', getErrorMessage(err, 'Failed to update slot'))
-    return
+    return false
   }
   toast.success('Slot updated', 'Watchers will be notified.')
   await load()
+  return true
+}
+
+async function updateStatus(slot: Slot, newStatus: 'AVAILABLE' | 'RESERVED' | 'CLOSED') {
+  if (newStatus === 'CLOSED') {
+    pendingCloseSlot.value = slot
+    closeConfirmOpen.value = true
+    return
+  }
+  await performStatusUpdate(slot, newStatus)
+}
+
+async function confirmCloseSlot() {
+  if (!pendingCloseSlot.value) return
+  closeConfirmLoading.value = true
+  try {
+    const ok = await performStatusUpdate(pendingCloseSlot.value, 'CLOSED')
+    if (ok) {
+      closeConfirmOpen.value = false
+      pendingCloseSlot.value = null
+    }
+  } finally {
+    closeConfirmLoading.value = false
+  }
 }
 
 watch(
@@ -116,6 +144,7 @@ watch(
             variant="outline"
             color="neutral"
             icon="i-lucide-chevron-left"
+            aria-label="Previous day"
             @click="dayOffset -= 1"
           />
           <UButton size="xs" variant="outline" color="neutral" @click="dayOffset = 0">
@@ -126,6 +155,7 @@ watch(
             variant="outline"
             color="neutral"
             icon="i-lucide-chevron-right"
+            aria-label="Next day"
             @click="dayOffset += 1"
           />
         </div>
@@ -145,15 +175,20 @@ watch(
 
       <UAlert v-if="error" color="error" :title="error" icon="i-lucide-circle-alert" />
 
-      <div v-if="loading" class="flex justify-center p-4">
-        <UIcon name="i-lucide-loader-2" class="animate-spin text-white/40 size-6" />
+      <div v-if="loading" class="flex flex-col gap-2">
+        <div
+          v-for="n in 4"
+          :key="n"
+          class="h-12 rounded-lg border border-white/10 bg-white/5 animate-pulse"
+        />
       </div>
 
       <div
         v-else-if="slots.length === 0"
-        class="rounded-lg border border-dashed border-white/10 p-6 text-center text-sm text-white/50"
+        class="flex flex-col items-center gap-1 rounded-lg border border-dashed border-white/10 p-6 text-center"
       >
-        No slots for this window.
+        <UIcon name="i-lucide-calendar-x" class="size-6 text-white/40" />
+        <p class="text-sm text-white/60">No slots for this window.</p>
       </div>
 
       <ul v-else class="flex flex-col gap-2">
@@ -193,11 +228,48 @@ watch(
                 ],
               ]"
             >
-              <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-more-horizontal" />
+              <UButton
+                size="xs"
+                variant="ghost"
+                color="neutral"
+                icon="i-lucide-more-horizontal"
+                aria-label="Slot actions"
+              />
             </UDropdown>
           </div>
         </li>
       </ul>
     </div>
+
+    <UModal v-model:open="closeConfirmOpen" :dismissible="!closeConfirmLoading">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="flex items-start gap-3">
+            <div class="rounded-full bg-error/10 p-2 shrink-0">
+              <UIcon name="i-lucide-ban" class="size-5 text-error" />
+            </div>
+            <div class="flex flex-col gap-1 min-w-0">
+              <h2 class="text-lg font-semibold">Close this slot?</h2>
+              <p class="text-sm text-white/60">
+                Watchers will be notified that this slot is closed.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-2 justify-end">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              :disabled="closeConfirmLoading"
+              @click="closeConfirmOpen = false"
+            >
+              Cancel
+            </UButton>
+            <UButton color="error" :loading="closeConfirmLoading" @click="confirmCloseSlot">
+              Close slot
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </UCard>
 </template>

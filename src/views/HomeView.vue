@@ -9,13 +9,26 @@
             integration. Start building your app by modifying this home view.
           </p>
           <div class="flex justify-center gap-3 pt-4" ref="docref">
-            <UButton icon="i-lucide-book-open" variant="soft" @click="openDocs">
+            <UButton
+              icon="i-lucide-book-open"
+              variant="soft"
+              aria-label="Open documentation"
+              @click="openDocs"
+            >
               Documentation
             </UButton>
-            <UButton icon="i-lucide-book-open" variant="soft" @click="openGuide"> Guide </UButton>
+            <UButton
+              icon="i-lucide-compass"
+              variant="soft"
+              aria-label="Start app guide"
+              @click="openGuide"
+            >
+              Guide
+            </UButton>
             <UButton
               icon="i-lucide-settings"
               variant="soft"
+              aria-label="Open settings"
               @click="openSettings"
               ref="settingsref"
             >
@@ -23,6 +36,35 @@
             </UButton>
           </div>
         </div>
+      </div>
+
+      <!-- Activity feed empty state -->
+      <div
+        class="rounded-lg border border-white/10 bg-white/5 p-8 text-center flex flex-col items-center gap-3"
+      >
+        <UIcon name="i-lucide-activity" class="size-8 text-white/40" />
+        <p class="text-sm font-medium">No activity yet</p>
+        <p class="text-xs text-white/60 max-w-sm">
+          Follow friends or join a team to see their workouts and tournaments here.
+        </p>
+      </div>
+
+      <!-- Workouts empty state -->
+      <div
+        class="rounded-lg border border-white/10 bg-white/5 p-8 text-center flex flex-col items-center gap-3"
+      >
+        <UIcon name="i-lucide-dumbbell" class="size-8 text-white/40" />
+        <p class="text-sm font-medium">No workouts logged</p>
+        <p class="text-xs text-white/60 max-w-sm">Log your first workout to get started.</p>
+        <UButton
+          size="sm"
+          color="primary"
+          variant="soft"
+          icon="i-lucide-plus"
+          @click="openWorkouts"
+        >
+          Go to workouts
+        </UButton>
       </div>
     </section>
   </PageLayout>
@@ -61,6 +103,9 @@ const openDocs = () => {
 
 const openSettings = () => {
   router.push('/settings')
+}
+const openWorkouts = () => {
+  router.push('/workouts')
 }
 const openGuide = () => {
   tour.start()

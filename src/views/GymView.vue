@@ -55,7 +55,13 @@ async function loadGyms() {
 onMounted(() => {
   setHeader({
     title: 'Gyms',
-    actions: [{ icon: 'i-lucide-plus', onClick: () => router.push('/gyms/create') }],
+    actions: [
+      {
+        icon: 'i-lucide-plus',
+        label: 'Create gym',
+        onClick: () => router.push('/gyms/create'),
+      },
+    ],
   })
   loadGyms()
 })
@@ -66,15 +72,22 @@ onMounted(() => {
     <section class="flex flex-col gap-5 px-5 py-6">
       <UAlert v-if="error" color="error" :title="error" icon="i-lucide-circle-alert" />
 
-      <div v-if="loading" class="flex justify-center p-8">
-        <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-8" />
+      <div v-if="loading" class="flex flex-col gap-3">
+        <div class="h-16 rounded-lg border border-white/10 bg-white/5 animate-pulse" />
+        <div class="h-28 rounded-lg border border-white/10 bg-white/5 animate-pulse" />
+        <div class="h-40 rounded-lg border border-white/10 bg-white/5 animate-pulse" />
       </div>
 
       <div
         v-else-if="gyms.length === 0"
-        class="rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
+        class="flex flex-col items-center gap-2 rounded-lg border border-dashed border-white/10 p-8 text-center"
       >
-        No gyms available yet.
+        <UIcon name="i-lucide-dumbbell" class="size-8 text-white/40" />
+        <p class="text-sm font-medium text-white/70">No gyms found</p>
+        <p class="text-xs text-white/50">Be the first to add a gym for your organization.</p>
+        <UButton class="mt-2" icon="i-lucide-plus" size="sm" @click="router.push('/gyms/create')">
+          Create a gym
+        </UButton>
       </div>
 
       <template v-else>

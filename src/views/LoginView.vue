@@ -27,11 +27,14 @@
           size="xl"
           color="primary"
           block
-          trailing-icon="i-lucide-arrow-right"
+          :trailing-icon="isAuthorizing ? undefined : 'i-lucide-arrow-right'"
           :loading="isAuthorizing"
+          :disabled="isAuthorizing"
+          :aria-label="isAuthorizing ? 'Signing you in' : t('login.getstarted')"
+          class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900"
           @click="startLogin"
         >
-          {{ t('login.getstarted') }}
+          {{ isAuthorizing ? t('login.error.wait') : t('login.getstarted') }}
         </UButton>
       </div>
     </div>
@@ -45,6 +48,8 @@ import { useHead } from '@unhead/vue'
 import FullPageLayout from '@/layouts/FullPageLayout.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { LOGIN_DEFAULT_REDIRECT, LOGIN_REDIRECT_STORAGE_KEY } from '@/stores/auth/constants'
+import { getErrorMessage } from '@/lib/api/errors'
+import { useToastStore } from '@/stores/toast'
 import logoUrl from '@/assets/images/logo_dark.png'
 const loginBgImage = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1080&q=80'
 
@@ -58,6 +63,7 @@ useHead({
 const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
+const toast = useToastStore()
 
 const backgroundUrl = loginBgImage
 
@@ -82,8 +88,13 @@ const startLogin = async () => {
   if (isAuthorizing.value) return
   isAuthorizing.value = true
   persistRedirectTarget()
-  await authStore.beginAuthentication()
-  isAuthorizing.value = false
+  try {
+    await authStore.beginAuthentication()
+  } catch (error: unknown) {
+    toast.error('Sign in failed', getErrorMessage(error, 'Please try again.'))
+  } finally {
+    isAuthorizing.value = false
+  }
 }
 
 watch(

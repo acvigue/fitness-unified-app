@@ -39,6 +39,17 @@ useHead({
   <AppLayout>
     <Suspense>
       <RouterView />
+      <template #fallback>
+        <div
+          class="flex-1 flex items-center justify-center"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <UIcon name="i-lucide-loader-2" class="text-2xl text-white/50 animate-spin" />
+          <span class="sr-only">Loading</span>
+        </div>
+      </template>
     </Suspense>
   </AppLayout>
   <OrganizationSetupModal v-if="showOrgSetup" />

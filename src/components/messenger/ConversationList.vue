@@ -5,6 +5,10 @@ import ConversationItem from './ConversationItem.vue'
 import { useMessengerStore } from '@/stores/messenger'
 import type { ConversationSummary } from '@/stores/messenger'
 
+const emit = defineEmits<{
+  'start-chat': []
+}>()
+
 const { t } = useI18n()
 const route = useRoute()
 const messengerStore = useMessengerStore()
@@ -39,15 +43,34 @@ function formatTimestamp(isoString: string): string {
   <div class="flex flex-col h-full overflow-y-auto">
     <!-- Loading state -->
     <div v-if="messengerStore.loading" class="flex justify-center py-8">
-      <UIcon name="i-lucide-loader-2" class="text-xl text-white/40 animate-spin" />
+      <UIcon
+        name="i-lucide-loader-2"
+        class="text-xl text-white/40 animate-spin"
+        aria-label="Loading conversations"
+      />
     </div>
 
     <!-- Empty state -->
     <div
       v-else-if="messengerStore.sortedConversations.length === 0"
-      class="flex-1 flex items-center justify-center text-white/30 py-8"
+      class="flex-1 flex flex-col items-center justify-center text-center gap-3 px-6 py-10"
     >
-      <p class="text-sm">{{ t('messenger.noconversations') }}</p>
+      <div class="size-12 rounded-full bg-white/5 flex items-center justify-center text-white/40">
+        <UIcon name="i-lucide-message-circle" class="size-6" />
+      </div>
+      <div>
+        <p class="text-sm font-medium text-white/70">{{ t('messenger.noconversations') }}</p>
+        <p class="text-xs text-white/40 mt-1">Start a chat to connect with someone.</p>
+      </div>
+      <UButton
+        size="sm"
+        icon="i-lucide-square-pen"
+        color="primary"
+        variant="soft"
+        @click="emit('start-chat')"
+      >
+        Start a chat
+      </UButton>
     </div>
 
     <!-- Conversation list -->

@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { apiClient } from '@/lib/api/client'
+import { getErrorMessage } from '@/lib/api/errors'
 import { useOrganizationStore } from '@/stores/organization'
+import { useToastStore } from '@/stores/toast'
 import type { components } from '@/types/api'
 
 type OrganizationResponseDto = components['schemas']['OrganizationResponseDto']
 
 const orgStore = useOrganizationStore()
+const toast = useToastStore()
 
 const activeTab = ref<'create' | 'join'>('create')
 
@@ -28,7 +31,7 @@ async function loadOrganizations() {
       params: { query: { per_page: 50, page: 1 } },
     })
     if (error) {
-      console.error('Failed to load organizations:', error)
+      toast.error('Failed to load organizations', getErrorMessage(error, 'Please try again.'))
       return
     }
     organizations.value = data.data ?? []
@@ -43,8 +46,9 @@ async function handleCreate() {
   createError.value = ''
   try {
     await orgStore.createOrganization(newOrgName.value.trim())
-  } catch {
-    createError.value = 'Failed to create organization. Please try again.'
+  } catch (err) {
+    createError.value = getErrorMessage(err, 'Failed to create organization. Please try again.')
+    toast.error('Could not create organization', createError.value)
   } finally {
     createLoading.value = false
   }
@@ -55,8 +59,9 @@ async function handleJoin(id: string) {
   joinError.value = ''
   try {
     await orgStore.joinOrganization(id)
-  } catch {
-    joinError.value = 'Failed to join organization. Please try again.'
+  } catch (err) {
+    joinError.value = getErrorMessage(err, 'Failed to join organization. Please try again.')
+    toast.error('Could not join organization', joinError.value)
   } finally {
     joiningId.value = null
   }
@@ -75,14 +80,24 @@ onMounted(() => {
           <UIcon
             name="i-lucide-building-2"
             class="text-3xl text-[var(--ui-color-primary-500)] mb-2"
+            aria-hidden="true"
           />
           <h2 class="text-lg font-semibold">Welcome to FitTime</h2>
           <p class="text-sm text-white/50 mt-1">Join or create an organization to get started.</p>
         </div>
 
         <!-- Tabs -->
-        <div class="flex gap-1 mb-5 rounded-lg bg-white/5 p-1">
+        <div
+          role="tablist"
+          aria-label="Organization setup"
+          class="flex gap-1 mb-5 rounded-lg bg-white/5 p-1"
+        >
           <button
+            id="org-tab-create"
+            type="button"
+            role="tab"
+            :aria-selected="activeTab === 'create'"
+            aria-controls="org-panel-create"
             class="flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors"
             :class="
               activeTab === 'create'
@@ -94,6 +109,11 @@ onMounted(() => {
             Create New
           </button>
           <button
+            id="org-tab-join"
+            type="button"
+            role="tab"
+            :aria-selected="activeTab === 'join'"
+            aria-controls="org-panel-join"
             class="flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors"
             :class="
               activeTab === 'join'
@@ -107,7 +127,13 @@ onMounted(() => {
         </div>
 
         <!-- Create tab -->
-        <div v-if="activeTab === 'create'" class="space-y-4">
+        <div
+          v-if="activeTab === 'create'"
+          id="org-panel-create"
+          role="tabpanel"
+          aria-labelledby="org-tab-create"
+          class="space-y-4"
+        >
           <UFormField label="Organization name">
             <UInput
               v-model="newOrgName"
@@ -115,7 +141,7 @@ onMounted(() => {
               @keydown.enter="handleCreate"
             />
           </UFormField>
-          <p v-if="createError" class="text-xs text-red-400">{{ createError }}</p>
+          <p v-if="createError" role="alert" class="text-xs text-red-400">{{ createError }}</p>
           <UButton
             block
             :loading="createLoading"
@@ -127,9 +153,20 @@ onMounted(() => {
         </div>
 
         <!-- Join tab -->
-        <div v-else class="space-y-3">
-          <div v-if="orgsLoading" class="flex justify-center py-8">
-            <UIcon name="i-lucide-loader-2" class="text-xl text-white/40 animate-spin" />
+        <div
+          v-else
+          id="org-panel-join"
+          role="tabpanel"
+          aria-labelledby="org-tab-join"
+          class="space-y-3"
+        >
+          <div v-if="orgsLoading" class="flex justify-center py-8" role="status" aria-live="polite">
+            <UIcon
+              name="i-lucide-loader-2"
+              class="text-xl text-white/40 animate-spin"
+              aria-hidden="true"
+            />
+            <span class="sr-only">Loading organizations</span>
           </div>
 
           <div
@@ -139,8 +176,8 @@ onMounted(() => {
             No organizations available to join.
           </div>
 
-          <div v-else class="max-h-64 overflow-y-auto space-y-2">
-            <div
+          <ul v-else class="max-h-64 overflow-y-auto space-y-2">
+            <li
               v-for="org in organizations"
               :key="org.id"
               class="flex items-center justify-between gap-3 p-3 rounded-lg bg-white/5 border border-white/10"
@@ -155,14 +192,15 @@ onMounted(() => {
                 size="sm"
                 :loading="joiningId === org.id"
                 :disabled="joiningId !== null"
+                :aria-label="`Join ${org.name}`"
                 @click="handleJoin(org.id)"
               >
                 Join
               </UButton>
-            </div>
-          </div>
+            </li>
+          </ul>
 
-          <p v-if="joinError" class="text-xs text-red-400">{{ joinError }}</p>
+          <p v-if="joinError" role="alert" class="text-xs text-red-400">{{ joinError }}</p>
         </div>
       </div>
     </template>

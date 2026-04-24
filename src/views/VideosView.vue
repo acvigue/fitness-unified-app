@@ -85,7 +85,13 @@ function sportLabel(sportId: string) {
 onMounted(() => {
   setHeader({
     title: 'Videos',
-    actions: [{ icon: 'i-lucide-plus', onClick: () => router.push('/videos/create') }],
+    actions: [
+      {
+        icon: 'i-lucide-plus',
+        label: 'Upload video',
+        onClick: () => router.push('/videos/create'),
+      },
+    ],
   })
   loadSports()
   loadVideos()
@@ -108,7 +114,12 @@ onMounted(() => {
               @update:model-value="applyFilters"
             />
           </UFormField>
-          <UButton icon="i-lucide-search" :loading="loading" @click="applyFilters">
+          <UButton
+            icon="i-lucide-search"
+            :loading="loading"
+            aria-label="Apply filters"
+            @click="applyFilters"
+          >
             Search
           </UButton>
         </div>
@@ -125,8 +136,17 @@ onMounted(() => {
       />
 
       <!-- Loading -->
-      <div v-if="loading" class="flex justify-center p-8">
-        <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-8" />
+      <div v-if="loading" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-busy="true">
+        <div
+          v-for="n in 6"
+          :key="n"
+          class="rounded-lg border border-white/10 bg-white/5 p-4 animate-pulse"
+        >
+          <div class="h-4 w-3/4 rounded bg-white/10" />
+          <div class="mt-2 h-3 w-full rounded bg-white/10" />
+          <div class="mt-1 h-3 w-2/3 rounded bg-white/10" />
+          <div class="mt-3 h-3 w-1/3 rounded bg-white/10" />
+        </div>
       </div>
 
       <!-- Empty -->
@@ -134,7 +154,14 @@ onMounted(() => {
         v-else-if="videos.length === 0"
         class="rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
       >
-        No videos found. Try adjusting your filters.
+        <UIcon name="i-lucide-video-off" class="size-8 mx-auto mb-2 text-white/30" />
+        <p>
+          {{
+            filterSportId !== 'all'
+              ? 'No videos match this sport filter.'
+              : 'No videos uploaded yet — share your first highlight!'
+          }}
+        </p>
       </div>
 
       <!-- Video Cards -->
