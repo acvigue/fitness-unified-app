@@ -240,6 +240,48 @@ async function generateBracket() {
   }
 }
 
+const seedingBracket = ref(false)
+
+const canSeedBracket = computed(
+  () =>
+    isOrgManager.value &&
+    tournament.value &&
+    isRoundRobin.value &&
+    bracket.value &&
+    bracket.value.rounds.every((round) =>
+      round.matches.every((match) => match.status === 'COMPLETED' || match.status === 'BYE')
+    )
+)
+
+async function seedBracket() {
+  if (!canSeedBracket.value) return
+  if (
+    !confirm(
+      'Seed single-elimination bracket from current standings? This removes round-robin matches.'
+    )
+  ) {
+    return
+  }
+  seedingBracket.value = true
+  actionError.value = ''
+  try {
+    const { error: err } = await apiClient.POST('/v1/tournaments/{id}/seed-bracket', {
+      params: { path: { id: tournamentId.value } },
+    })
+    if (err) {
+      actionError.value = getErrorMessage(err, 'Failed to seed bracket')
+      return
+    }
+    actionMessage.value = 'Bracket seeded from standings.'
+    await loadTournament()
+    await loadBracket()
+  } catch (e) {
+    actionError.value = e instanceof Error ? e.message : 'Failed to seed bracket'
+  } finally {
+    seedingBracket.value = false
+  }
+}
+
 function openRecordResult(match: TournamentMatchDto) {
   selectedMatch.value = match
   resultForm.value = { team1Score: 0, team2Score: 0 }
@@ -530,16 +572,29 @@ onUnmounted(() => {
             <div>
               <p class="text-xs uppercase tracking-[0.3em] text-white/60">Standings</p>
             </div>
-            <UButton
-              size="xs"
-              variant="ghost"
-              color="neutral"
-              icon="i-lucide-refresh-cw"
-              :loading="standingsLoading"
-              @click="loadStandings"
-            >
-              Refresh
-            </UButton>
+            <div class="flex items-center gap-2">
+              <UButton
+                v-if="canSeedBracket"
+                size="xs"
+                color="primary"
+                variant="soft"
+                icon="i-lucide-git-branch"
+                :loading="seedingBracket"
+                @click="seedBracket"
+              >
+                Seed bracket
+              </UButton>
+              <UButton
+                size="xs"
+                variant="ghost"
+                color="neutral"
+                icon="i-lucide-refresh-cw"
+                :loading="standingsLoading"
+                @click="loadStandings"
+              >
+                Refresh
+              </UButton>
+            </div>
           </div>
 
           <div class="overflow-x-auto -mx-1">

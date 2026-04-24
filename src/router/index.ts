@@ -30,6 +30,8 @@ import GymView from '@/views/GymView.vue'
 import GymCreateView from '@/views/GymCreateView.vue'
 import BlockedUsersView from '@/views/BlockedUsersView.vue'
 import MyReportsView from '@/views/MyReportsView.vue'
+import ReminderPreferencesView from '@/views/ReminderPreferencesView.vue'
+import GymSubscriptionsView from '@/views/GymSubscriptionsView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 import ProfileCompareView from "@/views/ProfileCompareView.vue";
@@ -205,6 +207,16 @@ const router = createRouter({
       path: '/settings/my-reports',
       name: 'my-reports',
       component: MyReportsView,
+    },
+    {
+      path: '/settings/reminder-preferences',
+      name: 'reminder-preferences',
+      component: ReminderPreferencesView,
+    },
+    {
+      path: '/settings/gym-subscriptions',
+      name: 'gym-subscriptions',
+      component: GymSubscriptionsView,
     },
   ],
 })
