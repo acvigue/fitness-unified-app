@@ -8,7 +8,6 @@ import MessengerView from '@/views/messenger/MessengerView.vue'
 import WorkoutsView from '@/views/WorkoutsView.vue'
 import ReportView from '@/views/ReportView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import UserReportView from '@/views/UserReportView.vue'
 import UserProfileView from '@/views/UserProfileView.vue'
 import TeamView from '@/views/TeamView.vue'
 import TournamentsView from '@/views/TournamentsView.vue'
@@ -30,6 +29,7 @@ import VideoCreateView from '@/views/VideoCreateView.vue'
 import GymView from '@/views/GymView.vue'
 import GymCreateView from '@/views/GymCreateView.vue'
 import BlockedUsersView from '@/views/BlockedUsersView.vue'
+import MyReportsView from '@/views/MyReportsView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 import ProfileCompareView from "@/views/ProfileCompareView.vue";
@@ -200,6 +200,11 @@ const router = createRouter({
       path: '/settings/blocked-users',
       name: 'blocked-users',
       component: BlockedUsersView,
+    },
+    {
+      path: '/settings/my-reports',
+      name: 'my-reports',
+      component: MyReportsView,
     },
   ],
 })

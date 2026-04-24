@@ -6,14 +6,12 @@ import UserLink from '@/components/UserLink.vue'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/types/api'
-import { useAuthStore } from '@/stores/auth/auth'
 import { useI18n } from 'vue-i18n'
 
 type Report = components['schemas']['ReportResponseDto']
 type UserLookupItem = components['schemas']['UserLookupItemDto']
 
 const { t } = useI18n()
-const authStore = useAuthStore()
 const { setHeader } = usePageHeader()
 
 // Reports list
@@ -95,15 +93,10 @@ async function submitReport() {
   showSuccess.value = false
 
   try {
-    const reporterId = authStore.user?.sub ?? ''
-    const now = new Date()
     const { error: submitError } = await apiClient.POST('/v1/report', {
       body: {
-        reporterId,
         reportedId: selectedUser.value.id,
         reason: reason.value.trim(),
-        status: 'PENDING',
-        createdAt: now.toISOString(),
       },
     })
     if (submitError) throw new Error(getErrorMessage(submitError, 'Failed to submit report'))
