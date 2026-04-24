@@ -68,7 +68,11 @@ async function loadTeams() {
   loadingTeams.value = true
   setMessages()
   try {
-    const { data, error } = await apiClient.GET('/v1/teams')
+    const query: Record<string, string> = {}
+    if (teamSearch.value.trim()) query.q = teamSearch.value.trim()
+    const { data, error } = await apiClient.GET('/v1/teams', {
+      params: { query: Object.keys(query).length > 0 ? query : undefined },
+    })
     if (error) {
       setMessages('', getErrorMessage(error, 'Failed to load teams'))
       return
@@ -79,6 +83,14 @@ async function loadTeams() {
   } finally {
     loadingTeams.value = false
   }
+}
+
+const teamSearch = ref('')
+let searchDebounce: ReturnType<typeof setTimeout> | null = null
+
+function onSearchInput() {
+  if (searchDebounce) clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(() => loadTeams(), 300)
 }
 
 async function loadMyInvitations() {
@@ -269,6 +281,14 @@ onMounted(async () => {
             @click="loadTeams"
           />
         </div>
+
+        <UInput
+          v-model="teamSearch"
+          icon="i-lucide-search"
+          placeholder="Search teams by name"
+          class="mb-3 w-full"
+          @update:model-value="onSearchInput"
+        />
 
         <div v-if="loadingTeams" class="flex justify-center p-8">
           <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-8" />

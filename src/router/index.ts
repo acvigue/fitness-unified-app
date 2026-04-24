@@ -32,6 +32,7 @@ import BlockedUsersView from '@/views/BlockedUsersView.vue'
 import MyReportsView from '@/views/MyReportsView.vue'
 import ReminderPreferencesView from '@/views/ReminderPreferencesView.vue'
 import GymSubscriptionsView from '@/views/GymSubscriptionsView.vue'
+import TeamBroadcastsView from '@/views/TeamBroadcastsView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 import ProfileCompareView from "@/views/ProfileCompareView.vue";
@@ -78,6 +79,11 @@ const router = createRouter({
       path: '/teams/:id/meetups',
       name: 'team-meetups',
       component: TeamMeetupsView,
+    },
+    {
+      path: '/teams/:id/broadcasts',
+      name: 'team-broadcasts',
+      component: TeamBroadcastsView,
     },
     {
       path: '/teams/:id/blocks',
