@@ -105,9 +105,7 @@ watch(teamId, load)
               autoresize
             />
             <div class="flex items-center justify-end gap-2">
-              <UButton variant="ghost" color="neutral" @click="composing = false">
-                Cancel
-              </UButton>
+              <UButton variant="ghost" color="neutral" @click="composing = false"> Cancel </UButton>
               <UButton
                 color="primary"
                 :loading="sending"

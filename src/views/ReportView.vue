@@ -104,8 +104,8 @@ async function submitReport() {
     selectedUser.value = null
     reason.value = ''
     loadReports()
-  } catch (err: any) {
-    error.value = err.message || t('report.error')
+  } catch (err: unknown) {
+    error.value = err instanceof Error ? err.message : t('report.error')
   } finally {
     submitting.value = false
   }

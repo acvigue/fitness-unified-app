@@ -1,9 +1,19 @@
-// @ts-nocheck - AppSchemaDto/AppSchemaVisibilityDto removed from API types
+// Local type definitions — AppSchemaDto/AppSchemaVisibilityDto were removed from API types
 import { ref, watch, type Ref } from 'vue'
-import type { components } from '@/types/api'
 
-type AppSchemaField = components['schemas']['AppSchemaDto']['schema'][number]
-type AppSchemaVisibility = components['schemas']['AppSchemaVisibilityDto']
+interface AppSchemaField {
+  id: string
+  type: string
+  default?: unknown
+  source?: string
+}
+
+interface AppSchemaVisibility {
+  variable: string
+  value: unknown
+  condition: 'equal' | 'not_equal'
+  type: 'invisible' | 'disabled'
+}
 
 export interface VisibilityState {
   visible: boolean

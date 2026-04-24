@@ -149,10 +149,7 @@ onMounted(async () => {
         </UButton>
       </div>
 
-      <div
-        v-if="blockStore.loading && !blocks.length"
-        class="flex justify-center p-8"
-      >
+      <div v-if="blockStore.loading && !blocks.length" class="flex justify-center p-8">
         <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-8" />
       </div>
 

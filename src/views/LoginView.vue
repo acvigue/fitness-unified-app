@@ -78,7 +78,7 @@ const persistRedirectTarget = () => {
   sessionStorage.setItem(LOGIN_REDIRECT_STORAGE_KEY, redirectTarget.value)
 }
 
-const startLogin = async (_event?: MouseEvent) => {
+const startLogin = async () => {
   if (isAuthorizing.value) return
   isAuthorizing.value = true
   persistRedirectTarget()

@@ -29,19 +29,19 @@ const sports = ref<Sport[]>([])
 const filterSportId = ref('all')
 const page = ref(1)
 
-
 async function loadVideos() {
   loading.value = true
   error.value = ''
   try {
-    const query: Record<string, unknown> = {
+    type VideosQuery = { page?: number; per_page?: number; sportId?: string }
+    const query: VideosQuery = {
       page: page.value,
       per_page: 12,
     }
     if (filterSportId.value && filterSportId.value !== 'all') query.sportId = filterSportId.value
 
     const { data, error: err } = await apiClient.GET('/v1/videos', {
-      params: { query: query as any },
+      params: { query },
     })
     if (err) {
       error.value = getErrorMessage(err, 'Failed to load videos')
@@ -85,7 +85,7 @@ function sportLabel(sportId: string) {
 onMounted(() => {
   setHeader({
     title: 'Videos',
-    actions: [{ icon: 'i-lucide-plus', onClick: () => router.push('/videos/create') }]
+    actions: [{ icon: 'i-lucide-plus', onClick: () => router.push('/videos/create') }],
   })
   loadSports()
   loadVideos()

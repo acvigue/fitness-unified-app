@@ -144,10 +144,7 @@ watch(() => props.tournamentId, load)
         </UButton>
       </div>
 
-      <p
-        v-else-if="canManage && !isCompleted"
-        class="text-xs text-white/40 text-center"
-      >
+      <p v-else-if="canManage && !isCompleted" class="text-xs text-white/40 text-center">
         Recaps can be linked after the tournament is completed.
       </p>
     </div>

@@ -119,20 +119,12 @@ onMounted(() => {
               />
             </label>
 
-            <p
-              v-if="globalPreference.length === 0"
-              class="text-xs text-amber-300"
-            >
+            <p v-if="globalPreference.length === 0" class="text-xs text-amber-300">
               You've disabled all reminders. You won't be notified of upcoming tournaments.
             </p>
           </div>
 
-          <UButton
-            color="primary"
-            :loading="saving"
-            :disabled="loading"
-            @click="saveGlobal"
-          >
+          <UButton color="primary" :loading="saving" :disabled="loading" @click="saveGlobal">
             Save preferences
           </UButton>
         </div>
@@ -151,9 +143,7 @@ onMounted(() => {
               class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm"
             >
               <p class="text-white/70 truncate">Tournament: {{ p.tournamentId }}</p>
-              <p class="text-xs text-white/50">
-                {{ p.intervalsMinutes.join(' min, ') }} min
-              </p>
+              <p class="text-xs text-white/50">{{ p.intervalsMinutes.join(' min, ') }} min</p>
             </li>
           </ul>
         </div>

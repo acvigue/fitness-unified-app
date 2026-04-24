@@ -37,7 +37,7 @@ const rangeLabel = computed(() =>
     weekday: 'short',
     month: 'short',
     day: 'numeric',
-  })
+  }),
 )
 
 async function load() {
@@ -98,7 +98,7 @@ async function updateStatus(slot: Slot, newStatus: 'AVAILABLE' | 'RESERVED' | 'C
 watch(
   () => [props.gymId, statusFilter.value, dayOffset.value] as const,
   () => load(),
-  { immediate: true }
+  { immediate: true },
 )
 </script>
 
@@ -118,12 +118,7 @@ watch(
             icon="i-lucide-chevron-left"
             @click="dayOffset -= 1"
           />
-          <UButton
-            size="xs"
-            variant="outline"
-            color="neutral"
-            @click="dayOffset = 0"
-          >
+          <UButton size="xs" variant="outline" color="neutral" @click="dayOffset = 0">
             Today
           </UButton>
           <UButton
@@ -180,9 +175,21 @@ watch(
             <UDropdown
               :items="[
                 [
-                  { label: 'Mark available', icon: 'i-lucide-check', click: () => updateStatus(slot, 'AVAILABLE') },
-                  { label: 'Mark reserved', icon: 'i-lucide-lock', click: () => updateStatus(slot, 'RESERVED') },
-                  { label: 'Mark closed', icon: 'i-lucide-ban', click: () => updateStatus(slot, 'CLOSED') },
+                  {
+                    label: 'Mark available',
+                    icon: 'i-lucide-check',
+                    click: () => updateStatus(slot, 'AVAILABLE'),
+                  },
+                  {
+                    label: 'Mark reserved',
+                    icon: 'i-lucide-lock',
+                    click: () => updateStatus(slot, 'RESERVED'),
+                  },
+                  {
+                    label: 'Mark closed',
+                    icon: 'i-lucide-ban',
+                    click: () => updateStatus(slot, 'CLOSED'),
+                  },
                 ],
               ]"
             >

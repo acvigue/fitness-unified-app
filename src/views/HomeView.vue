@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef, computed } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import PageLayout from '@/layouts/PageLayout.vue'
@@ -41,9 +41,6 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 const refStore = useGuideRefsStore()
-
-const docRef = useTemplateRef('docref')
-const settingsRef = useTemplateRef('settingsref')
 
 const tour = useShepherd({
   useModalOverlay: true,

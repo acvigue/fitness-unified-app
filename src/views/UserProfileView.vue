@@ -7,17 +7,21 @@ import { usePageHeader } from '@/composables/usePageHeader'
 import { useI18n } from 'vue-i18n'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
-import type {components} from "@/types/api";
+import type { components } from '@/types/api'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const { setHeader} = usePageHeader()
+const { setHeader } = usePageHeader()
 
 type UserTournaments = components['schemas']['TournamentResponseDto']
+type UserProfile = components['schemas']['UserProfileResponseDto'] & {
+  firstName?: string
+  lastName?: string
+}
 
 const userId = computed(() => route.params.userId as string)
-const profile = ref<any>(null)
+const profile = ref<UserProfile | null>(null)
 const loading = ref(true)
 const error = ref('')
 const tournamentHistory = ref<UserTournaments[]>([])
@@ -45,17 +49,20 @@ onMounted(async () => {
     if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
     profile.value = profileData
     tournamentHistory.value = profile.value.tournaments
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to load profile. userId:', userId.value, 'Error:', err)
-    error.value = err.message || 'Failed to load profile'
+    error.value = err instanceof Error ? err.message : 'Failed to load profile'
   } finally {
     loading.value = false
   }
   try {
-    const { data: profileData, error: profileErr } = await apiClient.PATCH('/v1/user/profile/user/privacy', {
-      body: {q: userId.value},
-    })
-    if (profileErr ) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
+    const { data: profileData, error: profileErr } = await apiClient.PATCH(
+      '/v1/user/profile/user/privacy',
+      {
+        body: { q: userId.value },
+      },
+    )
+    if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
     console.log(profileData)
     hidingBio.value = profileData.privateBio
     hidingSports.value = profileData.privateSports
@@ -68,7 +75,7 @@ onMounted(async () => {
 })
 
 const primaryPicture = computed(() => {
-  return profile.value?.pictures?.find((p: any) => p.isPrimary)?.url || ''
+  return profile.value?.pictures?.find((p) => p.isPrimary)?.url || ''
 })
 
 const moveToComparePage = () => {
@@ -98,7 +105,6 @@ function getStatusColor(status: string) {
       return 'neutral'
   }
 }
-
 </script>
 
 <template>
@@ -127,7 +133,7 @@ function getStatusColor(status: string) {
       <div class="bg-white/5 p-4 rounded-lg">
         <p class="text-white/70 text-sm mb-1">{{ t('profile.bio') }}</p>
         <p v-if="hidingBio" class="text-white">Bio is Hidden</p>
-        <p v-else class="text-white">{{ profile.bio || 'no bio' }}</p>
+        <p v-else class="text-white">{{ profile?.bio || 'no bio' }}</p>
       </div>
 
       <!-- Favorite Sports -->
@@ -177,7 +183,8 @@ function getStatusColor(status: string) {
               <div class="mt-1.5 flex items-center gap-2 text-sm text-white/60">
                 <UIcon name="i-lucide-dumbbell" class="text-xs" />
                 <span
-                >{{ tournament.sport?.icon || '' }} {{ tournament.sport?.name || 'Unknown' }}</span
+                  >{{ tournament.sport?.icon || '' }}
+                  {{ tournament.sport?.name || 'Unknown' }}</span
                 >
                 <UBadge variant="subtle" color="neutral" size="xs">
                   {{ tournament.format === 'ROUND_ROBIN' ? 'Round Robin' : 'Elimination' }}
@@ -189,16 +196,17 @@ function getStatusColor(status: string) {
                   <div
                     class="h-full rounded-full bg-primary transition-all"
                     :style="{
-                  width: `${Math.min((tournament.teams.length / tournament.maxTeams) * 100, 100)}%`,
-                }"
+                      width: `${Math.min((tournament.teams.length / tournament.maxTeams) * 100, 100)}%`,
+                    }"
                   />
                 </div>
                 <span class="text-xs text-white/50">
-              {{ tournament.teams.length }}/{{ tournament.maxTeams }} teams
-            </span>
+                  {{ tournament.teams.length }}/{{ tournament.maxTeams }} teams
+                </span>
               </div>
             </button>
-          </div>        </div>
+          </div>
+        </div>
         <div v-else>
           <p class="text-white/50">None played yet.</p>
         </div>
@@ -211,7 +219,7 @@ function getStatusColor(status: string) {
         <div v-else-if="profile?.featuredAchievements?.length" class="grid gap-2 sm:grid-cols-2">
           <div
             v-for="ua in profile.featuredAchievements"
-            :key="ua.id"
+            :key="ua.id ?? ua.achievement.id"
             class="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 p-3"
           >
             <UIcon name="i-lucide-award" class="text-primary" />
@@ -224,7 +232,9 @@ function getStatusColor(status: string) {
         <p v-else class="text-white/50 text-sm">No featured achievements.</p>
       </div>
       <div class="flex justify-center gap-3 flex-wrap">
-        <UButton @click="moveToComparePage" color="primary" variant="soft"> Compare Profiles </UButton>
+        <UButton @click="moveToComparePage" color="primary" variant="soft">
+          Compare Profiles
+        </UButton>
         <UserBlockButton v-if="userId" :user-id="userId" />
       </div>
     </div>

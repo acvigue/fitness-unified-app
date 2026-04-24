@@ -13,7 +13,6 @@ import { getErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/types/api'
 
 type Tournament = components['schemas']['TournamentResponseDto']
-type TournamentTeam = components['schemas']['TournamentTeamResponseDto']
 type TournamentMatchDto = components['schemas']['TournamentMatchResponseDto']
 type BracketResponse = components['schemas']['TournamentBracketResponseDto']
 type StandingsResponse = components['schemas']['TournamentStandingsResponseDto']
@@ -57,7 +56,7 @@ const selectedTeamId = ref('')
 const tournamentId = computed(() => route.params.id as string)
 
 const currentUserId = computed(() => {
-  const user = (authStore as any).user
+  const user = authStore.user as { sub?: string; id?: string } | null | undefined
   return user?.sub || user?.id || ''
 })
 
@@ -249,15 +248,15 @@ const canSeedBracket = computed(
     isRoundRobin.value &&
     bracket.value &&
     bracket.value.rounds.every((round) =>
-      round.matches.every((match) => match.status === 'COMPLETED' || match.status === 'BYE')
-    )
+      round.matches.every((match) => match.status === 'COMPLETED' || match.status === 'BYE'),
+    ),
 )
 
 async function seedBracket() {
   if (!canSeedBracket.value) return
   if (
     !confirm(
-      'Seed single-elimination bracket from current standings? This removes round-robin matches.'
+      'Seed single-elimination bracket from current standings? This removes round-robin matches.',
     )
   ) {
     return

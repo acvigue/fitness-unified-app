@@ -47,12 +47,14 @@ async function load() {
     const params: Record<string, string> = {}
     if (query.value.trim()) params.q = query.value.trim()
     if (teamIdFilter.value.trim()) params.teamId = teamIdFilter.value.trim()
-    const response = await (apiClient as unknown as {
-      GET: (
-        path: string,
-        opts: { params: { query: Record<string, string> } }
-      ) => Promise<{ data?: Message[]; error?: unknown }>
-    }).GET('/v1/moderation/messages', { params: { query: params } })
+    const response = await (
+      apiClient as unknown as {
+        GET: (
+          path: string,
+          opts: { params: { query: Record<string, string> } },
+        ) => Promise<{ data?: Message[]; error?: unknown }>
+      }
+    ).GET('/v1/moderation/messages', { params: { query: params } })
     if (response.error) {
       error.value = getErrorMessage(response.error, 'Failed to load messages')
       return

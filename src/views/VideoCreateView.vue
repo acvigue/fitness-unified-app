@@ -89,12 +89,12 @@ onMounted(() => {
           <UFormField label="Video Name">
             <UInput v-model="form.name" placeholder="Cool Video" />
           </UFormField>
-		  
-		  <UFormField label="Video Description">
+
+          <UFormField label="Video Description">
             <UInput v-model="form.description" placeholder="Stuff happens." />
           </UFormField>
-		  
-		  <UFormField label="Video URL">
+
+          <UFormField label="Video URL">
             <UInput v-model="form.url" placeholder="123.123.123" />
           </UFormField>
 
@@ -115,9 +115,7 @@ onMounted(() => {
             </div>
           </UFormField>
 
-          <UButton color="primary" :loading="creating" @click="createVideo">
-            Create Video
-          </UButton>
+          <UButton color="primary" :loading="creating" @click="createVideo"> Create Video </UButton>
         </div>
       </UCard>
     </section>

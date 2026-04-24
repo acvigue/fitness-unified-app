@@ -22,11 +22,13 @@ const sidebarRef = useTemplateRef('sidebarref')
 const store = useGuideRefsStore()
 
 onMounted(() => {
-  console.log('sidebarmounted')
-  console.log(sidebarRef.value)
-  console.log(sidebarRef.value.$el)
-  store.setSidebar(sidebarRef.value.$el)
-  console.log(store.getSidebar)
+  const el =
+    sidebarRef.value && typeof sidebarRef.value === 'object' && '$el' in sidebarRef.value
+      ? (sidebarRef.value as { $el: HTMLElement }).$el
+      : (sidebarRef.value as HTMLElement | null)
+  if (el) {
+    store.setSidebar(el)
+  }
 })
 </script>
 

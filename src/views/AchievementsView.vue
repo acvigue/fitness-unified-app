@@ -114,7 +114,7 @@ onMounted(() => {
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div
             v-for="ua in earned"
-            :key="ua.id"
+            :key="ua.id ?? ua.achievement.id"
             class="rounded-lg border border-primary/30 bg-primary/5 p-4"
           >
             <div class="flex items-start gap-3">
@@ -139,7 +139,7 @@ onMounted(() => {
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div
             v-for="ua in inProgress"
-            :key="ua.id"
+            :key="ua.id ?? ua.achievement.id"
             class="rounded-lg border border-white/10 bg-white/2 p-4"
           >
             <div class="flex items-start gap-3">

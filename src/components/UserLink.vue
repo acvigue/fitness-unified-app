@@ -24,7 +24,9 @@ onMounted(async () => {
         })
         .then(
           ({ data }) => {
-            const d = data as any
+            const d = data as
+              | { firstName?: string; lastName?: string; name?: string; username?: string }
+              | undefined
             if (d?.firstName || d?.lastName)
               return [d.firstName, d.lastName].filter(Boolean).join(' ')
             return d?.name || d?.username || props.userId

@@ -140,9 +140,7 @@ async function restrict(): Promise<void> {
   action.value = null
 }
 
-function toggleRestrictionAction(
-  value: 'MESSAGING' | 'TEAM_JOIN' | 'TOURNAMENT_REGISTER'
-) {
+function toggleRestrictionAction(value: 'MESSAGING' | 'TEAM_JOIN' | 'TOURNAMENT_REGISTER') {
   if (!action.value || action.value.kind !== 'restrict') return
   const idx = action.value.actions.indexOf(value)
   if (idx === -1) {

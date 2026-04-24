@@ -9,7 +9,7 @@ const props = withDefaults(
     size?: 'xs' | 'sm' | 'md'
     variant?: 'solid' | 'outline' | 'ghost'
   }>(),
-  { size: 'sm', variant: 'outline' }
+  { size: 'sm', variant: 'outline' },
 )
 
 const store = useUserBlockStore()

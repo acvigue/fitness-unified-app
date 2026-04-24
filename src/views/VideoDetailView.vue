@@ -29,7 +29,7 @@ const videoPlayer = ref<HTMLVideoElement | null>(null)
 const videoId = computed(() => route.params.id as string)
 const currentUserId = computed(() => authStore.user?.sub ?? '')
 const isUploader = computed(
-  () => !!video.value && !!currentUserId.value && video.value.uploaderId === currentUserId.value
+  () => !!video.value && !!currentUserId.value && video.value.uploaderId === currentUserId.value,
 )
 
 async function loadVideo() {

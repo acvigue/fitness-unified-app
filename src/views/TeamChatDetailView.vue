@@ -214,11 +214,9 @@ onMounted(async () => {
   await messengerStore.initialize()
   await Promise.all([
     loadChatInfo(),
-    messengerStore
-      .loadChatHistory(chatId.value)
-      .catch((e) => {
-        loadError.value = e instanceof Error ? e.message : 'Failed to load history'
-      }),
+    messengerStore.loadChatHistory(chatId.value).catch((e) => {
+      loadError.value = e instanceof Error ? e.message : 'Failed to load history'
+    }),
   ])
   scrollToBottom()
 })
@@ -282,9 +280,11 @@ onUnmounted(() => {
               v-if="msg.sender.id !== currentUserId"
               class="text-[10px] text-white/50 font-medium mb-0.5"
             >
-              {{ ((msg.sender.name as unknown as string) ||
-                 (msg.sender.username as unknown as string) ||
-                 initialsFor('Member')) }}
+              {{
+                (msg.sender.name as unknown as string) ||
+                (msg.sender.username as unknown as string) ||
+                initialsFor('Member')
+              }}
             </p>
             <div v-if="msg.media?.length" class="flex flex-wrap gap-1.5 mb-1">
               <template v-for="m in msg.media" :key="m.id">

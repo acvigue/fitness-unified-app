@@ -58,7 +58,7 @@ const removeMemberId = ref('')
 const deletingTeam = ref(false)
 
 const currentUserId = computed(() => {
-  const user = (authStore as any).user
+  const user = authStore.user as { sub?: string; id?: string } | null | undefined
   return user?.sub || user?.id || ''
 })
 

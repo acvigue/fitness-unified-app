@@ -15,11 +15,11 @@ export const useNotificationStore = defineStore('notifications', () => {
   const seenIds = new Set<string>()
 
   const unreadCount = computed(
-    () => notifications.value.filter((n) => !n.dismissed && !n.readAt).length
+    () => notifications.value.filter((n) => !n.dismissed && !n.readAt).length,
   )
 
   const unreadNotifications = computed(() =>
-    notifications.value.filter((n) => !n.dismissed && !n.readAt)
+    notifications.value.filter((n) => !n.dismissed && !n.readAt),
   )
 
   function detectNewAndToast(next: Notification[]) {

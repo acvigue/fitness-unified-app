@@ -128,7 +128,9 @@ watch(otherUserId, load)
             </div>
             <div class="rounded-lg bg-white/5 p-3">
               <p class="text-white/60 text-xs">Sports</p>
-              <p class="text-white font-semibold">{{ comparison[side].stats.favoriteSportsCount }}</p>
+              <p class="text-white font-semibold">
+                {{ comparison[side].stats.favoriteSportsCount }}
+              </p>
             </div>
           </div>
 
@@ -137,7 +139,9 @@ watch(otherUserId, load)
             <p v-if="comparison[side].profile.bio === null" class="text-white/50 italic">
               Bio is hidden
             </p>
-            <p v-else class="text-white">{{ comparison[side].profile.bio || t('profile.noBio') }}</p>
+            <p v-else class="text-white">
+              {{ comparison[side].profile.bio || t('profile.noBio') }}
+            </p>
           </div>
 
           <div class="bg-white/5 p-4 rounded-lg">

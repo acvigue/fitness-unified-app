@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useHead } from '@unhead/vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { apiClient } from '@/lib/api/client'
@@ -14,7 +14,6 @@ type TournamentInvitation = components['schemas']['TournamentInvitationResponseD
 useHead({ title: 'Manage Tournament' })
 
 const route = useRoute()
-const router = useRouter()
 const { setHeader } = usePageHeader()
 
 const tournamentId = computed(() => route.params.id as string)

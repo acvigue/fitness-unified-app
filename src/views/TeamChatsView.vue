@@ -103,10 +103,7 @@ onMounted(async () => {
         <UButton icon="i-lucide-plus" size="sm" @click="pickerOpen = true">Message Team</UButton>
       </div>
 
-      <div
-        v-if="teamChatStore.loading && !chats.length"
-        class="flex justify-center p-8"
-      >
+      <div v-if="teamChatStore.loading && !chats.length" class="flex justify-center p-8">
         <UIcon name="i-lucide-loader-2" class="animate-spin text-white/50 size-8" />
       </div>
 

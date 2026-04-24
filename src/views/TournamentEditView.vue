@@ -81,7 +81,7 @@ async function saveTournament() {
         name: form.name.trim(),
         maxTeams: form.maxTeams,
         startDate: new Date(form.startDate).toISOString(),
-        status: form.status as any,
+        status: form.status as 'OPEN' | 'CLOSED' | 'UPCOMING' | 'INPROGRESS' | 'COMPLETED',
       },
     })
     if (err) {
@@ -188,7 +188,11 @@ onMounted(() => {
           <p class="font-medium text-red-100">Danger Zone</p>
           <p class="mt-1 text-sm text-red-100/80">
             Deleting a tournament cannot be undone.
-            {{ tournament && tournament.teams.length > 0 ? `${tournament.teams.length} team(s) are currently registered.` : '' }}
+            {{
+              tournament && tournament.teams.length > 0
+                ? `${tournament.teams.length} team(s) are currently registered.`
+                : ''
+            }}
           </p>
           <UButton
             class="mt-4"

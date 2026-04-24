@@ -151,25 +151,22 @@
       </UCard>
       <UCard class="bg-white/5">
         <div class="flex flex-col gap-5">
-        <p class="text-xs uppercase tracking-[0.3em] text-white/60">
-           Profile Privacy
-        </p>
-        <p class="text-sm mt-2"> Hide Bio From Other Users</p>
-        <URadioGroup v-model="value1" :items="items" />
-        <p class="text-sm mt-2"> Hide Favorite Sports From Other Users</p>
-        <URadioGroup v-model="value2" :items="items" />
-        <p class="text-sm mt-2"> Hide Tournament History From Other Users</p>
-        <URadioGroup v-model="value3" :items="items" />
-        <p class="text-sm mt-2"> Hide Featured Achievements From Other Users</p>
-        <URadioGroup v-model="value4" :items="items" />
-        <div class="flex justify-end">
-          <UButton color="primary" :loading="saving2" @click="savePrivacy">
-            Save Privacy
-          </UButton>
-        </div>
+          <p class="text-xs uppercase tracking-[0.3em] text-white/60">Profile Privacy</p>
+          <p class="text-sm mt-2">Hide Bio From Other Users</p>
+          <URadioGroup v-model="value1" :items="items" />
+          <p class="text-sm mt-2">Hide Favorite Sports From Other Users</p>
+          <URadioGroup v-model="value2" :items="items" />
+          <p class="text-sm mt-2">Hide Tournament History From Other Users</p>
+          <URadioGroup v-model="value3" :items="items" />
+          <p class="text-sm mt-2">Hide Featured Achievements From Other Users</p>
+          <URadioGroup v-model="value4" :items="items" />
+          <div class="flex justify-end">
+            <UButton color="primary" :loading="saving2" @click="savePrivacy">
+              Save Privacy
+            </UButton>
+          </div>
         </div>
       </UCard>
-
 
       <!-- Language Section -->
       <UCard class="bg-white/5">
@@ -236,7 +233,7 @@
                   <UIcon name="i-lucide-monitor" class="text-white/50 shrink-0" />
                   <span class="text-sm font-medium truncate">{{ session.ipAddress }}</span>
                   <UBadge
-                    v-if="(session as any).thisSession"
+                    v-if="(session as Session & { thisSession?: boolean }).thisSession"
                     color="primary"
                     variant="soft"
                     size="xs"
@@ -532,21 +529,21 @@ onMounted(async () => {
   try {
     const { data: privacyData, error: profileErr } = await apiClient.GET('/v1/user/profile/privacy')
     if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to update name'))
-    if (privacyData.privateBio === true){
-        value1.value = "Yes";
+    if (privacyData.privateBio === true) {
+      value1.value = 'Yes'
     }
-    if (privacyData.privateSports === true){
-      value2.value = "Yes";
+    if (privacyData.privateSports === true) {
+      value2.value = 'Yes'
     }
-    if (privacyData.privateTournaments === true){
-      value3.value = "Yes";
+    if (privacyData.privateTournaments === true) {
+      value3.value = 'Yes'
     }
-    if (privacyData.privateAchievements === true){
-      value4.value = "Yes";
+    if (privacyData.privateAchievements === true) {
+      value4.value = 'Yes'
     }
     console.log(privacyData)
-  } catch (err: any) {
-    profileError.value = err.message || 'Failed to update name'
+  } catch (err: unknown) {
+    profileError.value = err instanceof Error ? err.message : 'Failed to update name'
   }
 })
 
@@ -604,15 +601,22 @@ const handleAccountAction = async () => {
     confirmModal.value.isOpen = false
     await authStore.logout()
     router.replace('/login')
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Action failed', err)
-    confirmModal.value.error = err.message || t('settings.actionFailed')
+    confirmModal.value.error = err instanceof Error ? err.message : t('settings.actionFailed')
     confirmModal.value.loading = false
   }
 }
 
 // Profile
-const profile = ref<UserProfile>({ userId: '', bio: '', favoriteSports: [], pictures: [] })
+const profile = ref<UserProfile>({
+  userId: '',
+  bio: '',
+  favoriteSports: [],
+  pictures: [],
+  featuredAchievements: [],
+  tournaments: [],
+})
 const profileForm = reactive({ bio: '', favoriteSports: [] as Sport[] })
 const saving = ref(false)
 const saving2 = ref(false)
@@ -639,8 +643,8 @@ async function saveName() {
     if (nameErr) throw new Error(getErrorMessage(nameErr, 'Failed to update name'))
     originalName.value = { firstName: nameForm.firstName, lastName: nameForm.lastName }
     nameSuccess.value = true
-  } catch (err: any) {
-    profileError.value = err.message || 'Failed to update name'
+  } catch (err: unknown) {
+    profileError.value = err instanceof Error ? err.message : 'Failed to update name'
   } finally {
     savingName.value = false
   }
@@ -700,9 +704,9 @@ async function uploadFile(file: File) {
       url: media.url,
       isPrimary: profile.value.pictures.length === 0,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Upload failed', error)
-    profileError.value = error.message || t('settings.uploadFailed')
+    profileError.value = error instanceof Error ? error.message : t('settings.uploadFailed')
   } finally {
     uploading.value = false
   }
@@ -746,7 +750,7 @@ const localeLabels: Record<string, string> = {
   es: 'Español',
 }
 const localeOptions = SUPPORT_LOCALES.map((l) => ({ label: localeLabels[l] || l, value: l }))
-const selectedLocale = ref(localeOptions.find((o) => o.value === locale.value) || localeOptions[0])
+const selectedLocale = ref(locale.value)
 
 function changeLocale(value: string) {
   locale.value = value
@@ -781,7 +785,7 @@ async function revokeSession(id: string) {
       params: { path: { id } },
     })
     if (revokeErr) throw new Error(getErrorMessage(revokeErr, 'Failed to revoke session'))
-    if ((session as any)?.thisSession) {
+    if ((session as (Session & { thisSession?: boolean }) | undefined)?.thisSession) {
       await authStore.clearLocalSession()
       window.location.reload()
       return
@@ -839,9 +843,9 @@ async function saveProfile() {
     pendingPictureIds.value = []
     originalProfile.value = serializeForm()
     showSaveSuccess.value = true
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update failed', error)
-    profileError.value = error.message || 'Failed to update profile'
+    profileError.value = error instanceof Error ? error.message : 'Failed to update profile'
   } finally {
     saving.value = false
   }
@@ -853,10 +857,10 @@ async function savePrivacy() {
   showSaveInfo.value = false
 
   saving2.value = true
-  const bio = value1.value !== "No"
-  const sports = value2.value !== "No"
-  const tournaments = value3.value !== "No"
-  const achievements = value4.value !== "No"
+  const bio = value1.value !== 'No'
+  const sports = value2.value !== 'No'
+  const tournaments = value3.value !== 'No'
+  const achievements = value4.value !== 'No'
 
   try {
     const { error: updateErr } = await apiClient.PATCH('/v1/user/profile/privacy', {
@@ -869,9 +873,9 @@ async function savePrivacy() {
       },
     })
     if (updateErr) throw new Error(getErrorMessage(updateErr, 'Failed to update profile'))
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update failed', error)
-    profileError.value = error.message || 'Failed to update profile'
+    profileError.value = error instanceof Error ? error.message : 'Failed to update profile'
   } finally {
     saving2.value = false
   }

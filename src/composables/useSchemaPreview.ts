@@ -1,8 +1,28 @@
-// @ts-nocheck - @/lib/api/apps module removed
+// Note: @/lib/api/apps module was removed — local stub below so this unused composable still compiles
 import { ref, watch, onUnmounted, type Ref } from 'vue'
-import { appsApi } from '@/lib/api/apps'
 import { getErrorMessage } from '@/lib/api/errors'
 import { debounce } from '@/utils/debounce'
+
+interface RenderResponse {
+  error?: unknown
+  data?: { result?: { render_output?: string } }
+}
+
+const appsApi = {
+  async getPreview(
+    _appId: string,
+    _opts: { width: number; height: number },
+  ): Promise<string | null> {
+    return null
+  },
+  async renderApp(
+    _appId: string,
+    _config: Record<string, unknown>,
+    _opts: { width: number; height: number; deviceId?: string },
+  ): Promise<RenderResponse> {
+    return { data: {} }
+  },
+}
 
 export type PreviewErrorType = 'http' | 'empty' | 'setup' | null
 
@@ -90,7 +110,7 @@ export function useSchemaPreview(
         error.value = 'Nothing to show'
         previewBase64.value = null
       }
-    } catch (err) {
+    } catch {
       previewBase64.value = null
       errorType.value = 'setup'
       error.value = 'Complete setup below'

@@ -37,7 +37,7 @@ import ModerationMessagesView from '@/views/moderation/ModerationMessagesView.vu
 import ModerationUsersView from '@/views/moderation/ModerationUsersView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
-import ProfileCompareView from "@/views/ProfileCompareView.vue";
+import ProfileCompareView from '@/views/ProfileCompareView.vue'
 
 const router = createRouter({
   history: createWebHistory('/'),
@@ -181,27 +181,27 @@ const router = createRouter({
       name: 'settings',
       component: SettingsView,
     },
-	{
+    {
       path: '/videos',
       name: 'videos',
       component: VideosView,
     },
-	{
+    {
       path: '/videos/:id',
       name: 'video-detail',
       component: VideoDetailView,
     },
-	{
+    {
       path: '/videos/create',
       name: 'video-create',
       component: VideoCreateView,
     },
-  {
+    {
       path: '/gyms',
       name: 'gyms',
       component: GymView,
     },
-  {
+    {
       path: '/gyms/create',
       name: 'gym-create',
       component: GymCreateView,

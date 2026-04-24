@@ -50,15 +50,22 @@ async function loadTournaments() {
   loading.value = true
   error.value = ''
   try {
-    const query: Record<string, unknown> = {
+    type TournamentsQuery = {
+      page?: number
+      per_page?: number
+      sportId?: string
+      status?: 'OPEN' | 'CLOSED' | 'UPCOMING' | 'INPROGRESS' | 'COMPLETED'
+    }
+    const query: TournamentsQuery = {
       page: page.value,
       per_page: 12,
     }
     if (filterSportId.value && filterSportId.value !== 'all') query.sportId = filterSportId.value
-    if (filterStatus.value && filterStatus.value !== 'all') query.status = filterStatus.value
+    if (filterStatus.value && filterStatus.value !== 'all')
+      query.status = filterStatus.value as TournamentsQuery['status']
 
     const { data, error: err } = await apiClient.GET('/v1/tournaments', {
-      params: { query: query as any },
+      params: { query },
     })
     if (err) {
       error.value = getErrorMessage(err, 'Failed to load tournaments')

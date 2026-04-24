@@ -22,7 +22,7 @@ watch(
   () => props.open,
   (v) => {
     if (v) reason.value = ''
-  }
+  },
 )
 
 async function submit() {
@@ -69,12 +69,7 @@ async function submit() {
           <UButton variant="ghost" color="neutral" @click="emit('update:open', false)">
             Cancel
           </UButton>
-          <UButton
-            color="error"
-            :loading="submitting"
-            :disabled="!reason.trim()"
-            @click="submit"
-          >
+          <UButton color="error" :loading="submitting" :disabled="!reason.trim()" @click="submit">
             Submit report
           </UButton>
         </div>

@@ -61,16 +61,13 @@ async function save() {
   saving.value = true
   error.value = ''
   try {
-    const { data, error: apiError } = await apiClient.PATCH(
-      '/v1/chats/announcements/{chatId}',
-      {
-        params: { path: { chatId: props.chat.id } },
-        body: {
-          name: form.name.trim(),
-          writeRoles: form.writeRoles,
-        },
+    const { data, error: apiError } = await apiClient.PATCH('/v1/chats/announcements/{chatId}', {
+      params: { path: { chatId: props.chat.id } },
+      body: {
+        name: form.name.trim(),
+        writeRoles: form.writeRoles,
       },
-    )
+    })
     if (apiError) {
       error.value = getErrorMessage(apiError, 'Failed to update channel')
       return
@@ -89,12 +86,9 @@ async function remove() {
   deleting.value = true
   error.value = ''
   try {
-    const { error: apiError } = await apiClient.DELETE(
-      '/v1/chats/announcements/{chatId}',
-      {
-        params: { path: { chatId: props.chat.id } },
-      },
-    )
+    const { error: apiError } = await apiClient.DELETE('/v1/chats/announcements/{chatId}', {
+      params: { path: { chatId: props.chat.id } },
+    })
     if (apiError) {
       error.value = getErrorMessage(apiError, 'Failed to delete channel')
       return

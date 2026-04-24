@@ -48,9 +48,7 @@ const filtered = computed(() => {
   } else if (directionFilter.value === 'OUTGOING') {
     list = list.filter((m) => m.proposingTeamId === teamId.value)
   }
-  return [...list].sort(
-    (a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime(),
-  )
+  return [...list].sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime())
 })
 
 const statusOptions = [

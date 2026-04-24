@@ -33,9 +33,11 @@ async function loadGyms() {
   loading.value = true
   error.value = ''
   try {
-    const response = await (apiClient as unknown as {
-      GET: (path: string) => Promise<{ data?: unknown; error?: unknown }>
-    }).GET('/v1/gyms')
+    const response = await (
+      apiClient as unknown as {
+        GET: (path: string) => Promise<{ data?: unknown; error?: unknown }>
+      }
+    ).GET('/v1/gyms')
     const { data, error: err } = response
     if (err) {
       error.value = getErrorMessage(err, 'Failed to load gyms')

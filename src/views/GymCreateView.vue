@@ -18,14 +18,7 @@ setHeader({
 
 type PaintMode = 'open' | 'closed'
 type CellState = 'open' | 'closed'
-type DayKey =
-  | 'monday'
-  | 'tuesday'
-  | 'wednesday'
-  | 'thursday'
-  | 'friday'
-  | 'saturday'
-  | 'sunday'
+type DayKey = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
 
 type DayConfig = {
   key: DayKey
@@ -330,7 +323,9 @@ function onCreateGym() {
             </UFormField>
           </div>
 
-          <div class="lg:col-span-2 flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+          <div
+            class="lg:col-span-2 flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3"
+          >
             <div>
               <p class="text-sm font-medium text-white/80">Gym active</p>
               <p class="text-xs text-white/50">Inactive gyms can be hidden from normal browsing.</p>
@@ -394,7 +389,9 @@ function onCreateGym() {
 
           <div class="flex flex-wrap items-center gap-3 text-xs text-white/55">
             <div class="flex items-center gap-2">
-              <span class="inline-block h-3 w-3 rounded-sm border border-green-400/35 bg-green-500/20" />
+              <span
+                class="inline-block h-3 w-3 rounded-sm border border-green-400/35 bg-green-500/20"
+              />
               Open
             </div>
             <div class="flex items-center gap-2">
@@ -416,7 +413,9 @@ function onCreateGym() {
                 gridTemplateColumns: '110px repeat(7, minmax(120px, 1fr))',
               }"
             >
-              <div class="sticky top-0 z-10 rounded-lg border border-white/10 bg-black/20 p-3 text-sm font-medium text-white/60 backdrop-blur">
+              <div
+                class="sticky top-0 z-10 rounded-lg border border-white/10 bg-black/20 p-3 text-sm font-medium text-white/60 backdrop-blur"
+              >
                 Time
               </div>
 
@@ -430,7 +429,9 @@ function onCreateGym() {
               </div>
 
               <template v-for="slot in timeSlots" :key="slot">
-                <div class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/65">
+                <div
+                  class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/65"
+                >
                   {{ toDisplayTime(slot) }}
                 </div>
 
@@ -463,7 +464,9 @@ function onCreateGym() {
             <div class="flex items-center justify-between">
               <div>
                 <h2 class="text-lg font-semibold text-white">Gym preview</h2>
-                <p class="text-sm text-white/60">This is how the basic gym information will look.</p>
+                <p class="text-sm text-white/60">
+                  This is how the basic gym information will look.
+                </p>
               </div>
               <UBadge :color="form.isActive ? 'success' : 'neutral'" variant="soft">
                 {{ form.isActive ? 'Active' : 'Inactive' }}
@@ -484,9 +487,7 @@ function onCreateGym() {
                   </p>
                 </div>
 
-                <UBadge color="info" variant="soft">
-                  Capacity {{ form.capacity || '—' }}
-                </UBadge>
+                <UBadge color="info" variant="soft"> Capacity {{ form.capacity || '—' }} </UBadge>
               </div>
             </div>
           </div>
@@ -507,7 +508,9 @@ function onCreateGym() {
               </div>
             </div>
 
-            <div class="max-h-[520px] overflow-auto rounded-xl border border-white/10 bg-black/20 p-3">
+            <div
+              class="max-h-[520px] overflow-auto rounded-xl border border-white/10 bg-black/20 p-3"
+            >
               <div
                 v-for="(rule, index) in mergedWeeklyRules"
                 :key="`${rule.dayOfWeek}-${rule.startTime}-${rule.endTime}-${index}`"
@@ -518,9 +521,7 @@ function onCreateGym() {
                     <p class="text-sm font-medium text-white">
                       {{ days[rule.dayOfWeek].label }}
                     </p>
-                    <p class="text-xs text-white/55">
-                      {{ rule.startTime }} - {{ rule.endTime }}
-                    </p>
+                    <p class="text-xs text-white/55">{{ rule.startTime }} - {{ rule.endTime }}</p>
                   </div>
 
                   <UBadge :color="rule.isOpen ? 'success' : 'neutral'" variant="soft">
@@ -535,9 +536,7 @@ function onCreateGym() {
 
       <!-- Actions -->
       <div class="flex items-center justify-end gap-3">
-        <UButton color="neutral" variant="outline" @click="onCancel">
-          Cancel
-        </UButton>
+        <UButton color="neutral" variant="outline" @click="onCancel"> Cancel </UButton>
 
         <UButton icon="i-lucide-plus" :disabled="!isValid" @click="onCreateGym">
           Create Gym

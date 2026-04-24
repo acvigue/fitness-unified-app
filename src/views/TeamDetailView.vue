@@ -51,7 +51,7 @@ const canProposeMeetup = computed(
 const canStartTeamChat = computed(() => isMyOwnTeam.value || myOtherTeams.value.length > 0)
 
 const currentUserId = computed(() => {
-  const user = (authStore as any).user
+  const user = authStore.user as { sub?: string; id?: string } | null | undefined
   return user?.sub || user?.id || ''
 })
 
@@ -216,7 +216,8 @@ async function loadMyTeams() {
     const { data, error: err } = await apiClient.GET('/v1/teams')
     if (err) return
     myTeams.value = (data ?? []).filter(
-      (t) => t.captainId === currentUserId.value || t.members.some((m) => m.sub === currentUserId.value),
+      (t) =>
+        t.captainId === currentUserId.value || t.members.some((m) => m.sub === currentUserId.value),
     )
   } catch {
     // Non-critical

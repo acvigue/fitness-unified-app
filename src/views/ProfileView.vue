@@ -10,11 +10,12 @@ import type { components } from '@/types/api'
 
 type UserAchievement = components['schemas']['UserAchievementResponseDto']
 type UserTournaments = components['schemas']['TournamentResponseDto']
+type UserProfile = components['schemas']['UserProfileResponseDto']
 
 const { t } = useI18n()
 const { setHeader } = usePageHeader()
 
-const profile = ref<any>(null)
+const profile = ref<UserProfile | null>(null)
 const loading = ref(true)
 const error = ref('')
 
@@ -23,7 +24,6 @@ const hidingSports = ref(false)
 const hidingTournaments = ref(false)
 const hidingAchievements = ref(false)
 
-
 // Featured achievements editing
 const earnedAchievements = ref<UserAchievement[]>([])
 const tournamentHistory = ref<UserTournaments[]>([])
@@ -31,7 +31,6 @@ const editingFeatured = ref(false)
 const selectedFeaturedIds = ref<string[]>([])
 const savingFeatured = ref(false)
 const featuredMessage = ref('')
-
 
 onMounted(async () => {
   setHeader({
@@ -42,7 +41,9 @@ onMounted(async () => {
     const { data: profileData, error: profileErr } = await apiClient.GET('/v1/user/profile')
     if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
     profile.value = profileData
-    selectedFeaturedIds.value = (profile.value?.featuredAchievements ?? []).map((a: any) => a.id)
+    selectedFeaturedIds.value = (profile.value?.featuredAchievements ?? [])
+      .map((a) => a.id)
+      .filter((id): id is string => typeof id === 'string')
     tournamentHistory.value = profile.value.tournaments
   } catch (err) {
     error.value = 'Failed to load profile'
@@ -52,7 +53,7 @@ onMounted(async () => {
   }
   try {
     const { data: profileData, error: profileErr } = await apiClient.GET('/v1/user/profile/privacy')
-    if (profileErr ) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
+    if (profileErr) throw new Error(getErrorMessage(profileErr, 'Failed to load profile'))
     hidingBio.value = profileData.privateBio
     hidingSports.value = profileData.privateSports
     hidingTournaments.value = profileData.privateTournaments
@@ -93,7 +94,7 @@ function getStatusColor(status: string) {
 }
 
 const primaryPicture = computed(() => {
-  return profile.value?.pictures?.find((p: any) => p.isPrimary)?.url || ''
+  return profile.value?.pictures?.find((p) => p.isPrimary)?.url || ''
 })
 
 async function startEditFeatured() {
@@ -120,7 +121,10 @@ async function saveFeatured() {
   featuredMessage.value = ''
   try {
     const { error: updateErr } = await apiClient.PATCH('/v1/user/profile', {
-      body: { featuredAchievementIds: selectedFeaturedIds.value } as any,
+      body: { featuredAchievementIds: selectedFeaturedIds.value } as unknown as Record<
+        string,
+        unknown
+      >,
     })
     if (updateErr) throw new Error(getErrorMessage(updateErr, 'Failed to update profile'))
     const { data: refreshedProfile, error: refreshErr } = await apiClient.GET('/v1/user/profile')
@@ -165,7 +169,7 @@ async function saveFeatured() {
       <div class="bg-white/5 p-4 rounded-lg">
         <p class="text-white/70 text-sm mb-1">Bio</p>
         <p v-if="hidingBio" class="text-white">Bio is Hidden</p>
-        <p v-else class="text-white">{{ profile.bio || 'no bio' }}</p>
+        <p v-else class="text-white">{{ profile?.bio || 'no bio' }}</p>
       </div>
 
       <!-- Favorite Sports -->
@@ -174,14 +178,14 @@ async function saveFeatured() {
         <p v-if="hidingSports" class="text-white">Favorite Sports is Hidden</p>
         <div v-else class="flex flex-wrap gap-2">
           <UBadge
-            v-for="sport in profile.favoriteSports"
+            v-for="sport in profile?.favoriteSports"
             :key="sport.id"
             color="primary"
             variant="soft"
           >
             {{ sport.icon }} {{ sport.name }}
           </UBadge>
-          <p v-if="!profile.favoriteSports?.length" class="text-white/50 text-sm">
+          <p v-if="!profile?.favoriteSports?.length" class="text-white/50 text-sm">
             No favorite sports added.
           </p>
         </div>
@@ -215,7 +219,8 @@ async function saveFeatured() {
               <div class="mt-1.5 flex items-center gap-2 text-sm text-white/60">
                 <UIcon name="i-lucide-dumbbell" class="text-xs" />
                 <span
-                >{{ tournament.sport?.icon || '' }} {{ tournament.sport?.name || 'Unknown' }}</span
+                  >{{ tournament.sport?.icon || '' }}
+                  {{ tournament.sport?.name || 'Unknown' }}</span
                 >
                 <UBadge variant="subtle" color="neutral" size="xs">
                   {{ tournament.format === 'ROUND_ROBIN' ? 'Round Robin' : 'Elimination' }}
@@ -227,16 +232,17 @@ async function saveFeatured() {
                   <div
                     class="h-full rounded-full bg-primary transition-all"
                     :style="{
-                  width: `${Math.min((tournament.teams.length / tournament.maxTeams) * 100, 100)}%`,
-                }"
+                      width: `${Math.min((tournament.teams.length / tournament.maxTeams) * 100, 100)}%`,
+                    }"
                   />
                 </div>
                 <span class="text-xs text-white/50">
-              {{ tournament.teams.length }}/{{ tournament.maxTeams }} teams
-            </span>
+                  {{ tournament.teams.length }}/{{ tournament.maxTeams }} teams
+                </span>
               </div>
             </button>
-          </div>        </div>
+          </div>
+        </div>
         <div v-else>
           <p class="text-white/50">None played yet.</p>
         </div>
@@ -246,7 +252,13 @@ async function saveFeatured() {
       <div class="bg-white/5 p-4 rounded-lg">
         <div class="flex items-center justify-between mb-2">
           <p class="text-white/70 text-sm">Featured Achievements</p>
-          <UButton v-if="!hidingSports" size="xs" variant="ghost" color="neutral" @click="startEditFeatured">
+          <UButton
+            v-if="!hidingSports"
+            size="xs"
+            variant="ghost"
+            color="neutral"
+            @click="startEditFeatured"
+          >
             {{ editingFeatured ? 'Cancel' : 'Edit' }}
           </UButton>
         </div>
@@ -266,7 +278,7 @@ async function saveFeatured() {
           <div v-else-if="profile?.featuredAchievements?.length" class="grid gap-2 sm:grid-cols-2">
             <div
               v-for="ua in profile.featuredAchievements"
-              :key="ua.id"
+              :key="ua.id ?? ua.achievement.id"
               class="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 p-3"
             >
               <UIcon name="i-lucide-award" class="text-primary" />
@@ -292,26 +304,28 @@ async function saveFeatured() {
           <div v-else class="flex flex-col gap-2">
             <button
               v-for="ua in earnedAchievements"
-              :key="ua.id"
+              :key="ua.id ?? ua.achievement.id"
               type="button"
               class="flex items-center gap-2 rounded-lg border p-3 text-left transition"
               :class="
-                selectedFeaturedIds.includes(ua.id)
+                ua.id && selectedFeaturedIds.includes(ua.id)
                   ? 'border-primary bg-primary/10'
                   : 'border-white/10 hover:bg-white/5'
               "
-              @click="toggleFeatured(ua.id)"
+              @click="ua.id && toggleFeatured(ua.id)"
             >
               <UIcon
                 name="i-lucide-award"
-                :class="selectedFeaturedIds.includes(ua.id) ? 'text-primary' : 'text-white/40'"
+                :class="
+                  ua.id && selectedFeaturedIds.includes(ua.id) ? 'text-primary' : 'text-white/40'
+                "
               />
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium">{{ ua.achievement.name }}</p>
                 <p class="text-xs text-white/50">{{ ua.achievement.description }}</p>
               </div>
               <UIcon
-                v-if="selectedFeaturedIds.includes(ua.id)"
+                v-if="ua.id && selectedFeaturedIds.includes(ua.id)"
                 name="i-lucide-check"
                 class="text-primary"
               />

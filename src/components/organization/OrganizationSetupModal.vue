@@ -43,7 +43,7 @@ async function handleCreate() {
   createError.value = ''
   try {
     await orgStore.createOrganization(newOrgName.value.trim())
-  } catch (e) {
+  } catch {
     createError.value = 'Failed to create organization. Please try again.'
   } finally {
     createLoading.value = false
@@ -55,7 +55,7 @@ async function handleJoin(id: string) {
   joinError.value = ''
   try {
     await orgStore.joinOrganization(id)
-  } catch (e) {
+  } catch {
     joinError.value = 'Failed to join organization. Please try again.'
   } finally {
     joiningId.value = null
