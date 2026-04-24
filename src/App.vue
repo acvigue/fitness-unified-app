@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import { computed, onMounted } from 'vue'
 
 import AppLayout from './layouts/AppLayout.vue'
+import AppToaster from '@/components/AppToaster.vue'
 import OrganizationSetupModal from '@/components/organization/OrganizationSetupModal.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
@@ -41,4 +42,5 @@ useHead({
     </Suspense>
   </AppLayout>
   <OrganizationSetupModal v-if="showOrgSetup" />
+  <AppToaster />
 </template>

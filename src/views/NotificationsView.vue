@@ -4,6 +4,7 @@ import { useHead } from '@unhead/vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useNotificationStore } from '@/stores/notifications'
+import { useNotificationRouting } from '@/composables/useNotificationRouting'
 
 useHead({
   title: 'Notifications',
@@ -11,6 +12,7 @@ useHead({
 
 const { setHeader } = usePageHeader()
 const notificationStore = useNotificationStore()
+const { open } = useNotificationRouting()
 
 const NOTIFICATION_ICONS: Record<string, string> = {
   TEAM_INVITE: 'i-lucide-user-plus',
@@ -24,7 +26,20 @@ const NOTIFICATION_ICONS: Record<string, string> = {
   TEAM_DELETED: 'i-lucide-trash-2',
   TOURNAMENT_DELETED: 'i-lucide-circle-x',
   TOURNAMENT_INVITE: 'i-lucide-trophy',
+  TOURNAMENT_REMINDER: 'i-lucide-clock',
   ACHIEVEMENT_UNLOCKED: 'i-lucide-award',
+  TEAM_BROADCAST: 'i-lucide-megaphone',
+  GYM_STATUS_CHANGED: 'i-lucide-dumbbell',
+  MESSAGE_FLAGGED: 'i-lucide-flag',
+  MESSAGE_DELETED: 'i-lucide-trash',
+  ACCOUNT_SUSPENDED: 'i-lucide-pause-circle',
+  ACCOUNT_UNSUSPENDED: 'i-lucide-play-circle',
+  ACCOUNT_BANNED: 'i-lucide-ban',
+  ACCOUNT_RESTRICTED: 'i-lucide-shield-alert',
+  MEETUP_ACCEPTED: 'i-lucide-calendar-check',
+  MEETUP_DECLINED: 'i-lucide-calendar-x',
+  MEETUP_CANCELLED: 'i-lucide-calendar-minus',
+  MEETUP_PROPOSAL: 'i-lucide-calendar-plus',
 }
 
 function getIcon(type: string) {
@@ -76,15 +91,19 @@ onMounted(() => {
       </div>
 
       <div v-else class="flex flex-col gap-2">
-        <div
+        <button
           v-for="notification in notificationStore.notifications"
           :key="notification.id"
-          class="flex items-start gap-3 rounded-lg border p-4 transition"
+          type="button"
+          class="flex items-start gap-3 rounded-lg border p-4 text-left transition hover:bg-white/5"
           :class="
             notification.dismissed
               ? 'border-white/5 bg-white/[0.02] opacity-60'
-              : 'border-white/10 bg-white/5'
+              : !notification.readAt
+                ? 'border-primary/40 bg-primary/[0.04]'
+                : 'border-white/10 bg-white/5'
           "
+          @click="open(notification)"
         >
           <UIcon
             :name="getIcon(notification.type)"
@@ -93,7 +112,14 @@ onMounted(() => {
           />
 
           <div class="flex-1 min-w-0">
-            <p class="font-medium text-sm">{{ notification.title }}</p>
+            <div class="flex items-center gap-2">
+              <p class="font-medium text-sm">{{ notification.title }}</p>
+              <span
+                v-if="!notification.readAt && !notification.dismissed"
+                class="inline-block size-2 rounded-full bg-primary"
+                aria-label="Unread"
+              />
+            </div>
             <p class="text-sm text-white/60 mt-0.5">{{ notification.content }}</p>
             <p class="text-xs text-white/40 mt-1">{{ formatDate(notification.createdAt) }}</p>
           </div>
@@ -104,9 +130,9 @@ onMounted(() => {
             variant="ghost"
             color="neutral"
             icon="i-lucide-x"
-            @click="notificationStore.dismiss(notification.id)"
+            @click.stop="notificationStore.dismiss(notification.id)"
           />
-        </div>
+        </button>
       </div>
     </section>
   </PageLayout>

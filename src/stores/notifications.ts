@@ -10,9 +10,13 @@ export const useNotificationStore = defineStore('notifications', () => {
   const loading = ref(false)
   let pollInterval: ReturnType<typeof setInterval> | null = null
 
-  const unreadCount = computed(() => notifications.value.filter((n) => !n.dismissed).length)
+  const unreadCount = computed(
+    () => notifications.value.filter((n) => !n.dismissed && !n.readAt).length
+  )
 
-  const unreadNotifications = computed(() => notifications.value.filter((n) => !n.dismissed))
+  const unreadNotifications = computed(() =>
+    notifications.value.filter((n) => !n.dismissed && !n.readAt)
+  )
 
   async function fetchNotifications() {
     loading.value = true
@@ -42,6 +46,20 @@ export const useNotificationStore = defineStore('notifications', () => {
     }
   }
 
+  async function markRead(id: string) {
+    const { error } = await apiClient.PATCH('/v1/notifications/{id}/read', {
+      params: { path: { id } },
+    })
+    if (error) {
+      console.error('Failed to mark notification read:', error)
+      return
+    }
+    const notification = notifications.value.find((n) => n.id === id)
+    if (notification && !notification.readAt) {
+      notification.readAt = new Date().toISOString()
+    }
+  }
+
   function startPolling(intervalMs = 30000) {
     stopPolling()
     fetchNotifications()
@@ -68,6 +86,7 @@ export const useNotificationStore = defineStore('notifications', () => {
     unreadNotifications,
     fetchNotifications,
     dismiss,
+    markRead,
     startPolling,
     stopPolling,
     $reset,
