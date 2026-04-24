@@ -29,6 +29,7 @@ import VideoDetailView from '@/views/VideoDetailView.vue'
 import VideoCreateView from '@/views/VideoCreateView.vue'
 import GymView from '@/views/GymView.vue'
 import GymCreateView from '@/views/GymCreateView.vue'
+import BlockedUsersView from '@/views/BlockedUsersView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
 import ProfileCompareView from "@/views/ProfileCompareView.vue";
@@ -194,6 +195,11 @@ const router = createRouter({
       path: '/gyms/create',
       name: 'gym-create',
       component: GymCreateView,
+    },
+    {
+      path: '/settings/blocked-users',
+      name: 'blocked-users',
+      component: BlockedUsersView,
     },
   ],
 })

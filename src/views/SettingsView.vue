@@ -302,6 +302,62 @@
         </div>
       </UCard>
 
+      <!-- Preferences shortcuts  -->
+      <UCard class="bg-white/5">
+        <div class="space-y-3">
+          <div>
+            <p class="text-xs uppercase tracking-[0.3em] text-white/60">Preferences</p>
+            <p class="text-sm text-white/60">Manage reminders, subscriptions, and blocks.</p>
+          </div>
+          <div class="flex flex-col gap-2">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-clock"
+              trailing-icon="i-lucide-chevron-right"
+              block
+              class="justify-between"
+              :to="{ name: 'reminder-preferences' }"
+            >
+              Tournament reminders
+            </UButton>
+            <UButton
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-bell"
+              trailing-icon="i-lucide-chevron-right"
+              block
+              class="justify-between"
+              :to="{ name: 'gym-subscriptions' }"
+            >
+              Watched gyms
+            </UButton>
+            <UButton
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-user-x"
+              trailing-icon="i-lucide-chevron-right"
+              block
+              class="justify-between"
+              :to="{ name: 'blocked-users' }"
+            >
+              Blocked users
+            </UButton>
+            <UButton
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-flag"
+              trailing-icon="i-lucide-chevron-right"
+              block
+              class="justify-between"
+              :to="{ name: 'my-reports' }"
+            >
+              My reports
+            </UButton>
+          </div>
+        </div>
+      </UCard>
+
       <!-- About Section  -->
       <UCard class="bg-white/5">
         <div class="space-y-3">

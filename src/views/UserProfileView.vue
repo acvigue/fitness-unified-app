@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
+import UserBlockButton from '@/components/user/UserBlockButton.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useI18n } from 'vue-i18n'
 import { apiClient } from '@/lib/api/client'
@@ -222,8 +223,9 @@ function getStatusColor(status: string) {
         </div>
         <p v-else class="text-white/50 text-sm">No featured achievements.</p>
       </div>
-      <div class="flex justify-center">
+      <div class="flex justify-center gap-3 flex-wrap">
         <UButton @click="moveToComparePage" color="primary" variant="soft"> Compare Profiles </UButton>
+        <UserBlockButton v-if="userId" :user-id="userId" />
       </div>
     </div>
   </PageLayout>
