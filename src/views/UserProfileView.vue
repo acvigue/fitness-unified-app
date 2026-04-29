@@ -73,6 +73,10 @@ onMounted(async () => {
     }
     profile.value = profileData
     tournamentHistory.value = profile.value?.tournaments ?? []
+    hidingBio.value = profileData?.privateBio ?? false
+    hidingSports.value = profileData?.privateSports ?? false
+    hidingTournaments.value = profileData?.privateTournaments ?? false
+    hidingAchievements.value = profileData?.privateAchievements ?? false
   } catch (err: unknown) {
     console.error('Failed to load profile. userId:', userId.value, 'Error:', err)
     const msg = getErrorMessage(err, 'Failed to load profile')
@@ -80,25 +84,6 @@ onMounted(async () => {
     toast.error('Failed to load profile', msg)
   } finally {
     loading.value = false
-  }
-
-  if (notFound.value) return
-
-  try {
-    const { data: privacyData, error: privacyErr } = await apiClient.PATCH(
-      '/v1/user/profile/user/privacy',
-      {
-        body: { q: userId.value },
-      },
-    )
-    if (privacyErr) throw new Error(getErrorMessage(privacyErr, 'Failed to load privacy settings'))
-    hidingBio.value = privacyData.privateBio
-    hidingSports.value = privacyData.privateSports
-    hidingTournaments.value = privacyData.privateTournaments
-    hidingAchievements.value = privacyData.privateAchievements
-  } catch (err) {
-    // Non-fatal: privacy info defaults to "not hiding".
-    console.error(err)
   }
 })
 

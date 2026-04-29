@@ -37,6 +37,11 @@ const connected = ref(false)
 export function useChatSocket() {
   function connect(callbacks: SocketCallbacks) {
     if (socket?.connected) return
+    if (socket) {
+      socket.removeAllListeners()
+      socket.disconnect()
+      socket = null
+    }
 
     const authStore = useAuthStore()
 
@@ -71,8 +76,11 @@ export function useChatSocket() {
   }
 
   function disconnect() {
-    socket?.disconnect()
-    socket = null
+    if (socket) {
+      socket.removeAllListeners()
+      socket.disconnect()
+      socket = null
+    }
     connected.value = false
   }
 

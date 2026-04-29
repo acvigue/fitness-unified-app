@@ -62,7 +62,7 @@ export const useNotificationStore = defineStore('notifications', () => {
         console.error('Failed to fetch notifications:', error)
         return
       }
-      const next = data ?? []
+      const next = data?.data ?? []
       detectNewAndToast(next)
       notifications.value = next
     } finally {

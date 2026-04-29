@@ -32,7 +32,7 @@ async function loadTeams() {
       loadError.value = getErrorMessage(error, 'Failed to load teams')
       return
     }
-    allTeams.value = data ?? []
+    allTeams.value = data?.data ?? []
   } catch (e) {
     loadError.value = e instanceof Error ? e.message : 'Failed to load teams'
   } finally {

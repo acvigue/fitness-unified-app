@@ -74,7 +74,7 @@ async function loadData() {
       return
     }
     tournament.value = tournamentRes.data
-    allTeams.value = teamsRes.data ?? []
+    allTeams.value = teamsRes.data?.data ?? []
 
     await loadInvitations()
   } catch (e) {

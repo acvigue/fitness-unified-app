@@ -42,7 +42,7 @@ async function loadTeam() {
 async function loadAllTeamNames() {
   const { data, error } = await apiClient.GET('/v1/teams')
   if (error) return
-  for (const t of data ?? []) {
+  for (const t of data?.data ?? []) {
     teamNamesById.value.set(t.id, t.name)
   }
 }

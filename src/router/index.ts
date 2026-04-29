@@ -189,14 +189,14 @@ const router = createRouter({
       component: VideosView,
     },
     {
-      path: '/videos/:id',
-      name: 'video-detail',
-      component: VideoDetailView,
-    },
-    {
       path: '/videos/create',
       name: 'video-create',
       component: VideoCreateView,
+    },
+    {
+      path: '/videos/:id',
+      name: 'video-detail',
+      component: VideoDetailView,
     },
     {
       path: '/gyms',

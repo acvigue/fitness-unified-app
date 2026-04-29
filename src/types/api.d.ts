@@ -357,6 +357,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Track an engagement event for the current user */
         post: operations["EngagementController_trackEvent_v1"];
         delete?: never;
         options?: never;
@@ -371,6 +372,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List the current user's engagement events */
         get: operations["EngagementController_getUserEngagement_v1"];
         put?: never;
         post?: never;
@@ -387,6 +389,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Count profile views for the current user */
         get: operations["EngagementController_getProfileViews_v1"];
         put?: never;
         post?: never;
@@ -403,6 +406,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Count messages sent by the current user */
         get: operations["EngagementController_getMessagesSent_v1"];
         put?: never;
         post?: never;
@@ -1308,23 +1312,6 @@ export interface paths {
         head?: never;
         /** Update current user profile privacy */
         patch: operations["UserController_updateProfilePrivacy_v1"];
-        trace?: never;
-    };
-    "/v1/user/profile/user/privacy": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Update current user profile privacy */
-        patch: operations["UserController_getUserProfilePrivacy_v1"];
         trace?: never;
     };
     "/v1/user/sessions/enrich": {
@@ -2389,6 +2376,32 @@ export interface components {
              */
             createdAt: string;
         };
+        PaginationMetaDto: {
+            /**
+             * @description Current page number
+             * @example 1
+             */
+            page: number;
+            /**
+             * @description Items per page
+             * @example 20
+             */
+            per_page: number;
+            /**
+             * @description Total number of items
+             * @example 100
+             */
+            total: number;
+            /**
+             * @description Total number of pages
+             * @example 5
+             */
+            total_pages: number;
+        };
+        PaginatedNotificationResponseDto: {
+            data: components["schemas"]["NotificationResponseDto"][];
+            meta: components["schemas"]["PaginationMetaDto"];
+        };
         CreateBroadcastDto: {
             /**
              * @description Broadcast message content
@@ -2587,28 +2600,6 @@ export interface components {
              */
             createdAt: string;
         };
-        PaginationMetaDto: {
-            /**
-             * @description Current page number
-             * @example 1
-             */
-            page: number;
-            /**
-             * @description Items per page
-             * @example 20
-             */
-            per_page: number;
-            /**
-             * @description Total number of items
-             * @example 100
-             */
-            total: number;
-            /**
-             * @description Total number of pages
-             * @example 5
-             */
-            total_pages: number;
-        };
         ChatHistoryResponseDto: {
             data: components["schemas"]["MessageResponseDto"][];
             meta: components["schemas"]["PaginationMetaDto"];
@@ -2731,6 +2722,52 @@ export interface components {
             teamId?: string;
             chatId?: string;
             metadata?: Record<string, never>;
+        };
+        EngagementEventResponseDto: {
+            /** @description Event ID */
+            id: string;
+            /** @description User who performed the event */
+            userId: string;
+            /** @enum {string} */
+            type: "MESSAGE_SENT" | "PROFILE_VIEW" | "TEAM_JOIN" | "TEAM_LEAVE" | "CHAT_CREATED" | "TOURNAMENT_JOIN" | "TEAM_CHAT_MESSAGE" | "MEETUP_ATTENDED" | "INTER_TEAM_INTERACTION";
+            /** @description Target user, if event is user-targeted */
+            targetUserId?: string;
+            /** @description Team, if event is team-scoped */
+            teamId?: string;
+            /** @description Chat, if event is chat-scoped */
+            chatId?: string;
+            /** @description Additional metadata */
+            metadata?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Format: date-time
+             * @description Created timestamp
+             */
+            createdAt: string;
+        };
+        PaginatedEngagementEventResponseDto: {
+            data: components["schemas"]["EngagementEventResponseDto"][];
+            meta: components["schemas"]["PaginationMetaDto"];
+        };
+        EngagementCountResponseDto: {
+            /** @description Count */
+            count: number;
+        };
+        ModerationMessageResponseDto: {
+            id: string;
+            chatId: string;
+            senderId: string;
+            content: string;
+            type: string;
+            /** Format: date-time */
+            hiddenAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        PaginatedModerationMessageResponseDto: {
+            data: components["schemas"]["ModerationMessageResponseDto"][];
+            meta: components["schemas"]["PaginationMetaDto"];
         };
         FlagMessageDto: {
             reason?: string;
@@ -3138,6 +3175,10 @@ export interface components {
              */
             createdAt: string;
         };
+        PaginatedMeetupResponseDto: {
+            data: components["schemas"]["MeetupResponseDto"][];
+            meta: components["schemas"]["PaginationMetaDto"];
+        };
         CreateTeamBlockDto: {
             /**
              * @description ID of the team to block
@@ -3431,6 +3472,14 @@ export interface components {
             featuredAchievements: components["schemas"]["UserAchievementResponseDto"][];
             /** @description Tournament History */
             tournaments: components["schemas"]["TournamentResponseDto"][];
+            /** @description Whether bio is hidden from the viewer */
+            privateBio: boolean;
+            /** @description Whether favorite sports are hidden from the viewer */
+            privateSports: boolean;
+            /** @description Whether tournaments are hidden from the viewer */
+            privateTournaments: boolean;
+            /** @description Whether featured achievements are hidden from the viewer */
+            privateAchievements: boolean;
         };
         OrganizationMemberProfileResponseDto: {
             /**
@@ -3667,13 +3716,6 @@ export interface components {
              */
             privateAchievements: boolean;
         };
-        UserLookupQueryDto: {
-            /**
-             * @description Search term to look up users by email, name, or username
-             * @example john
-             */
-            q: string;
-        };
         EnrichSessionDto: {
             /** @description The refresh token for the current session */
             refreshToken: string;
@@ -3887,6 +3929,10 @@ export interface components {
              */
             createdAt: string;
         };
+        PaginatedReportResponseDto: {
+            data: components["schemas"]["ReportResponseDto"][];
+            meta: components["schemas"]["PaginationMetaDto"];
+        };
         UpdateReportStatusDto: {
             /**
              * @description Report ID
@@ -3942,6 +3988,10 @@ export interface components {
             sportId: string;
             /** @description List of team members */
             members: components["schemas"]["UserResponseDto"][];
+        };
+        PaginatedTeamResponseDto: {
+            data: components["schemas"]["TeamResponseDto"][];
+            meta: components["schemas"]["PaginationMetaDto"];
         };
         TeamInvitationResponseDto: {
             /**
@@ -4677,7 +4727,10 @@ export interface operations {
     };
     NotificationController_findAll_v1: {
         parameters: {
-            query?: never;
+            query?: {
+                per_page?: number;
+                page?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4689,7 +4742,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["NotificationResponseDto"][];
+                    "application/json": components["schemas"]["PaginatedNotificationResponseDto"];
                 };
             };
             /** @description Unauthorized - invalid or missing token */
@@ -5627,13 +5680,18 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["EngagementEventResponseDto"];
+                };
             };
         };
     };
     EngagementController_getUserEngagement_v1: {
         parameters: {
-            query?: never;
+            query?: {
+                per_page?: number;
+                page?: number;
+            };
             header?: never;
             path: {
                 userId: string;
@@ -5646,7 +5704,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PaginatedEngagementEventResponseDto"];
+                };
             };
         };
     };
@@ -5665,7 +5725,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["EngagementCountResponseDto"];
+                };
             };
         };
     };
@@ -5684,7 +5746,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["EngagementCountResponseDto"];
+                };
             };
         };
     };
@@ -5695,6 +5759,8 @@ export interface operations {
                 from?: string;
                 to?: string;
                 teamId?: string;
+                page?: number;
+                per_page?: number;
             };
             header?: never;
             path?: never;
@@ -5702,6 +5768,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedModerationMessageResponseDto"];
+                };
+            };
             /** @description Unauthorized - invalid or missing token */
             401: {
                 headers: {
@@ -7037,6 +7111,8 @@ export interface operations {
     MeetupController_getTeamMeetups_v1: {
         parameters: {
             query?: {
+                per_page?: number;
+                page?: number;
                 status?: "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
             };
             header?: never;
@@ -7052,7 +7128,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MeetupResponseDto"][];
+                    "application/json": components["schemas"]["PaginatedMeetupResponseDto"];
                 };
             };
             /** @description Unauthorized - invalid or missing token */
@@ -8673,29 +8749,6 @@ export interface operations {
             };
         };
     };
-    UserController_getUserProfilePrivacy_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserLookupQueryDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UpdateUserProfilePrivacyDto"];
-                };
-            };
-        };
-    };
     UserController_enrichSession_v1: {
         parameters: {
             query?: never;
@@ -9151,7 +9204,10 @@ export interface operations {
     };
     ReportController_findAll_v1: {
         parameters: {
-            query?: never;
+            query?: {
+                per_page?: number;
+                page?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -9163,11 +9219,20 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ReportResponseDto"][];
+                    "application/json": components["schemas"]["PaginatedReportResponseDto"];
                 };
             };
             /** @description Unauthorized - invalid or missing token */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9188,7 +9253,10 @@ export interface operations {
     };
     ReportController_findAllUserReports_v1: {
         parameters: {
-            query?: never;
+            query?: {
+                per_page?: number;
+                page?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -9200,7 +9268,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ReportResponseDto"][];
+                    "application/json": components["schemas"]["PaginatedReportResponseDto"];
                 };
             };
             /** @description Unauthorized - invalid or missing token */
@@ -9246,6 +9314,15 @@ export interface operations {
             };
             /** @description Unauthorized - invalid or missing token */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Access denied */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9317,6 +9394,8 @@ export interface operations {
                 q?: string;
                 /** @description Filter by sport */
                 sportId?: string;
+                per_page?: number;
+                page?: number;
             };
             header?: never;
             path?: never;
@@ -9329,7 +9408,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TeamResponseDto"][];
+                    "application/json": components["schemas"]["PaginatedTeamResponseDto"];
                 };
             };
             /** @description Unauthorized - invalid or missing token */

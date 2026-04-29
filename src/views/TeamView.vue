@@ -76,7 +76,7 @@ async function loadTeams() {
       toast.error('Failed to load teams', getErrorMessage(error))
       return
     }
-    teams.value = data ?? []
+    teams.value = data?.data ?? []
   } catch (e) {
     toast.error('Failed to load teams', getErrorMessage(e))
   } finally {

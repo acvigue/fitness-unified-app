@@ -194,8 +194,8 @@ async function loadTournament() {
 async function loadMyTeams() {
   try {
     const { data } = await apiClient.GET('/v1/teams')
-    if (data) {
-      myTeams.value = data
+    if (data?.data) {
+      myTeams.value = data.data
     }
   } catch {
     // Not critical

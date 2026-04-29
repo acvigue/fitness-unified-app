@@ -231,7 +231,7 @@ async function loadMyTeams() {
       toast.warning('Could not load your teams', getErrorMessage(err))
       return
     }
-    myTeams.value = (data ?? []).filter(
+    myTeams.value = (data?.data ?? []).filter(
       (t) =>
         t.captainId === currentUserId.value || t.members.some((m) => m.sub === currentUserId.value),
     )

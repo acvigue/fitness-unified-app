@@ -18,7 +18,7 @@ export const useMeetupStore = defineStore('meetup', () => {
         params: { path: { teamId } },
       })
       if (error) throw new Error(getErrorMessage(error, 'Failed to load meetups'))
-      meetupsByTeam.value.set(teamId, data ?? [])
+      meetupsByTeam.value.set(teamId, data?.data ?? [])
     } finally {
       loading.value = false
     }

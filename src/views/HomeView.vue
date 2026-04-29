@@ -10,14 +10,6 @@
           </p>
           <div class="flex justify-center gap-3 pt-4" ref="docref">
             <UButton
-              icon="i-lucide-book-open"
-              variant="soft"
-              aria-label="Open documentation"
-              @click="openDocs"
-            >
-              Documentation
-            </UButton>
-            <UButton
               icon="i-lucide-compass"
               variant="soft"
               aria-label="Start app guide"
@@ -77,12 +69,9 @@ import { useHead } from '@unhead/vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useShepherd } from 'vue-shepherd'
-import { useGuideRefsStore } from '@/stores/guide'
 
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
-
-const refStore = useGuideRefsStore()
 
 const tour = useShepherd({
   useModalOverlay: true,
@@ -95,11 +84,6 @@ useHead({
 
 const router = useRouter()
 const { setHeader } = usePageHeader()
-
-const openDocs = () => {
-  // Replace with your documentation URL
-  window.open('https://github.com/yourusername/yourproject', '_blank')
-}
 
 const openSettings = () => {
   router.push('/settings')
@@ -115,8 +99,6 @@ onMounted(() => {
   setHeader({
     title: 'Home',
   })
-  console.log('ref value:')
-  console.log(refStore.getSidebar)
 
   tour.addStep({
     attachTo: { element: null, on: 'bottom' },

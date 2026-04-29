@@ -150,7 +150,7 @@
 
           <!-- Status messages -->
           <p v-if="showSaveSuccess" class="text-green-500 text-sm mt-2">Saved profile</p>
-          <p v-if="showSaveInfo" class="text-red-500 text-sm mt-2">• Need to change the profile</p>
+          <p v-if="showSaveInfo" class="text-amber-500 text-sm mt-2">You have unsaved changes</p>
 
           <!-- Save Button -->
           <div class="flex justify-end">
@@ -604,7 +604,6 @@ onMounted(async () => {
     if (privacyData.privateAchievements === true) {
       value4.value = 'Yes'
     }
-    console.log(privacyData)
   } catch (err: unknown) {
     profileError.value = err instanceof Error ? err.message : 'Failed to update name'
   }
@@ -690,6 +689,10 @@ const profile = ref<UserProfile>({
   pictures: [],
   featuredAchievements: [],
   tournaments: [],
+  privateBio: false,
+  privateSports: false,
+  privateTournaments: false,
+  privateAchievements: false,
 })
 const profileForm = reactive({ bio: '', favoriteSports: [] as Sport[] })
 const saving = ref(false)

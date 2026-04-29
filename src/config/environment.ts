@@ -14,8 +14,6 @@ export const ENV = {
 
   /** External URLs */
   accountPortalUrl: 'https://sso.koiosdigital.net/realms/fittime/account',
-  supportUrl: 'https://example.com/support',
-  supportEmail: 'support@example.com',
 
   /** App Metadata */
   appChannel: isDev ? 'dev' : 'prod',

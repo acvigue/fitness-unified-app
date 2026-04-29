@@ -83,11 +83,22 @@ function formatTime(dateStr: string) {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
 }
 
+function escapeHtml(s: string) {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 function highlightMatch(content: string, query: string) {
-  if (!query) return content
-  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  return content.replace(
-    new RegExp(`(${escaped})`, 'gi'),
+  const safeContent = escapeHtml(content)
+  if (!query) return safeContent
+  const safeQuery = escapeHtml(query)
+  const regexSafeQuery = safeQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return safeContent.replace(
+    new RegExp(`(${regexSafeQuery})`, 'gi'),
     '<mark class="bg-primary/30 text-inherit rounded-sm px-0.5">$1</mark>',
   )
 }

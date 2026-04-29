@@ -40,7 +40,7 @@ async function loadReports() {
   try {
     const { data: reportsData, error: err } = await apiClient.GET('/v1/report/user')
     if (err) throw new Error(getErrorMessage(err, 'Failed to load reports'))
-    reports.value = Array.isArray(reportsData) ? reportsData : [reportsData]
+    reports.value = reportsData?.data ?? []
   } catch (e) {
     reports.value = []
     reportsError.value = getErrorMessage(e, 'Failed to load reports')

@@ -33,7 +33,7 @@ async function load() {
       toast.error('Could not load reports', message)
       return
     }
-    reports.value = Array.isArray(data) ? data : data ? [data] : []
+    reports.value = data?.data ?? []
   } catch (e) {
     const message = getErrorMessage(e, 'Failed to load reports')
     error.value = message

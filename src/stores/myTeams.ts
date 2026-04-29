@@ -25,7 +25,7 @@ export const useMyTeamsStore = defineStore('myTeams', () => {
     loading.value = true
     try {
       const { data } = await apiClient.GET('/v1/teams')
-      teams.value = (data ?? []) as Team[]
+      teams.value = data?.data ?? []
       initialized.value = true
     } finally {
       loading.value = false

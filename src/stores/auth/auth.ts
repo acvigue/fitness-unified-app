@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { defineStore } from 'pinia'
+import { defineStore, getActivePinia, type Pinia, type Store } from 'pinia'
 import { Preferences } from '@capacitor/preferences'
 import { KoiosOidcClient } from './oauthlib'
 import { jwtDecode } from 'jwt-decode'
@@ -176,10 +176,25 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
+   * Reset every other Pinia store so cached user-scoped data (chats, teams,
+   * notifications, blocks, ...) doesn't leak across user sessions on the same device.
+   */
+  function resetOtherStores() {
+    const pinia = getActivePinia() as (Pinia & { _s: Map<string, Store> }) | undefined
+    if (!pinia) return
+    for (const store of pinia._s.values()) {
+      if (store.$id === 'auth') continue
+      const reset = (store as { $reset?: () => void }).$reset
+      if (typeof reset === 'function') reset()
+    }
+  }
+
+  /**
    * Log out the user and clear all tokens
    */
   async function logout() {
     await persistTokens(undefined, undefined)
+    resetOtherStores()
 
     try {
       await KoiosOidcClient.logout()
@@ -190,7 +205,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function clearLocalSession() {
     await persistTokens(undefined, undefined)
-    // Optionally clear any other user-specific cached data here
+    resetOtherStores()
   }
 
   return {
