@@ -37,6 +37,8 @@ import ModerationMessagesView from '@/views/moderation/ModerationMessagesView.vu
 import ModerationUsersView from '@/views/moderation/ModerationUsersView.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
+import { useCurrentUserStore } from '@/stores/currentUser'
+import { useAccountStatusStore } from '@/stores/accountStatus'
 import ProfileCompareView from '@/views/ProfileCompareView.vue'
 
 const router = createRouter({
@@ -236,11 +238,13 @@ const router = createRouter({
       path: '/moderation/messages',
       name: 'moderation-messages',
       component: ModerationMessagesView,
+      meta: { requiresModRole: true },
     },
     {
       path: '/moderation/users',
       name: 'moderation-users',
       component: ModerationUsersView,
+      meta: { requiresModRole: true },
     },
   ],
 })
@@ -273,11 +277,26 @@ router.beforeEach(async (to) => {
     await orgStore.fetchMemberships()
   }
 
+  // Fetch the current user record (systemRole-based gates) and account
+  // status (so the banner is in place before the first paint) once.
+  const currentUser = useCurrentUserStore()
+  const accountStatus = useAccountStatusStore()
+  if (!currentUser.initialized) {
+    await currentUser.load()
+  }
+  if (!accountStatus.initialized) {
+    accountStatus.load().catch(() => undefined)
+  }
+
   if (to.meta.requiresOrgStaff) {
     const hasStaff = orgStore.memberships.some((m) => m.role === 'STAFF' || m.role === 'ADMIN')
     if (!hasStaff) {
       return { path: '/gyms' }
     }
+  }
+
+  if (to.meta.requiresModRole && !currentUser.isModerator) {
+    return { path: '/' }
   }
 
   return true

@@ -1084,6 +1084,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/user/me/account-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current user account status (active/suspended/banned + active restrictions). Reachable while suspended/banned so the frontend can render an appropriate banner. */
+        get: operations["UserController_getAccountStatus_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/user/profile": {
         parameters: {
             query?: never;
@@ -1338,7 +1355,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Update a report status */
+        /** Update a report status (organization admins only) */
         patch: operations["ReportController_setReportStatus_v1"];
         trace?: never;
     };
@@ -3034,6 +3051,12 @@ export interface components {
              *     ]
              */
             scopes: Record<string, never>[][];
+            /**
+             * @description System-wide role for the user. Only populated on /v1/user/me; absent when this DTO appears as a member subobject (e.g. team members).
+             * @example STUDENT
+             * @enum {string}
+             */
+            systemRole?: "STUDENT" | "TEAM_CAPTAIN" | "ORG_MANAGER" | "DEPT_MANAGER" | "ADMIN";
         };
         TournamentTeamResponseDto: {
             /**
@@ -3270,6 +3293,28 @@ export interface components {
              * @description Joined timestamp
              */
             joinedAt: string;
+        };
+        ActiveRestrictionDto: {
+            /** @enum {string} */
+            action: "MESSAGING" | "TEAM_JOIN" | "TOURNAMENT_REGISTER";
+            /** Format: date-time */
+            endsAt: string;
+            reason: string;
+        };
+        AccountStatusResponseDto: {
+            /**
+             * @description Overall account status. ACTIVE means the user can use the app normally; SUSPENDED is time-bounded; BANNED is permanent until revoked.
+             * @enum {string}
+             */
+            status: "ACTIVE" | "SUSPENDED" | "BANNED";
+            /**
+             * Format: date-time
+             * @description When a SUSPENDED account becomes active again (ISO 8601). Null otherwise.
+             */
+            suspendedUntil?: string | null;
+            reason?: string | null;
+            /** @description Active per-action restrictions, even when the overall status is ACTIVE. */
+            restrictions: components["schemas"]["ActiveRestrictionDto"][];
         };
         UpdateUserProfileDto: {
             /**
@@ -7481,6 +7526,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserMembershipResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    UserController_getAccountStatus_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountStatusResponseDto"];
                 };
             };
             /** @description Unauthorized - invalid or missing token */

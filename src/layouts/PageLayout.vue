@@ -27,6 +27,7 @@
         <NotificationBell />
       </div>
     </header>
+    <AccountStatusBanner />
     <main class="page-content">
       <slot />
     </main>
@@ -37,6 +38,7 @@
 import { useRouter } from 'vue-router'
 import { usePageHeader } from '@/composables/usePageHeader'
 import NotificationBell from '@/components/notifications/NotificationBell.vue'
+import AccountStatusBanner from '@/components/account/AccountStatusBanner.vue'
 
 const router = useRouter()
 const { title, backRoute, actions } = usePageHeader()
