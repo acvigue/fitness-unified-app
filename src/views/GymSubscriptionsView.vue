@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useHead } from '@unhead/vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useGymSubscriptionStore } from '@/stores/gymSubscriptions'
 import { useToastStore } from '@/stores/toast'
+import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
+import type { components } from '@/types/api'
+
+type GymSummary = components['schemas']['GymWithRulesResponseDto']
 
 useHead({ title: 'Watched gyms' })
 
@@ -13,9 +17,19 @@ const { setHeader } = usePageHeader()
 const store = useGymSubscriptionStore()
 const toast = useToastStore()
 
+const gymsById = ref<Record<string, GymSummary>>({})
+
 const confirmOpen = ref(false)
 const confirmLoading = ref(false)
 const pendingGymId = ref<string | null>(null)
+
+function gymName(gymId: string) {
+  return gymsById.value[gymId]?.name ?? `Gym · ${gymId.slice(0, 8)}`
+}
+
+function gymLocation(gymId: string) {
+  return gymsById.value[gymId]?.location ?? null
+}
 
 function askUnsubscribe(gymId: string) {
   pendingGymId.value = gymId
@@ -37,9 +51,16 @@ async function confirmUnsubscribe() {
   }
 }
 
-onMounted(() => {
+async function loadGymNames() {
+  const { data } = await apiClient.GET('/v1/gyms')
+  gymsById.value = Object.fromEntries((data ?? []).map((g) => [g.id, g]))
+}
+
+const pendingGymName = computed(() => (pendingGymId.value ? gymName(pendingGymId.value) : ''))
+
+onMounted(async () => {
   setHeader({ title: 'Watched gyms', backRoute: '/settings' })
-  store.load()
+  await Promise.all([store.load(), loadGymNames()])
 })
 </script>
 
@@ -88,8 +109,11 @@ onMounted(() => {
               :to="`/gyms?gymId=${sub.gymId}`"
               class="text-sm font-medium truncate hover:text-primary transition-colors block"
             >
-              Gym · {{ sub.gymId.slice(0, 8) }}
+              {{ gymName(sub.gymId) }}
             </RouterLink>
+            <p v-if="gymLocation(sub.gymId)" class="text-xs text-white/60">
+              {{ gymLocation(sub.gymId) }}
+            </p>
             <p class="text-xs text-white/50">
               Watched since {{ new Date(sub.createdAt).toLocaleDateString() }}
             </p>
@@ -116,7 +140,9 @@ onMounted(() => {
               <UIcon name="i-lucide-bell-off" class="size-5 text-error" />
             </div>
             <div class="flex flex-col gap-1 min-w-0">
-              <h2 class="text-lg font-semibold">Unsubscribe from gym?</h2>
+              <h2 class="text-lg font-semibold">
+                Unsubscribe from {{ pendingGymName || 'this gym' }}?
+              </h2>
               <p class="text-sm text-white/60">
                 You'll stop receiving updates when this gym's availability changes.
               </p>

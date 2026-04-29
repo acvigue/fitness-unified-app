@@ -1,73 +1,63 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useHead } from '@unhead/vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
-import GymSlotPanel from '@/components/gym/GymSlotPanel.vue'
+import GymScheduleGrid from '@/components/gym/GymScheduleGrid.vue'
 import GymSubscribeButton from '@/components/gym/GymSubscribeButton.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
+import { useMyTeamsStore } from '@/stores/myTeams'
+import { useGymPermissions, useHasStaffRoleAnywhere } from '@/composables/useGymPermissions'
+import type { components } from '@/types/api'
 
-interface GymSummary {
-  id: string
-  name: string
-  description: string | null
-  location: string | null
-  organizationId: string
-}
+type GymSummary = components['schemas']['GymWithRulesResponseDto']
 
 useHead({ title: 'Gyms' })
 
+const route = useRoute()
 const router = useRouter()
 const { setHeader } = usePageHeader()
+const myTeams = useMyTeamsStore()
+const hasStaffAnywhere = useHasStaffRoleAnywhere()
 
 const gyms = ref<GymSummary[]>([])
 const loading = ref(false)
 const error = ref('')
 const selectedGymId = ref<string>('')
 const searchTerm = ref('')
-const sortBy = ref<'name' | 'location'>('name')
 
 const filteredGyms = computed(() => {
   const term = searchTerm.value.trim().toLowerCase()
-  const list = term
-    ? gyms.value.filter(
-        (g) =>
-          g.name.toLowerCase().includes(term) ||
-          (g.location?.toLowerCase().includes(term) ?? false),
-      )
-    : gyms.value.slice()
-
-  return list.sort((a, b) => {
-    if (sortBy.value === 'location') {
-      const aLoc = a.location ?? ''
-      const bLoc = b.location ?? ''
-      const cmp = aLoc.localeCompare(bLoc)
-      if (cmp !== 0) return cmp
-    }
-    return a.name.localeCompare(b.name)
-  })
+  if (!term) return gyms.value.slice().sort((a, b) => a.name.localeCompare(b.name))
+  return gyms.value
+    .filter(
+      (g) =>
+        g.name.toLowerCase().includes(term) || (g.location?.toLowerCase().includes(term) ?? false),
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
 })
 
 const selectedGym = computed(() => gyms.value.find((g) => g.id === selectedGymId.value) ?? null)
+
+const { canManage } = useGymPermissions(() => selectedGym.value?.organizationId ?? null)
 
 async function loadGyms() {
   loading.value = true
   error.value = ''
   try {
-    const response = await (
-      apiClient as unknown as {
-        GET: (path: string) => Promise<{ data?: unknown; error?: unknown }>
-      }
-    ).GET('/v1/gyms')
-    const { data, error: err } = response
+    const { data, error: err } = await apiClient.GET('/v1/gyms')
     if (err) {
       error.value = getErrorMessage(err, 'Failed to load gyms')
       return
     }
-    gyms.value = (data as GymSummary[]) ?? []
-    if (gyms.value.length > 0 && !selectedGymId.value) {
+    gyms.value = data ?? []
+
+    const queryGymId = typeof route.query.gymId === 'string' ? route.query.gymId : null
+    if (queryGymId && gyms.value.some((g) => g.id === queryGymId)) {
+      selectedGymId.value = queryGymId
+    } else if (gyms.value.length > 0 && !selectedGymId.value) {
       selectedGymId.value = gyms.value[0].id
     }
   } finally {
@@ -85,17 +75,29 @@ watch(filteredGyms, (list) => {
   }
 })
 
+watch(
+  () => route.query.gymId,
+  (next) => {
+    if (typeof next === 'string' && gyms.value.some((g) => g.id === next)) {
+      selectedGymId.value = next
+    }
+  },
+)
+
 onMounted(() => {
   setHeader({
     title: 'Gyms',
-    actions: [
-      {
-        icon: 'i-lucide-plus',
-        label: 'Create gym',
-        onClick: () => router.push('/gyms/create'),
-      },
-    ],
+    actions: hasStaffAnywhere.value
+      ? [
+          {
+            icon: 'i-lucide-plus',
+            label: 'Create gym',
+            onClick: () => router.push('/gyms/create'),
+          },
+        ]
+      : [],
   })
+  myTeams.load()
   loadGyms()
 })
 </script>
@@ -117,8 +119,16 @@ onMounted(() => {
       >
         <UIcon name="i-lucide-dumbbell" class="size-8 text-white/40" />
         <p class="text-sm font-medium text-white/70">No gyms found</p>
-        <p class="text-xs text-white/50">Be the first to add a gym for your organization.</p>
-        <UButton class="mt-2" icon="i-lucide-plus" size="sm" @click="router.push('/gyms/create')">
+        <p v-if="hasStaffAnywhere" class="text-xs text-white/50">
+          Add a gym for your organization.
+        </p>
+        <UButton
+          v-if="hasStaffAnywhere"
+          class="mt-2"
+          icon="i-lucide-plus"
+          size="sm"
+          @click="router.push('/gyms/create')"
+        >
           Create a gym
         </UButton>
       </div>
@@ -131,28 +141,17 @@ onMounted(() => {
               icon="i-lucide-search"
               placeholder="Search by name or location"
             />
-            <div class="grid gap-3 sm:grid-cols-2">
-              <UFormField label="Sort by">
-                <USelect
-                  v-model="sortBy"
-                  :items="[
-                    { label: 'Name', value: 'name' },
-                    { label: 'Location', value: 'location' },
-                  ]"
-                />
-              </UFormField>
-              <UFormField label="Location">
-                <USelect
-                  v-model="selectedGymId"
-                  :items="
-                    filteredGyms.map((gym) => ({
-                      label: gym.name + (gym.location ? ` · ${gym.location}` : ''),
-                      value: gym.id,
-                    }))
-                  "
-                />
-              </UFormField>
-            </div>
+            <UFormField label="Gym">
+              <USelect
+                v-model="selectedGymId"
+                :items="
+                  filteredGyms.map((gym) => ({
+                    label: gym.name + (gym.location ? ` · ${gym.location}` : ''),
+                    value: gym.id,
+                  }))
+                "
+              />
+            </UFormField>
             <p v-if="filteredGyms.length === 0" class="text-xs text-white/50">
               No gyms match this search.
             </p>
@@ -170,11 +169,28 @@ onMounted(() => {
                 {{ selectedGym.description }}
               </p>
             </div>
-            <GymSubscribeButton :gym-id="selectedGym.id" />
+            <div class="flex items-center gap-2 shrink-0">
+              <UButton
+                v-if="canManage"
+                size="sm"
+                variant="outline"
+                color="neutral"
+                icon="i-lucide-settings"
+                @click="router.push(`/gyms/${selectedGym.id}/manage`)"
+              >
+                Manage
+              </UButton>
+              <GymSubscribeButton :gym-id="selectedGym.id" />
+            </div>
           </div>
         </UCard>
 
-        <GymSlotPanel v-if="selectedGymId" :gym-id="selectedGymId" />
+        <GymScheduleGrid
+          v-if="selectedGym"
+          :gym-id="selectedGym.id"
+          :organization-id="selectedGym.organizationId"
+          mode="browse"
+        />
       </template>
     </section>
   </PageLayout>

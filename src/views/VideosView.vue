@@ -170,17 +170,61 @@ onMounted(() => {
           v-for="video in videos"
           :key="video.id"
           type="button"
-          class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10"
+          class="overflow-hidden rounded-lg border border-white/10 bg-white/5 text-left transition hover:bg-white/10"
           @click="router.push(`/videos/${video.id}`)"
         >
-          <p class="font-medium truncate">{{ video.name }}</p>
-          <p v-if="video.description" class="mt-1 text-xs text-white/50 line-clamp-2">
-            {{ video.description }}
-          </p>
+          <div
+            class="relative aspect-video w-full overflow-hidden bg-black/40 flex items-center justify-center"
+          >
+            <img
+              v-if="video.thumbnailUrl"
+              :src="video.thumbnailUrl"
+              :alt="`${video.name} thumbnail`"
+              class="h-full w-full object-cover"
+              loading="lazy"
+            />
+            <UIcon
+              v-else-if="video.status === 'PENDING' || video.status === 'PROCESSING'"
+              name="i-lucide-loader-2"
+              class="animate-spin size-8 text-white/40"
+            />
+            <UIcon
+              v-else-if="video.status === 'ERRORED'"
+              name="i-lucide-circle-alert"
+              class="size-8 text-red-400/70"
+            />
+            <UIcon v-else name="i-lucide-video" class="size-8 text-white/30" />
 
-          <div class="mt-3 flex items-center gap-2 text-sm text-white/60">
-            <UIcon name="i-lucide-dumbbell" class="text-xs" />
-            <span>{{ sportLabel(video.sportId) }}</span>
+            <UBadge
+              v-if="video.status === 'PENDING' || video.status === 'PROCESSING'"
+              size="xs"
+              color="warning"
+              variant="soft"
+              class="absolute top-2 left-2"
+            >
+              {{ video.status === 'PENDING' ? 'Pending' : 'Processing' }}
+            </UBadge>
+            <UBadge
+              v-else-if="video.status === 'ERRORED'"
+              size="xs"
+              color="error"
+              variant="soft"
+              class="absolute top-2 left-2"
+            >
+              Errored
+            </UBadge>
+          </div>
+
+          <div class="p-4">
+            <p class="font-medium truncate">{{ video.name }}</p>
+            <p v-if="video.description" class="mt-1 text-xs text-white/50 line-clamp-2">
+              {{ video.description }}
+            </p>
+
+            <div class="mt-3 flex items-center gap-2 text-sm text-white/60">
+              <UIcon name="i-lucide-dumbbell" class="text-xs" />
+              <span>{{ sportLabel(video.sportId) }}</span>
+            </div>
           </div>
         </button>
       </div>

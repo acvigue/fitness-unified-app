@@ -205,6 +205,12 @@ const router = createRouter({
       path: '/gyms/create',
       name: 'gym-create',
       component: GymCreateView,
+      meta: { requiresOrgStaff: true },
+    },
+    {
+      path: '/gyms/:id/manage',
+      name: 'gym-manage',
+      component: () => import('@/views/GymManageView.vue'),
     },
     {
       path: '/settings/blocked-users',
@@ -265,6 +271,13 @@ router.beforeEach(async (to) => {
   const orgStore = useOrganizationStore()
   if (!orgStore.initialized) {
     await orgStore.fetchMemberships()
+  }
+
+  if (to.meta.requiresOrgStaff) {
+    const hasStaff = orgStore.memberships.some((m) => m.role === 'STAFF' || m.role === 'ADMIN')
+    if (!hasStaff) {
+      return { path: '/gyms' }
+    }
   }
 
   return true

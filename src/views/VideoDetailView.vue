@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useRoute, useRouter } from 'vue-router'
+import Hls from 'hls.js'
 import PageLayout from '@/layouts/PageLayout.vue'
 import UserLink from '@/components/UserLink.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
@@ -31,20 +32,20 @@ const videoPlayer = ref<HTMLVideoElement | null>(null)
 const confirmDeleteOpen = ref(false)
 const deleting = ref(false)
 
+let hls: Hls | null = null
+let pollHandle: ReturnType<typeof setInterval> | null = null
+
 const videoId = computed(() => route.params.id as string)
 const currentUserId = computed(() => authStore.user?.sub ?? '')
 const isUploader = computed(
   () => !!video.value && !!currentUserId.value && video.value.uploaderId === currentUserId.value,
 )
 
+const playableSrc = computed(() => video.value?.playbackUrl ?? null)
+
 function applyHeader() {
   const actions = []
   if (isUploader.value && video.value) {
-    actions.push({
-      icon: 'i-lucide-pencil',
-      label: 'Edit video',
-      onClick: () => router.push(`/videos/${videoId.value}/edit`),
-    })
     actions.push({
       icon: 'i-lucide-trash-2',
       label: 'Delete video',
@@ -74,12 +75,64 @@ async function loadVideo() {
     progress.value = progressRes.data ?? null
 
     applyHeader()
+    schedulePollIfProcessing()
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to load video'
   } finally {
     loading.value = false
   }
 }
+
+function schedulePollIfProcessing() {
+  stopPolling()
+  if (video.value?.status === 'PENDING' || video.value?.status === 'PROCESSING') {
+    pollHandle = setInterval(async () => {
+      const { data } = await apiClient.GET('/v1/videos/{id}', {
+        params: { path: { id: videoId.value } },
+      })
+      if (data) {
+        video.value = data
+        if (data.status === 'READY' || data.status === 'ERRORED') {
+          stopPolling()
+        }
+      }
+    }, 5000)
+  }
+}
+
+function stopPolling() {
+  if (pollHandle) {
+    clearInterval(pollHandle)
+    pollHandle = null
+  }
+}
+
+function destroyPlayer() {
+  if (hls) {
+    hls.destroy()
+    hls = null
+  }
+}
+
+function attachPlayer() {
+  destroyPlayer()
+  const el = videoPlayer.value
+  const src = playableSrc.value
+  if (!el || !src) return
+
+  if (Hls.isSupported()) {
+    hls = new Hls()
+    hls.loadSource(src)
+    hls.attachMedia(el)
+  } else {
+    // Safari plays HLS natively.
+    el.src = src
+  }
+}
+
+watch(playableSrc, (next, prev) => {
+  if (next !== prev) attachPlayer()
+})
 
 async function deleteVideo() {
   if (!video.value) return
@@ -150,6 +203,8 @@ onUnmounted(() => {
   if (el && el.currentTime > 0) {
     reportProgress(el.currentTime).catch(() => undefined)
   }
+  destroyPlayer()
+  stopPolling()
 })
 </script>
 
@@ -164,25 +219,70 @@ onUnmounted(() => {
     </div>
 
     <section v-else-if="video" class="flex flex-col gap-5 px-5 py-6">
-      <div class="overflow-hidden rounded-lg border border-white/10 bg-black">
+      <!-- READY: actual player -->
+      <div
+        v-if="playableSrc"
+        class="overflow-hidden rounded-lg border border-white/10 bg-black"
+        :style="video.aspectRatio ? { aspectRatio: video.aspectRatio.replace(':', '/') } : {}"
+      >
         <video
           ref="videoPlayer"
-          :src="video.url"
           controls
-          class="w-full"
+          playsinline
+          class="w-full h-full"
+          :poster="video.thumbnailUrl ?? undefined"
           :aria-label="`Video player for ${video.name}`"
           @timeupdate="onTimeUpdate"
           @ended="onEnded"
           @loadedmetadata="onLoadedMetadata"
+          @loadeddata="attachPlayer"
         >
           Your browser does not support the video tag.
         </video>
       </div>
 
+      <!-- PENDING / PROCESSING: still being ingested -->
+      <div
+        v-else-if="video.status === 'PENDING' || video.status === 'PROCESSING'"
+        class="flex flex-col items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-10 text-center"
+      >
+        <UIcon name="i-lucide-loader-2" class="animate-spin size-8 text-white/50" />
+        <div>
+          <p class="text-base font-medium">
+            {{ video.status === 'PENDING' ? 'Waiting for upload to finish…' : 'Processing video…' }}
+          </p>
+          <p class="mt-1 text-sm text-white/60">
+            Mux is preparing your video. This page will refresh automatically.
+          </p>
+        </div>
+      </div>
+
+      <!-- ERRORED: surface failure -->
+      <UAlert
+        v-else-if="video.status === 'ERRORED'"
+        color="error"
+        icon="i-lucide-circle-alert"
+        title="Video processing failed"
+        description="Mux could not process this upload. Try uploading the file again."
+      />
+
       <UCard class="bg-white/5">
         <div class="flex flex-col gap-4">
           <div>
-            <p class="text-xs uppercase tracking-[0.3em] text-white/60">Video</p>
+            <div class="flex items-center gap-2">
+              <p class="text-xs uppercase tracking-[0.3em] text-white/60">Video</p>
+              <UBadge
+                v-if="video.status === 'PENDING' || video.status === 'PROCESSING'"
+                size="xs"
+                color="warning"
+                variant="soft"
+              >
+                {{ video.status === 'PENDING' ? 'Pending upload' : 'Processing' }}
+              </UBadge>
+              <UBadge v-else-if="video.status === 'ERRORED'" size="xs" color="error" variant="soft">
+                Errored
+              </UBadge>
+            </div>
             <p class="text-lg font-medium">{{ video.name }}</p>
             <p v-if="video.description" class="mt-2 text-sm text-white/70">
               {{ video.description }}

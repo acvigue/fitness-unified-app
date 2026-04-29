@@ -1,15 +1,9 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { apiClient } from '@/lib/api/client'
+import type { components } from '@/types/api'
 
-// Type is not emitted in OpenAPI output (service returns a plain object literal),
-// so we mirror it locally.
-interface GymSubscription {
-  id: string
-  gymId: string
-  userId: string
-  createdAt: string
-}
+type GymSubscription = components['schemas']['GymSubscriptionResponseDto']
 
 export const useGymSubscriptionStore = defineStore('gymSubscriptions', () => {
   const subscriptions = ref<GymSubscription[]>([])
@@ -27,7 +21,7 @@ export const useGymSubscriptionStore = defineStore('gymSubscriptions', () => {
     try {
       const { data } = await apiClient.GET('/v1/gyms/subscriptions')
       if (Array.isArray(data)) {
-        subscriptions.value = data as GymSubscription[]
+        subscriptions.value = data
       }
       initialized.value = true
     } finally {
@@ -40,7 +34,7 @@ export const useGymSubscriptionStore = defineStore('gymSubscriptions', () => {
       params: { path: { id: gymId } },
     })
     if (data) {
-      subscriptions.value.push(data as GymSubscription)
+      subscriptions.value.push(data)
     }
   }
 
