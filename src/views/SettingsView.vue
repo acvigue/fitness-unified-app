@@ -383,7 +383,7 @@
         </div>
       </UCard>
 
-      <UCard class="bg-white/5">
+      <UCard v-if="currentUserStore.isModerator" class="bg-white/5">
         <div class="space-y-3">
           <div>
             <p class="text-xs uppercase tracking-[0.3em] text-white/60">Moderation</p>
@@ -540,6 +540,7 @@ import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useToastStore } from '@/stores/toast'
 import { useOrganizationStore } from '@/stores/organization'
+import { useCurrentUserStore } from '@/stores/currentUser'
 import type { components } from '@/types/api'
 
 type UserProfile = components['schemas']['UserProfileResponseDto']
@@ -560,6 +561,7 @@ const router = useRouter()
 const { setHeader } = usePageHeader()
 const toast = useToastStore()
 const orgStore = useOrganizationStore()
+const currentUserStore = useCurrentUserStore()
 const organizationsForAdmin = computed(() =>
   orgStore.memberships.filter((m) => m.role === 'STAFF' || m.role === 'ADMIN'),
 )

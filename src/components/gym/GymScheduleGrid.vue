@@ -22,48 +22,143 @@ const toast = useToastStore()
 const myTeams = useMyTeamsStore()
 const { canManage, canReserve } = useGymPermissions(() => props.organizationId)
 
+// 1 column on mobile via CSS, 3 columns on sm+ — always fetch 3 days.
+const VISIBLE_DAYS = 3
+const FALLBACK_START_HOUR = 6
+const FALLBACK_END_HOUR = 22
+const HOUR_PX = 56 // visual scale: 56px per hour
+
 const segments = ref<EffectiveSlot[]>([])
 const loading = ref(false)
 const error = ref('')
 
-function toDateInputValue(d: Date) {
-  const year = d.getFullYear()
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+function startOfDay(d: Date): Date {
+  const x = new Date(d)
+  x.setHours(0, 0, 0, 0)
+  return x
 }
-const selectedDate = ref(toDateInputValue(new Date()))
+function addDays(d: Date, n: number): Date {
+  const x = new Date(d)
+  x.setDate(x.getDate() + n)
+  return x
+}
+function ymd(d: Date): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+function fromYmd(s: string): Date {
+  const [y, m, day] = s.split('-').map(Number)
+  const x = new Date()
+  x.setFullYear(y ?? new Date().getFullYear(), (m ?? 1) - 1, day ?? 1)
+  x.setHours(0, 0, 0, 0)
+  return x
+}
 
-const windowFrom = computed(() => {
-  const [y, m, day] = selectedDate.value.split('-').map(Number)
-  const d = new Date()
-  d.setFullYear(y, (m ?? 1) - 1, day ?? 1)
-  d.setHours(0, 0, 0, 0)
-  return d
-})
+const selectedDate = ref(ymd(new Date()))
 
-const windowTo = computed(() => {
-  const d = new Date(windowFrom.value)
-  d.setDate(d.getDate() + 1)
-  return d
-})
+const windowFrom = computed(() => fromYmd(selectedDate.value))
+const windowTo = computed(() => addDays(windowFrom.value, VISIBLE_DAYS))
 
 function shiftDay(delta: number) {
-  const d = new Date(windowFrom.value)
-  d.setDate(d.getDate() + delta)
-  selectedDate.value = toDateInputValue(d)
+  selectedDate.value = ymd(addDays(windowFrom.value, delta))
 }
 function goToday() {
-  selectedDate.value = toDateInputValue(new Date())
+  selectedDate.value = ymd(new Date())
 }
 
-const rangeLabel = computed(() =>
-  windowFrom.value.toLocaleDateString(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  }),
-)
+interface DayBucket {
+  date: Date
+  midnightMs: number
+  label: string
+  shortLabel: string
+  isToday: boolean
+  segments: EffectiveSlot[]
+}
+
+const todayMs = computed(() => startOfDay(new Date()).getTime())
+
+const days = computed<DayBucket[]>(() => {
+  const out: DayBucket[] = []
+  for (let i = 0; i < VISIBLE_DAYS; i++) {
+    const d = addDays(windowFrom.value, i)
+    const midnight = startOfDay(d).getTime()
+    const dayEnd = midnight + 24 * 60 * 60 * 1000
+    out.push({
+      date: d,
+      midnightMs: midnight,
+      label: d.toLocaleDateString(undefined, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+      }),
+      shortLabel: d.toLocaleDateString(undefined, { weekday: 'short' }),
+      isToday: midnight === todayMs.value,
+      segments: segments.value.filter((s) => {
+        const start = new Date(s.startsAt).getTime()
+        return start >= midnight && start < dayEnd
+      }),
+    })
+  }
+  return out
+})
+
+const visibleHours = computed(() => {
+  if (segments.value.length === 0) {
+    return { start: FALLBACK_START_HOUR, end: FALLBACK_END_HOUR }
+  }
+  let earliest = Infinity
+  let latest = -Infinity
+  for (const seg of segments.value) {
+    const s = new Date(seg.startsAt)
+    const e = new Date(seg.endsAt)
+    const sMin = s.getHours() * 60 + s.getMinutes()
+    let eMin = e.getHours() * 60 + e.getMinutes()
+    // Treat 0:00 end as midnight of next day.
+    if (eMin === 0 && e.getTime() > s.getTime()) eMin = 24 * 60
+    earliest = Math.min(earliest, sMin)
+    latest = Math.max(latest, eMin)
+  }
+  let startHour = Math.max(0, Math.floor(earliest / 60))
+  let endHour = Math.min(24, Math.ceil(latest / 60))
+  // Always show at least 6 hours of vertical context
+  if (endHour - startHour < 6) {
+    endHour = Math.min(24, startHour + 6)
+  }
+  return { start: startHour, end: endHour }
+})
+
+const totalHours = computed(() => visibleHours.value.end - visibleHours.value.start)
+const totalMinutes = computed(() => totalHours.value * 60)
+const trackHeightPx = computed(() => totalHours.value * HOUR_PX)
+
+const hourMarks = computed(() => {
+  const out: number[] = []
+  for (let h = visibleHours.value.start; h <= visibleHours.value.end; h++) out.push(h)
+  return out
+})
+
+function hourLabel(h: number): string {
+  const d = new Date()
+  d.setHours(h % 24, 0, 0, 0)
+  return d.toLocaleTimeString(undefined, { hour: 'numeric' })
+}
+
+function blockStyle(seg: EffectiveSlot, midnightMs: number) {
+  const startMin = (new Date(seg.startsAt).getTime() - midnightMs) / 60000
+  // Clamp end at midnight so cross-day slots clip cleanly into this column.
+  const endMin = Math.min((new Date(seg.endsAt).getTime() - midnightMs) / 60000, 24 * 60)
+  const windowStartMin = visibleHours.value.start * 60
+  const total = totalMinutes.value
+  const top = Math.max(0, ((startMin - windowStartMin) / total) * 100)
+  const heightPct = Math.max(0, ((endMin - Math.max(startMin, windowStartMin)) / total) * 100)
+  return {
+    top: `${top}%`,
+    height: `${heightPct}%`,
+    minHeight: '28px',
+  }
+}
 
 async function load() {
   loading.value = true
@@ -91,10 +186,7 @@ async function load() {
 watch(() => [props.gymId, selectedDate.value] as const, load, { immediate: true })
 
 function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString(undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
 }
 
 function teamLabel(teamId: string | null | undefined) {
@@ -102,34 +194,64 @@ function teamLabel(teamId: string | null | undefined) {
   return myTeams.teams.find((t) => t.id === teamId)?.name ?? null
 }
 
-function statusTone(status: EffectiveSlot['status']) {
-  switch (status) {
-    case 'AVAILABLE':
-      return 'success'
-    case 'RESERVED':
-      return 'warning'
-    case 'CLOSED':
-      return 'neutral'
-  }
-}
-
 function isMyReservation(seg: EffectiveSlot) {
   if (seg.status !== 'RESERVED' || !seg.reservedByTeamId) return false
   return myTeams.captainTeams.some((t) => t.id === seg.reservedByTeamId)
+}
+
+function isActionable(seg: EffectiveSlot): boolean {
+  if (seg.status === 'AVAILABLE') {
+    return canReserve.value || (mode.value === 'manage' && canManage.value)
+  }
+  if (seg.status === 'RESERVED') {
+    return isMyReservation(seg) || (mode.value === 'manage' && canManage.value)
+  }
+  if (seg.status === 'CLOSED') {
+    return mode.value === 'manage' && canManage.value
+  }
+  return false
+}
+
+function actionLabel(seg: EffectiveSlot): string {
+  if (!isActionable(seg)) return ''
+  if (seg.status === 'AVAILABLE') {
+    return mode.value === 'manage' ? '. Tap to close' : '. Tap to reserve'
+  }
+  if (seg.status === 'RESERVED') return '. Tap to cancel'
+  if (seg.status === 'CLOSED') return '. Tap to reopen'
+  return ''
+}
+
+function ariaLabel(seg: EffectiveSlot, day: DayBucket): string {
+  const range = `${formatTime(seg.startsAt)} to ${formatTime(seg.endsAt)}`
+  const team = teamLabel(seg.reservedByTeamId)
+  const teamPart = team ? `, reserved by ${team}` : ''
+  return `${day.shortLabel} ${range}, ${seg.status.toLowerCase()}${teamPart}${actionLabel(seg)}`
 }
 
 const reserveOpen = ref(false)
 const closeOpen = ref(false)
 const activeWindow = ref<{ start: string; end: string } | null>(null)
 
-function openReserveFor(seg: EffectiveSlot) {
-  activeWindow.value = { start: seg.startsAt, end: seg.endsAt }
-  reserveOpen.value = true
-}
-
-function openCloseFor(seg: EffectiveSlot) {
-  activeWindow.value = { start: seg.startsAt, end: seg.endsAt }
-  closeOpen.value = true
+function onBlockAction(seg: EffectiveSlot) {
+  if (!isActionable(seg)) return
+  if (seg.status === 'AVAILABLE' && canReserve.value) {
+    activeWindow.value = { start: seg.startsAt, end: seg.endsAt }
+    reserveOpen.value = true
+    return
+  }
+  if (seg.status === 'AVAILABLE' && mode.value === 'manage' && canManage.value) {
+    activeWindow.value = { start: seg.startsAt, end: seg.endsAt }
+    closeOpen.value = true
+    return
+  }
+  if (seg.status === 'RESERVED') {
+    askCancel(seg)
+    return
+  }
+  if (seg.status === 'CLOSED') {
+    reopenClosure(seg)
+  }
 }
 
 const cancelConfirmOpen = ref(false)
@@ -176,15 +298,56 @@ async function reopenClosure(seg: EffectiveSlot) {
   toast.success('Window reopened')
   await load()
 }
+
+interface BlockTone {
+  bg: string
+  border: string
+  text: string
+}
+
+function blockTone(seg: EffectiveSlot, mine: boolean): BlockTone {
+  if (seg.status === 'CLOSED') {
+    return {
+      bg: 'bg-white/[0.04]',
+      border: 'border-white/10 border-dashed',
+      text: 'text-white/40',
+    }
+  }
+  if (seg.status === 'RESERVED' && mine) {
+    return {
+      bg: 'bg-blue-500/15',
+      border: 'border-blue-400/40',
+      text: 'text-blue-100',
+    }
+  }
+  if (seg.status === 'RESERVED') {
+    return {
+      bg: 'bg-amber-500/15',
+      border: 'border-amber-400/40',
+      text: 'text-amber-100',
+    }
+  }
+  return {
+    bg: 'bg-emerald-500/15',
+    border: 'border-emerald-400/40',
+    text: 'text-emerald-100',
+  }
+}
 </script>
 
 <template>
   <UCard class="bg-white/5">
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-4">
+      <!-- Header: range label + day stepper -->
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p class="text-xs uppercase tracking-[0.3em] text-white/60">Schedule</p>
-          <p class="text-sm text-white/60">{{ rangeLabel }}</p>
+          <p class="text-sm text-white/60">
+            <span class="sm:hidden">{{ days[0]?.label }}</span>
+            <span class="hidden sm:inline">
+              {{ days[0]?.label }} — {{ days[VISIBLE_DAYS - 1]?.label }}
+            </span>
+          </p>
         </div>
         <div class="flex items-center gap-2">
           <UButton
@@ -211,8 +374,29 @@ async function reopenClosure(seg: EffectiveSlot) {
         <UInput v-model="selectedDate" type="date" icon="i-lucide-calendar" />
       </UFormField>
 
+      <!-- Legend -->
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+        <div class="flex items-center gap-1.5">
+          <span class="size-3 rounded-sm bg-emerald-500/30 border border-emerald-400/40" />
+          <span class="text-white/60">Available</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="size-3 rounded-sm bg-blue-500/30 border border-blue-400/40" />
+          <span class="text-white/60">Your team</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="size-3 rounded-sm bg-amber-500/30 border border-amber-400/40" />
+          <span class="text-white/60">Reserved</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="size-3 rounded-sm bg-white/[0.04] border border-dashed border-white/15" />
+          <span class="text-white/60">Closed</span>
+        </div>
+      </div>
+
       <UAlert v-if="error" color="error" :title="error" icon="i-lucide-circle-alert" />
 
+      <!-- Loading -->
       <div v-if="loading" class="flex flex-col gap-2">
         <div
           v-for="n in 4"
@@ -221,92 +405,120 @@ async function reopenClosure(seg: EffectiveSlot) {
         />
       </div>
 
-      <div
-        v-else-if="segments.length === 0"
-        class="flex flex-col items-center gap-1 rounded-lg border border-dashed border-white/10 p-6 text-center"
-      >
-        <UIcon name="i-lucide-calendar-x" class="size-6 text-white/40" />
-        <p class="text-sm text-white/60">Closed all day.</p>
-        <p v-if="mode === 'manage'" class="text-xs text-white/40">
-          Edit the weekly schedule or add an exception to open hours.
-        </p>
+      <!-- Time grid -->
+      <div v-else class="overflow-y-auto" style="max-height: 70vh">
+        <div class="flex gap-1 sm:gap-2">
+          <!-- Hour axis -->
+          <div class="shrink-0 w-10 sm:w-14 pt-7">
+            <div class="relative" :style="{ height: `${trackHeightPx}px` }">
+              <div
+                v-for="h in hourMarks"
+                :key="h"
+                class="absolute right-1 -translate-y-1/2 text-[10px] sm:text-xs text-white/40 tabular-nums whitespace-nowrap"
+                :style="{
+                  top: `${((h - visibleHours.start) / totalHours) * 100}%`,
+                }"
+              >
+                {{ hourLabel(h) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Day columns -->
+          <div class="flex-1 grid gap-1 sm:gap-2 grid-cols-1 sm:grid-cols-3">
+            <div
+              v-for="(day, idx) in days"
+              :key="day.midnightMs"
+              class="flex flex-col"
+              :class="{ 'hidden sm:flex': idx > 0 }"
+            >
+              <div
+                class="flex items-baseline justify-between px-2 py-1 mb-1 rounded text-xs"
+                :class="day.isToday ? 'bg-primary/15 text-primary' : 'text-white/60'"
+              >
+                <span class="font-semibold">{{ day.shortLabel }}</span>
+                <span class="tabular-nums">{{ day.date.getDate() }}</span>
+              </div>
+              <div
+                class="relative rounded-lg border border-white/10 bg-white/[0.02]"
+                :style="{ height: `${trackHeightPx}px` }"
+              >
+                <!-- Hour gridlines -->
+                <div
+                  v-for="h in hourMarks"
+                  :key="h"
+                  class="absolute inset-x-0 border-t border-white/5 pointer-events-none"
+                  :style="{
+                    top: `${((h - visibleHours.start) / totalHours) * 100}%`,
+                  }"
+                />
+
+                <!-- Empty state -->
+                <div
+                  v-if="day.segments.length === 0"
+                  class="absolute inset-0 flex flex-col items-center justify-center text-center text-white/30 gap-1"
+                >
+                  <UIcon name="i-lucide-calendar-x" class="size-4" />
+                  <span class="text-[10px] sm:text-xs">Closed</span>
+                </div>
+
+                <!-- Segment blocks -->
+                <button
+                  v-for="(seg, segIdx) in day.segments"
+                  :key="`${seg.startsAt}-${seg.endsAt}-${seg.slotId ?? segIdx}`"
+                  type="button"
+                  :aria-label="ariaLabel(seg, day)"
+                  :disabled="!isActionable(seg)"
+                  class="absolute left-1 right-1 rounded-md border px-2 py-1 text-left transition-all overflow-hidden"
+                  :class="[
+                    blockTone(seg, isMyReservation(seg)).bg,
+                    blockTone(seg, isMyReservation(seg)).border,
+                    blockTone(seg, isMyReservation(seg)).text,
+                    isActionable(seg)
+                      ? 'cursor-pointer hover:brightness-125 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'
+                      : 'cursor-default',
+                  ]"
+                  :style="blockStyle(seg, day.midnightMs)"
+                  @click="onBlockAction(seg)"
+                >
+                  <div class="flex items-start justify-between gap-1">
+                    <div class="min-w-0 flex-1">
+                      <div
+                        class="text-[10px] sm:text-xs font-semibold leading-tight tabular-nums truncate"
+                      >
+                        {{ formatTime(seg.startsAt) }}
+                        <span class="hidden sm:inline opacity-70"
+                          >– {{ formatTime(seg.endsAt) }}</span
+                        >
+                      </div>
+                      <div
+                        v-if="seg.status === 'RESERVED' && teamLabel(seg.reservedByTeamId)"
+                        class="text-[9px] sm:text-[10px] opacity-80 truncate mt-0.5"
+                      >
+                        {{ teamLabel(seg.reservedByTeamId) }}
+                      </div>
+                    </div>
+                    <UIcon
+                      v-if="isMyReservation(seg)"
+                      name="i-lucide-check"
+                      class="size-3 sm:size-3.5 shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <ul v-else class="flex flex-col gap-2">
-        <li
-          v-for="(seg, idx) in segments"
-          :key="`${seg.startsAt}-${seg.endsAt}-${seg.slotId ?? idx}`"
-          class="flex items-center justify-between gap-3 rounded-lg border border-white/10 px-3 py-2"
-          :class="{
-            'bg-success/5 border-success/20': seg.status === 'AVAILABLE',
-            'bg-warning/5 border-warning/20': seg.status === 'RESERVED',
-            'bg-white/5': seg.status === 'CLOSED',
-          }"
-        >
-          <div class="min-w-0">
-            <p class="text-sm font-medium">
-              {{ formatTime(seg.startsAt) }} – {{ formatTime(seg.endsAt) }}
-            </p>
-            <p
-              v-if="seg.status === 'RESERVED' && teamLabel(seg.reservedByTeamId)"
-              class="text-xs text-white/60"
-            >
-              {{ teamLabel(seg.reservedByTeamId) }}
-            </p>
-            <p v-if="seg.note" class="text-xs text-white/50 truncate">{{ seg.note }}</p>
-          </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <UBadge :color="statusTone(seg.status)" variant="soft" size="xs">
-              {{ seg.status }}
-            </UBadge>
-
-            <UButton
-              v-if="seg.status === 'AVAILABLE' && canReserve"
-              size="xs"
-              icon="i-lucide-calendar-plus"
-              @click="openReserveFor(seg)"
-            >
-              Reserve
-            </UButton>
-
-            <UButton
-              v-if="seg.status === 'AVAILABLE' && mode === 'manage' && canManage"
-              size="xs"
-              variant="outline"
-              color="neutral"
-              icon="i-lucide-ban"
-              @click="openCloseFor(seg)"
-            >
-              Close
-            </UButton>
-
-            <UButton
-              v-if="
-                seg.status === 'RESERVED' &&
-                (isMyReservation(seg) || (mode === 'manage' && canManage))
-              "
-              size="xs"
-              variant="outline"
-              color="error"
-              icon="i-lucide-x"
-              @click="askCancel(seg)"
-            >
-              Cancel
-            </UButton>
-
-            <UButton
-              v-if="seg.status === 'CLOSED' && mode === 'manage' && canManage"
-              size="xs"
-              variant="outline"
-              color="neutral"
-              icon="i-lucide-undo-2"
-              @click="reopenClosure(seg)"
-            >
-              Reopen
-            </UButton>
-          </div>
-        </li>
-      </ul>
+      <!-- Mode-specific footnote -->
+      <p
+        v-if="mode === 'browse' && !canReserve && !loading && segments.length > 0"
+        class="text-xs text-white/40"
+      >
+        Only team captains can reserve. Ask your captain to book a slot for the team.
+      </p>
     </div>
 
     <ReserveSlotModal
@@ -317,7 +529,6 @@ async function reopenClosure(seg: EffectiveSlot) {
       :window-end="activeWindow.end"
       @reserved="load"
     />
-
     <CloseSlotModal
       v-if="activeWindow"
       v-model:open="closeOpen"
