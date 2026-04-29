@@ -2763,6 +2763,9 @@ export interface components {
             id: string;
             suspensionId: string;
             userId: string;
+            /** @description Display name of the appealing user. Populated on mod-side endpoints; null on self-service responses. */
+            userName?: string | null;
+            userUsername?: string | null;
             message: string;
             /** @enum {string} */
             status: "PENDING" | "APPROVED" | "DENIED";

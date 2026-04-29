@@ -113,7 +113,12 @@ function formatDate(iso: string) {
         >
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
-              <p class="text-sm font-medium">User {{ a.userId.slice(0, 8) }}</p>
+              <p class="text-sm font-medium">
+                {{ a.userName ?? a.userUsername ?? `User ${a.userId.slice(0, 8)}` }}
+              </p>
+              <p v-if="a.userUsername && a.userName" class="text-xs text-white/50">
+                @{{ a.userUsername }}
+              </p>
               <p class="text-xs text-white/50">Submitted {{ formatDate(a.createdAt) }}</p>
             </div>
             <UBadge color="warning" variant="soft" size="xs">PENDING</UBadge>
