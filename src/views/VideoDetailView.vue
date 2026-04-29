@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useRoute, useRouter } from 'vue-router'
-import Hls from 'hls.js'
+import videojs from 'video.js'
+import type Player from 'video.js/dist/types/player'
+import 'video.js/dist/video-js.css'
 import PageLayout from '@/layouts/PageLayout.vue'
 import UserLink from '@/components/UserLink.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
@@ -28,11 +30,11 @@ const progress = ref<Progress | null>(null)
 const loading = ref(true)
 const error = ref('')
 
-const videoPlayer = ref<HTMLVideoElement | null>(null)
+const videoEl = ref<HTMLVideoElement | null>(null)
 const confirmDeleteOpen = ref(false)
 const deleting = ref(false)
 
-let hls: Hls | null = null
+let player: Player | null = null
 let pollHandle: ReturnType<typeof setInterval> | null = null
 
 const videoId = computed(() => route.params.id as string)
@@ -76,6 +78,8 @@ async function loadVideo() {
 
     applyHeader()
     schedulePollIfProcessing()
+    await nextTick()
+    attachPlayer()
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to load video'
   } finally {
@@ -108,30 +112,50 @@ function stopPolling() {
 }
 
 function destroyPlayer() {
-  if (hls) {
-    hls.destroy()
-    hls = null
+  if (player) {
+    player.dispose()
+    player = null
   }
 }
 
 function attachPlayer() {
   destroyPlayer()
-  const el = videoPlayer.value
+  const el = videoEl.value
   const src = playableSrc.value
   if (!el || !src) return
 
-  if (Hls.isSupported()) {
-    hls = new Hls()
-    hls.loadSource(src)
-    hls.attachMedia(el)
-  } else {
-    // Safari plays HLS natively.
-    el.src = src
-  }
+  player = videojs(el, {
+    controls: true,
+    fluid: true,
+    playsinline: true,
+    preload: 'metadata',
+    poster: video.value?.thumbnailUrl ?? undefined,
+    sources: [{ src, type: 'application/x-mpegURL' }],
+  })
+
+  player.on('loadedmetadata', () => {
+    if (!progress.value?.positionSeconds || progress.value.completed) return
+    player?.currentTime(progress.value.positionSeconds)
+  })
+
+  player.on('timeupdate', () => {
+    const t = player?.currentTime() ?? 0
+    const now = Date.now()
+    if (now - lastSent < THROTTLE_MS) return
+    lastSent = now
+    reportProgress(t)
+  })
+
+  player.on('ended', () => {
+    const t = player?.currentTime() ?? 0
+    reportProgress(t, true)
+  })
 }
 
-watch(playableSrc, (next, prev) => {
-  if (next !== prev) attachPlayer()
+watch(playableSrc, async (next, prev) => {
+  if (next === prev) return
+  await nextTick()
+  attachPlayer()
 })
 
 async function deleteVideo() {
@@ -155,7 +179,6 @@ async function deleteVideo() {
   }
 }
 
-// Throttle progress updates
 let lastSent = 0
 const THROTTLE_MS = 10_000
 
@@ -171,37 +194,15 @@ async function reportProgress(positionSeconds: number, completed = false) {
   }
 }
 
-function onTimeUpdate() {
-  const el = videoPlayer.value
-  if (!el) return
-  const now = Date.now()
-  if (now - lastSent < THROTTLE_MS) return
-  lastSent = now
-  reportProgress(el.currentTime)
-}
-
-function onEnded() {
-  const el = videoPlayer.value
-  if (!el) return
-  reportProgress(el.currentTime, true)
-}
-
-function onLoadedMetadata() {
-  const el = videoPlayer.value
-  if (!el || !progress.value?.positionSeconds) return
-  if (progress.value.completed) return
-  el.currentTime = progress.value.positionSeconds
-}
-
 onMounted(() => {
   setHeader({ title: 'Video', backRoute: '/videos' })
   loadVideo()
 })
 
 onUnmounted(() => {
-  const el = videoPlayer.value
-  if (el && el.currentTime > 0) {
-    reportProgress(el.currentTime).catch(() => undefined)
+  const t = player?.currentTime() ?? 0
+  if (t > 0) {
+    reportProgress(t).catch(() => undefined)
   }
   destroyPlayer()
   stopPolling()
@@ -219,29 +220,17 @@ onUnmounted(() => {
     </div>
 
     <section v-else-if="video" class="flex flex-col gap-5 px-5 py-6">
-      <!-- READY: actual player -->
-      <div
-        v-if="playableSrc"
-        class="overflow-hidden rounded-lg border border-white/10 bg-black"
-        :style="video.aspectRatio ? { aspectRatio: video.aspectRatio.replace(':', '/') } : {}"
-      >
+      <!-- READY: video.js player -->
+      <div v-if="playableSrc" class="overflow-hidden rounded-lg border border-white/10 bg-black">
         <video
-          ref="videoPlayer"
-          controls
+          ref="videoEl"
+          class="video-js vjs-default-skin vjs-big-play-centered w-full"
           playsinline
-          class="w-full h-full"
-          :poster="video.thumbnailUrl ?? undefined"
           :aria-label="`Video player for ${video.name}`"
-          @timeupdate="onTimeUpdate"
-          @ended="onEnded"
-          @loadedmetadata="onLoadedMetadata"
-          @loadeddata="attachPlayer"
-        >
-          Your browser does not support the video tag.
-        </video>
+        />
       </div>
 
-      <!-- PENDING / PROCESSING: still being ingested -->
+      <!-- PENDING / PROCESSING -->
       <div
         v-else-if="video.status === 'PENDING' || video.status === 'PROCESSING'"
         class="flex flex-col items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-10 text-center"
@@ -257,7 +246,7 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- ERRORED: surface failure -->
+      <!-- ERRORED -->
       <UAlert
         v-else-if="video.status === 'ERRORED'"
         color="error"
