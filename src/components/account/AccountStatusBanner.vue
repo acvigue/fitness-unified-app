@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useAccountStatusStore } from '@/stores/accountStatus'
+import SuspensionAppealModal from './SuspensionAppealModal.vue'
 
 const store = useAccountStatusStore()
+const appealOpen = ref(false)
 
 const visible = computed(() => store.isSuspended || store.isBanned)
 
@@ -37,5 +39,13 @@ const detail = computed(() => {
     :title="title"
     :description="detail || undefined"
     class="rounded-none border-x-0 border-t-0"
-  />
+  >
+    <template v-if="store.isSuspended" #actions>
+      <UButton size="xs" variant="outline" color="neutral" @click="appealOpen = true">
+        Appeal
+      </UButton>
+    </template>
+  </UAlert>
+
+  <SuspensionAppealModal v-model:open="appealOpen" @submitted="store.load(true)" />
 </template>

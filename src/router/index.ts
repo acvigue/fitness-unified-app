@@ -235,6 +235,16 @@ const router = createRouter({
       component: GymSubscriptionsView,
     },
     {
+      path: '/organizations/:id/members',
+      name: 'organization-members',
+      component: () => import('@/views/organization/OrganizationMembersView.vue'),
+    },
+    {
+      path: '/settings/organization-invitations',
+      name: 'organization-invitations',
+      component: () => import('@/views/organization/MyOrganizationInvitationsView.vue'),
+    },
+    {
       path: '/moderation/messages',
       name: 'moderation-messages',
       component: ModerationMessagesView,
@@ -244,6 +254,12 @@ const router = createRouter({
       path: '/moderation/users',
       name: 'moderation-users',
       component: ModerationUsersView,
+      meta: { requiresModRole: true },
+    },
+    {
+      path: '/moderation/suspension-appeals',
+      name: 'moderation-appeals',
+      component: () => import('@/views/moderation/ModerationAppealsView.vue'),
       meta: { requiresModRole: true },
     },
   ],

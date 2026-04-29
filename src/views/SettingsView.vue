@@ -343,6 +343,42 @@
             >
               My reports
             </UButton>
+            <UButton
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-mail"
+              trailing-icon="i-lucide-chevron-right"
+              block
+              class="justify-between"
+              :to="{ name: 'organization-invitations' }"
+            >
+              Organization invitations
+            </UButton>
+          </div>
+        </div>
+      </UCard>
+
+      <UCard v-if="organizationsForAdmin.length > 0" class="bg-white/5">
+        <div class="space-y-3">
+          <div>
+            <p class="text-xs uppercase tracking-[0.3em] text-white/60">Organizations</p>
+            <p class="text-sm text-white/60">Manage members and roles in your organizations.</p>
+          </div>
+          <div class="flex flex-col gap-2">
+            <UButton
+              v-for="org in organizationsForAdmin"
+              :key="org.organizationId"
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-users"
+              trailing-icon="i-lucide-chevron-right"
+              block
+              class="justify-between"
+              :to="`/organizations/${org.organizationId}/members`"
+            >
+              {{ org.organizationName ?? 'Organization' }} ·
+              {{ org.role }}
+            </UButton>
           </div>
         </div>
       </UCard>
@@ -377,6 +413,17 @@
               :to="{ name: 'moderation-users' }"
             >
               Manage users
+            </UButton>
+            <UButton
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-shield-check"
+              trailing-icon="i-lucide-chevron-right"
+              block
+              class="justify-between"
+              :to="{ name: 'moderation-appeals' }"
+            >
+              Suspension appeals
             </UButton>
           </div>
         </div>
@@ -492,6 +539,7 @@ import { ENV } from '@/config/environment'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useToastStore } from '@/stores/toast'
+import { useOrganizationStore } from '@/stores/organization'
 import type { components } from '@/types/api'
 
 type UserProfile = components['schemas']['UserProfileResponseDto']
@@ -511,6 +559,10 @@ const authStore = useAuthStore()
 const router = useRouter()
 const { setHeader } = usePageHeader()
 const toast = useToastStore()
+const orgStore = useOrganizationStore()
+const organizationsForAdmin = computed(() =>
+  orgStore.memberships.filter((m) => m.role === 'STAFF' || m.role === 'ADMIN'),
+)
 
 const logoutConfirmOpen = ref(false)
 const loggingOut = ref(false)

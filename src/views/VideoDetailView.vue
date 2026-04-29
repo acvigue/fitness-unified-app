@@ -44,6 +44,10 @@ const isUploader = computed(
 )
 
 const playableSrc = computed(() => video.value?.playbackUrl ?? null)
+// Only true once the video element is actually mounted in the DOM. video.js
+// can't initialize before the element exists, so the watch below is the single
+// trigger that decides when to attach.
+const shouldShowPlayer = computed(() => !loading.value && !!playableSrc.value)
 
 function applyHeader() {
   const actions = []
@@ -78,8 +82,6 @@ async function loadVideo() {
 
     applyHeader()
     schedulePollIfProcessing()
-    await nextTick()
-    attachPlayer()
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to load video'
   } finally {
@@ -152,11 +154,18 @@ function attachPlayer() {
   })
 }
 
-watch(playableSrc, async (next, prev) => {
-  if (next === prev) return
-  await nextTick()
-  attachPlayer()
-})
+watch(
+  shouldShowPlayer,
+  async (show) => {
+    if (show) {
+      await nextTick()
+      attachPlayer()
+    } else {
+      destroyPlayer()
+    }
+  },
+  { immediate: true },
+)
 
 async function deleteVideo() {
   if (!video.value) return
