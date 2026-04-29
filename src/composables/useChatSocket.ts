@@ -17,10 +17,17 @@ export interface TypingStopEvent {
   userId: string
 }
 
+export interface MessagesReadEvent {
+  chatId: string
+  readByUserId: string
+  markedCount: number
+}
+
 export interface SocketCallbacks {
   onNewMessage: (message: MessageResponse) => void
   onTypingStart: (event: TypingStartEvent) => void
   onTypingStop: (event: TypingStopEvent) => void
+  onMessagesRead?: (event: MessagesReadEvent) => void
   onError: (error: { message: string }) => void
 }
 
@@ -53,7 +60,14 @@ export function useChatSocket() {
     socket.on('new_message', callbacks.onNewMessage)
     socket.on('typing_start', callbacks.onTypingStart)
     socket.on('typing_stop', callbacks.onTypingStop)
+    if (callbacks.onMessagesRead) {
+      socket.on('messages_read', callbacks.onMessagesRead)
+    }
     socket.on('error', callbacks.onError)
+  }
+
+  function emitMarkRead(chatId: string) {
+    socket?.emit('mark_read', { chatId })
   }
 
   function disconnect() {
@@ -86,5 +100,6 @@ export function useChatSocket() {
     joinChat,
     emitTypingStart,
     emitTypingStop,
+    emitMarkRead,
   }
 }

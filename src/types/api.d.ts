@@ -2358,7 +2358,7 @@ export interface components {
              * @example TEAM_INVITE
              * @enum {string}
              */
-            type: "TEAM_INVITE" | "TEAM_INVITE_RESPONSE" | "TEAM_JOIN_REQUEST" | "TEAM_REQUEST_RESPONSE" | "CAPTAIN_ASSIGNED" | "CAPTAIN_TRANSFERRED" | "TEAM_DELETED" | "MEMBER_LEFT" | "REMOVED_FROM_TEAM" | "TEAM_BROADCAST" | "TEAM_CHAT_MESSAGE" | "ORGANIZATION_INVITE" | "ORGANIZATION_INVITE_RESPONSE" | "ORGANIZATION_ROLE_CHANGED" | "ORGANIZATION_MEMBER_REMOVED" | "TOURNAMENT_INVITATION_RECEIVED" | "TOURNAMENT_REMINDER" | "TOURNAMENT_FORFEIT_RECORDED" | "TOURNAMENT_MATCH_RESULT_PENDING" | "TOURNAMENT_MATCH_RESULT_CONFIRMED" | "TOURNAMENT_MATCH_RESULT_DISPUTED" | "MEETUP_PROPOSAL" | "MEETUP_ACCEPTED" | "MEETUP_DECLINED" | "MEETUP_CANCELLED" | "GYM_STATUS_CHANGED" | "MESSAGE_FLAGGED" | "MESSAGE_DELETED" | "ACCOUNT_SUSPENDED" | "ACCOUNT_UNSUSPENDED" | "ACCOUNT_BANNED" | "ACCOUNT_UNBANNED" | "ACCOUNT_RESTRICTED" | "SUSPENSION_APPEAL_SUBMITTED" | "SUSPENSION_APPEAL_DECIDED";
+            type: "TEAM_INVITE" | "TEAM_INVITE_RESPONSE" | "TEAM_JOIN_REQUEST" | "TEAM_REQUEST_RESPONSE" | "CAPTAIN_ASSIGNED" | "CAPTAIN_TRANSFERRED" | "TEAM_DELETED" | "MEMBER_LEFT" | "REMOVED_FROM_TEAM" | "TEAM_BROADCAST" | "TEAM_CHAT_MESSAGE" | "ORGANIZATION_INVITE" | "ORGANIZATION_INVITE_RESPONSE" | "ORGANIZATION_ROLE_CHANGED" | "ORGANIZATION_MEMBER_REMOVED" | "TOURNAMENT_INVITATION_RECEIVED" | "TOURNAMENT_REMINDER" | "TOURNAMENT_FORFEIT_RECORDED" | "TOURNAMENT_MATCH_RESULT_PENDING" | "TOURNAMENT_MATCH_RESULT_CONFIRMED" | "TOURNAMENT_MATCH_RESULT_DISPUTED" | "MEETUP_PROPOSAL" | "MEETUP_ACCEPTED" | "MEETUP_DECLINED" | "MEETUP_CANCELLED" | "GYM_STATUS_CHANGED" | "ACHIEVEMENT_UNLOCKED" | "MESSAGE_FLAGGED" | "MESSAGE_DELETED" | "ACCOUNT_SUSPENDED" | "ACCOUNT_UNSUSPENDED" | "ACCOUNT_BANNED" | "ACCOUNT_UNBANNED" | "ACCOUNT_RESTRICTED" | "SUSPENSION_APPEAL_SUBMITTED" | "SUSPENSION_APPEAL_DECIDED";
             /**
              * @description Notification title
              * @example Team Invitation
@@ -4181,12 +4181,19 @@ export interface components {
              * @example PENDING
              * @enum {string}
              */
-            status: "PENDING" | "COMPLETED" | "BYE";
+            status: "PENDING" | "PENDING_CONFIRMATION" | "COMPLETED" | "BYE" | "FORFEIT";
             /**
              * @description Next match ID the winner advances to
              * @example cm456def789ghi
              */
             nextMatchId?: string;
+            /** @description Team that reported the current pending score, when status is PENDING_CONFIRMATION */
+            reportedByTeamId?: string | null;
+            /**
+             * Format: date-time
+             * @description When the current pending score was reported (ISO 8601)
+             */
+            scoreReportedAt?: string | null;
         };
         BracketRoundDto: {
             /**

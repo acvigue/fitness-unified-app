@@ -89,6 +89,29 @@ const isOpen = computed(() => tournament.value?.status === 'OPEN')
 
 const isRoundRobin = computed(() => tournament.value?.format === 'ROUND_ROBIN')
 
+const myCaptainTeamIds = computed(() => myCaptainTeams.value.map((t) => t.id))
+
+const registrationClosed = computed(() => {
+  if (!tournament.value?.registrationClosesAt) return false
+  return new Date() >= new Date(tournament.value.registrationClosesAt)
+})
+
+const registrationCloseLabel = computed(() => {
+  if (!tournament.value?.registrationClosesAt) return null
+  const d = new Date(tournament.value.registrationClosesAt)
+  return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+})
+
+const joinDisabledReason = computed<string | null>(() => {
+  if (!tournament.value) return null
+  if (!isOpen.value) return 'Registration is closed'
+  if (registrationClosed.value) return 'Registration window has ended'
+  if (isFull.value) return 'Tournament is full'
+  if (myCaptainTeams.value.length === 0) return 'You must be a team captain to register'
+  if (joinableTeams.value.length === 0) return 'All your teams are already registered'
+  return null
+})
+
 const canGenerateBracket = computed(
   () =>
     isOrgManager.value &&
@@ -306,9 +329,127 @@ async function seedBracket() {
 
 function openRecordResult(match: TournamentMatchDto) {
   selectedMatch.value = match
-  resultForm.value = { team1Score: 0, team2Score: 0 }
+  resultForm.value = {
+    team1Score: match.team1Score ?? 0,
+    team2Score: match.team2Score ?? 0,
+  }
   resultError.value = ''
   resultModalOpen.value = true
+}
+
+// ─── Captain-side report / confirm / dispute ──────────────
+const reportModalOpen = ref(false)
+const submittingReport = ref(false)
+const reportError = ref('')
+
+function openReportResult(match: TournamentMatchDto) {
+  selectedMatch.value = match
+  resultForm.value = {
+    team1Score: match.team1Score ?? 0,
+    team2Score: match.team2Score ?? 0,
+  }
+  reportError.value = ''
+  reportModalOpen.value = true
+}
+
+async function submitReport() {
+  if (!selectedMatch.value) return
+  if (!isRoundRobin.value && resultForm.value.team1Score === resultForm.value.team2Score) {
+    reportError.value = 'Scores cannot be tied in single elimination'
+    return
+  }
+  if (resultForm.value.team1Score < 0 || resultForm.value.team2Score < 0) {
+    reportError.value = 'Scores must be 0 or greater'
+    return
+  }
+  submittingReport.value = true
+  try {
+    const { error: err } = await apiClient.POST('/v1/tournaments/{id}/matches/{matchId}/report', {
+      params: { path: { id: tournamentId.value, matchId: selectedMatch.value.id } },
+      body: {
+        team1Score: resultForm.value.team1Score,
+        team2Score: resultForm.value.team2Score,
+      },
+    })
+    if (err) {
+      reportError.value = getErrorMessage(err, 'Failed to report score')
+      return
+    }
+    toast.success('Score reported', 'Awaiting confirmation by the opposing captain.')
+    reportModalOpen.value = false
+    await loadBracket()
+  } finally {
+    submittingReport.value = false
+  }
+}
+
+async function confirmResult(match: TournamentMatchDto) {
+  const { error: err } = await apiClient.POST('/v1/tournaments/{id}/matches/{matchId}/confirm', {
+    params: { path: { id: tournamentId.value, matchId: match.id } },
+  })
+  if (err) {
+    toast.error('Could not confirm', getErrorMessage(err, 'Failed to confirm match'))
+    return
+  }
+  toast.success('Match confirmed')
+  await loadBracket()
+  await loadTournament()
+  if (isRoundRobin.value) await loadStandings()
+}
+
+async function disputeResult(match: TournamentMatchDto) {
+  const { error: err } = await apiClient.POST('/v1/tournaments/{id}/matches/{matchId}/dispute', {
+    params: { path: { id: tournamentId.value, matchId: match.id } },
+  })
+  if (err) {
+    toast.error('Could not dispute', getErrorMessage(err, 'Failed to dispute match'))
+    return
+  }
+  toast.info('Score disputed', 'Org staff has been notified.')
+  await loadBracket()
+}
+
+// ─── Forfeit (org staff) ──────────────────────────────────
+const forfeitModalOpen = ref(false)
+const forfeitMatchTarget = ref<TournamentMatchDto | null>(null)
+const forfeitTeamId = ref<string>('')
+const submittingForfeit = ref(false)
+
+function openForfeit(match: TournamentMatchDto) {
+  forfeitMatchTarget.value = match
+  forfeitTeamId.value = match.team1?.id ?? ''
+  forfeitModalOpen.value = true
+}
+
+async function submitForfeit() {
+  if (!forfeitMatchTarget.value || !forfeitTeamId.value) return
+  submittingForfeit.value = true
+  try {
+    const { error: err } = await apiClient.POST(
+      '/v1/tournaments/{id}/matches/{matchId}/forfeit/{teamId}',
+      {
+        params: {
+          path: {
+            id: tournamentId.value,
+            matchId: forfeitMatchTarget.value.id,
+            teamId: forfeitTeamId.value,
+          },
+        },
+      },
+    )
+    if (err) {
+      toast.error('Could not record forfeit', getErrorMessage(err, 'Failed to forfeit'))
+      return
+    }
+    toast.success('Forfeit recorded')
+    forfeitModalOpen.value = false
+    forfeitMatchTarget.value = null
+    await loadBracket()
+    await loadTournament()
+    if (isRoundRobin.value) await loadStandings()
+  } finally {
+    submittingForfeit.value = false
+  }
 }
 
 async function submitResult() {
@@ -589,8 +730,13 @@ onUnmounted(() => {
             :rounds="bracket.rounds"
             :total-rounds="bracket.totalRounds"
             :is-org-manager="!!isOrgManager"
+            :my-captain-team-ids="myCaptainTeamIds"
             :format="tournament.format"
             @record-result="openRecordResult"
+            @report-result="openReportResult"
+            @confirm-result="confirmResult"
+            @dispute-result="disputeResult"
+            @forfeit-match="openForfeit"
           />
         </div>
       </UCard>
@@ -694,14 +840,26 @@ onUnmounted(() => {
       </UCard>
 
       <!-- Join Tournament (student/captain view) -->
-      <UCard v-if="isOpen && !isFull && joinableTeams.length > 0" class="bg-white/5">
+      <UCard
+        v-if="!myRegisteredTeams.length && (joinableTeams.length > 0 || joinDisabledReason)"
+        class="bg-white/5"
+      >
         <div class="flex flex-col gap-3">
           <div>
             <p class="text-xs uppercase tracking-[0.3em] text-white/60">Join Tournament</p>
-            <p class="text-sm text-white/60">Register one of your teams for this tournament.</p>
+            <p class="text-sm text-white/60">
+              <template v-if="joinDisabledReason">{{ joinDisabledReason }}.</template>
+              <template v-else>Register one of your teams for this tournament.</template>
+            </p>
+            <p
+              v-if="registrationCloseLabel && !registrationClosed"
+              class="text-xs text-white/40 mt-1"
+            >
+              Registration closes {{ registrationCloseLabel }}.
+            </p>
           </div>
 
-          <div class="flex flex-col gap-3 sm:flex-row">
+          <div v-if="joinableTeams.length > 0" class="flex flex-col gap-3 sm:flex-row">
             <USelect
               v-model="selectedTeamId"
               placeholder="Select a team..."
@@ -711,7 +869,7 @@ onUnmounted(() => {
             <UButton
               color="primary"
               :loading="actionLoading"
-              :disabled="!selectedTeamId"
+              :disabled="!selectedTeamId || !!joinDisabledReason"
               @click="joinTournament"
             >
               Join Tournament
@@ -864,6 +1022,82 @@ onUnmounted(() => {
             </UButton>
             <UButton color="primary" :loading="seedingBracket" @click="seedBracket">
               Seed bracket
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Captain Score Report Modal -->
+    <UModal v-model:open="reportModalOpen" :dismissible="!submittingReport">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-flag-triangle-right" class="size-5 text-primary" />
+            <h2 class="text-lg font-semibold">Report match score</h2>
+          </div>
+          <p class="text-sm text-white/60">
+            Your opponent will be asked to confirm. They can dispute and escalate to staff.
+          </p>
+          <p v-if="reportError" class="text-sm text-red-400">{{ reportError }}</p>
+
+          <div v-if="selectedMatch" class="flex items-center gap-4">
+            <UFormField :label="selectedMatch.team1?.name || 'Team 1'" class="flex-1">
+              <UInput v-model.number="resultForm.team1Score" type="number" :min="0" />
+            </UFormField>
+            <span class="text-white/40 text-lg font-bold pt-5">vs</span>
+            <UFormField :label="selectedMatch.team2?.name || 'Team 2'" class="flex-1">
+              <UInput v-model.number="resultForm.team2Score" type="number" :min="0" />
+            </UFormField>
+          </div>
+
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              :disabled="submittingReport"
+              @click="reportModalOpen = false"
+            >
+              Cancel
+            </UButton>
+            <UButton :loading="submittingReport" @click="submitReport">Report score</UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Forfeit Modal (org staff) -->
+    <UModal v-model:open="forfeitModalOpen" :dismissible="!submittingForfeit">
+      <template #content>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-flag" class="size-5 text-error" />
+            <h2 class="text-lg font-semibold">Record forfeit</h2>
+          </div>
+          <p class="text-sm text-white/60">
+            The opposing team is awarded the win. This advances the bracket immediately.
+          </p>
+          <UFormField v-if="forfeitMatchTarget" label="Forfeiting team" required>
+            <USelect
+              v-model="forfeitTeamId"
+              :items="
+                [forfeitMatchTarget.team1, forfeitMatchTarget.team2]
+                  .filter((t): t is NonNullable<typeof t> => Boolean(t))
+                  .map((t) => ({ label: t.name, value: t.id }))
+              "
+            />
+          </UFormField>
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              :disabled="submittingForfeit"
+              @click="forfeitModalOpen = false"
+            >
+              Cancel
+            </UButton>
+            <UButton color="error" :loading="submittingForfeit" @click="submitForfeit">
+              Record forfeit
             </UButton>
           </div>
         </div>

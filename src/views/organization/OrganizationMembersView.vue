@@ -44,9 +44,7 @@ const canViewInvitations = computed(() => myRole.value === 'STAFF' || myRole.val
 
 useHead({ title: 'Organization members' })
 
-const orgName = computed(
-  () => myMembership.value?.organizationName ?? 'Organization members',
-)
+const orgName = computed(() => myMembership.value?.organizationName ?? 'Organization members')
 
 onMounted(async () => {
   if (!orgStore.initialized) await orgStore.fetchMemberships()
@@ -205,12 +203,7 @@ const renderRoleBadge = (role: Role) =>
                 size="sm"
               />
             </div>
-            <UButton
-              v-if="isAdmin"
-              icon="i-lucide-user-plus"
-              size="sm"
-              @click="inviteOpen = true"
-            >
+            <UButton v-if="isAdmin" icon="i-lucide-user-plus" size="sm" @click="inviteOpen = true">
               Invite member
             </UButton>
           </div>
@@ -313,7 +306,11 @@ const renderRoleBadge = (role: Role) =>
 
       <InviteMemberModal v-model:open="inviteOpen" @invited="store.loadFor(orgId)" />
 
-      <UModal :open="!!removeTarget" :dismissible="!removeLoading" @update:open="(v) => !v && (removeTarget = null)">
+      <UModal
+        :open="!!removeTarget"
+        :dismissible="!removeLoading"
+        @update:open="(v) => !v && (removeTarget = null)"
+      >
         <template #content>
           <div class="p-6 flex flex-col gap-4">
             <div class="flex items-start gap-3">
@@ -345,7 +342,11 @@ const renderRoleBadge = (role: Role) =>
         </template>
       </UModal>
 
-      <UModal :open="!!revokeTarget" :dismissible="!revokeLoading" @update:open="(v) => !v && (revokeTarget = null)">
+      <UModal
+        :open="!!revokeTarget"
+        :dismissible="!revokeLoading"
+        @update:open="(v) => !v && (revokeTarget = null)"
+      >
         <template #content>
           <div class="p-6 flex flex-col gap-4">
             <div class="flex items-start gap-3">

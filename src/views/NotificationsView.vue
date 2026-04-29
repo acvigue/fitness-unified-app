@@ -8,22 +8,21 @@ import { useNotificationRouting } from '@/composables/useNotificationRouting'
 import { useToastStore } from '@/stores/toast'
 import { getErrorMessage } from '@/lib/api/errors'
 
-useHead({
-  title: 'Notifications',
-})
+useHead({ title: 'Notifications' })
 
 const { setHeader } = usePageHeader()
 const notificationStore = useNotificationStore()
 const { open } = useNotificationRouting()
 const toast = useToastStore()
 
-const confirmMarkAllOpen = ref(false)
 const confirmDeleteOpen = ref(false)
 const pendingDeleteId = ref<string | null>(null)
 const pendingDeleteTitle = ref('')
 const busy = ref(false)
 
-const hasUnread = computed(() => notificationStore.unreadCount > 0)
+type Category = 'ALL' | 'UNREAD' | 'TEAM' | 'TOURNAMENT' | 'ORG' | 'GYM' | 'MEETUP' | 'MODERATION'
+
+const category = ref<Category>('ALL')
 
 const NOTIFICATION_ICONS: Record<string, string> = {
   TEAM_INVITE: 'i-lucide-user-plus',
@@ -35,18 +34,28 @@ const NOTIFICATION_ICONS: Record<string, string> = {
   MEMBER_LEFT: 'i-lucide-user-minus',
   REMOVED_FROM_TEAM: 'i-lucide-user-x',
   TEAM_DELETED: 'i-lucide-trash-2',
-  TOURNAMENT_DELETED: 'i-lucide-circle-x',
-  TOURNAMENT_INVITE: 'i-lucide-trophy',
-  TOURNAMENT_REMINDER: 'i-lucide-clock',
-  ACHIEVEMENT_UNLOCKED: 'i-lucide-award',
   TEAM_BROADCAST: 'i-lucide-megaphone',
+  TEAM_CHAT_MESSAGE: 'i-lucide-message-square',
+  ORGANIZATION_INVITE: 'i-lucide-mail',
+  ORGANIZATION_INVITE_RESPONSE: 'i-lucide-mail-check',
+  ORGANIZATION_ROLE_CHANGED: 'i-lucide-shield',
+  ORGANIZATION_MEMBER_REMOVED: 'i-lucide-user-x',
+  TOURNAMENT_INVITATION_RECEIVED: 'i-lucide-trophy',
+  TOURNAMENT_REMINDER: 'i-lucide-clock',
+  TOURNAMENT_FORFEIT_RECORDED: 'i-lucide-flag',
+  TOURNAMENT_MATCH_RESULT_PENDING: 'i-lucide-flag-triangle-right',
+  TOURNAMENT_MATCH_RESULT_CONFIRMED: 'i-lucide-check-check',
+  TOURNAMENT_MATCH_RESULT_DISPUTED: 'i-lucide-alert-triangle',
   GYM_STATUS_CHANGED: 'i-lucide-dumbbell',
   MESSAGE_FLAGGED: 'i-lucide-flag',
   MESSAGE_DELETED: 'i-lucide-trash',
   ACCOUNT_SUSPENDED: 'i-lucide-pause-circle',
   ACCOUNT_UNSUSPENDED: 'i-lucide-play-circle',
   ACCOUNT_BANNED: 'i-lucide-ban',
+  ACCOUNT_UNBANNED: 'i-lucide-circle-check',
   ACCOUNT_RESTRICTED: 'i-lucide-shield-alert',
+  SUSPENSION_APPEAL_SUBMITTED: 'i-lucide-shield-question',
+  SUSPENSION_APPEAL_DECIDED: 'i-lucide-shield-check',
   MEETUP_ACCEPTED: 'i-lucide-calendar-check',
   MEETUP_DECLINED: 'i-lucide-calendar-x',
   MEETUP_CANCELLED: 'i-lucide-calendar-minus',
@@ -56,6 +65,69 @@ const NOTIFICATION_ICONS: Record<string, string> = {
 function getIcon(type: string) {
   return NOTIFICATION_ICONS[type] || 'i-lucide-bell'
 }
+
+function categoryFor(type: string): Exclude<Category, 'ALL' | 'UNREAD'> | 'OTHER' {
+  if (
+    type.startsWith('TEAM_') ||
+    type.startsWith('CAPTAIN_') ||
+    type === 'MEMBER_LEFT' ||
+    type === 'REMOVED_FROM_TEAM'
+  )
+    return 'TEAM'
+  if (type.startsWith('TOURNAMENT_')) return 'TOURNAMENT'
+  if (type.startsWith('ORGANIZATION_')) return 'ORG'
+  if (type === 'GYM_STATUS_CHANGED') return 'GYM'
+  if (type.startsWith('MEETUP_')) return 'MEETUP'
+  if (type.startsWith('MESSAGE_') || type.startsWith('ACCOUNT_') || type.startsWith('SUSPENSION_'))
+    return 'MODERATION'
+  return 'OTHER'
+}
+
+const filtered = computed(() => {
+  const list = notificationStore.notifications
+  if (category.value === 'ALL') return list
+  if (category.value === 'UNREAD') return list.filter((n) => !n.readAt && !n.dismissed)
+  return list.filter((n) => categoryFor(n.type) === category.value)
+})
+
+const groups = computed<{ key: string; label: string; items: typeof filtered.value }[]>(() => {
+  if (category.value !== 'ALL') {
+    return [{ key: category.value, label: '', items: filtered.value }]
+  }
+  const buckets = new Map<string, typeof filtered.value>()
+  for (const n of filtered.value) {
+    const cat = categoryFor(n.type)
+    if (!buckets.has(cat)) buckets.set(cat, [])
+    buckets.get(cat)!.push(n)
+  }
+  const labels: Record<string, string> = {
+    TEAM: 'Team',
+    TOURNAMENT: 'Tournaments',
+    ORG: 'Organizations',
+    GYM: 'Gyms',
+    MEETUP: 'Meetups',
+    MODERATION: 'Account & moderation',
+    OTHER: 'Other',
+  }
+  return [...buckets.entries()].map(([k, items]) => ({
+    key: k,
+    label: labels[k] ?? k,
+    items,
+  }))
+})
+
+const filterItems: { label: string; value: Category }[] = [
+  { label: 'All', value: 'ALL' },
+  { label: 'Unread', value: 'UNREAD' },
+  { label: 'Team', value: 'TEAM' },
+  { label: 'Tournament', value: 'TOURNAMENT' },
+  { label: 'Org', value: 'ORG' },
+  { label: 'Gym', value: 'GYM' },
+  { label: 'Meetup', value: 'MEETUP' },
+  { label: 'Moderation', value: 'MODERATION' },
+]
+
+const hasUnread = computed(() => notificationStore.unreadCount > 0)
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr)
@@ -101,17 +173,16 @@ async function confirmDelete() {
   }
 }
 
-async function confirmMarkAll() {
+async function markAll() {
+  if (!hasUnread.value || busy.value) return
   busy.value = true
   try {
     const unread = notificationStore.unreadNotifications.slice()
     await Promise.all(unread.map((n) => notificationStore.markRead(n.id)))
-    toast.success('All notifications marked as read')
   } catch (e) {
     toast.error('Could not mark all as read', getErrorMessage(e))
   } finally {
     busy.value = false
-    confirmMarkAllOpen.value = false
   }
 }
 
@@ -133,8 +204,9 @@ onMounted(() => {
             variant="ghost"
             color="neutral"
             icon="i-lucide-check-check"
+            :loading="busy"
             aria-label="Mark all notifications as read"
-            @click="confirmMarkAllOpen = true"
+            @click="markAll"
           >
             Mark all read
           </UButton>
@@ -148,6 +220,19 @@ onMounted(() => {
             @click="refresh"
           />
         </div>
+      </div>
+
+      <div class="flex flex-wrap gap-1">
+        <UButton
+          v-for="item in filterItems"
+          :key="item.value"
+          size="xs"
+          :color="category === item.value ? 'primary' : 'neutral'"
+          :variant="category === item.value ? 'soft' : 'ghost'"
+          @click="category = item.value"
+        >
+          {{ item.label }}
+        </UButton>
       </div>
 
       <div
@@ -168,78 +253,65 @@ onMounted(() => {
       </div>
 
       <div
-        v-else-if="notificationStore.notifications.length === 0"
+        v-else-if="filtered.length === 0"
         class="flex flex-col items-center gap-2 rounded-lg border border-dashed border-white/10 p-8 text-center text-sm text-white/50"
       >
         <UIcon name="i-lucide-bell-off" class="size-8 text-white/40" />
-        <p>You're all caught up</p>
+        <p>{{ category === 'ALL' ? "You're all caught up" : 'Nothing matches this filter' }}</p>
       </div>
 
-      <div v-else class="flex flex-col gap-2">
-        <button
-          v-for="notification in notificationStore.notifications"
-          :key="notification.id"
-          type="button"
-          class="flex items-start gap-3 rounded-lg border p-4 text-left transition hover:bg-white/5"
-          :class="
-            notification.dismissed
-              ? 'border-white/5 bg-white/[0.02] opacity-60'
-              : !notification.readAt
-                ? 'border-primary/40 bg-primary/[0.04]'
-                : 'border-white/10 bg-white/5'
-          "
-          @click="open(notification)"
-        >
-          <UIcon
-            :name="getIcon(notification.type)"
-            class="mt-0.5 text-lg shrink-0"
-            :class="notification.dismissed ? 'text-white/30' : 'text-primary'"
-          />
-
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2">
-              <p class="font-medium text-sm">{{ notification.title }}</p>
-              <span
-                v-if="!notification.readAt && !notification.dismissed"
-                class="inline-block size-2 rounded-full bg-primary"
-                aria-label="Unread"
-              />
+      <div v-else class="flex flex-col gap-4">
+        <div v-for="group in groups" :key="group.key" class="flex flex-col gap-2">
+          <p v-if="group.label" class="text-xs uppercase tracking-[0.3em] text-white/50">
+            {{ group.label }}
+            <span class="ml-1 text-white/30 normal-case tracking-normal">
+              ({{ group.items.length }})
+            </span>
+          </p>
+          <button
+            v-for="notification in group.items"
+            :key="notification.id"
+            type="button"
+            class="flex items-start gap-3 rounded-lg border p-4 text-left transition hover:bg-white/5"
+            :class="
+              notification.dismissed
+                ? 'border-white/5 bg-white/[0.02] opacity-60'
+                : !notification.readAt
+                  ? 'border-primary/40 bg-primary/[0.04]'
+                  : 'border-white/10 bg-white/5'
+            "
+            @click="open(notification)"
+          >
+            <UIcon
+              :name="getIcon(notification.type)"
+              class="mt-0.5 text-lg shrink-0"
+              :class="notification.dismissed ? 'text-white/30' : 'text-primary'"
+            />
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="font-medium text-sm">{{ notification.title }}</p>
+                <span
+                  v-if="!notification.readAt && !notification.dismissed"
+                  class="inline-block size-2 rounded-full bg-primary"
+                  aria-label="Unread"
+                />
+              </div>
+              <p class="text-sm text-white/60 mt-0.5">{{ notification.content }}</p>
+              <p class="text-xs text-white/40 mt-1">{{ formatDate(notification.createdAt) }}</p>
             </div>
-            <p class="text-sm text-white/60 mt-0.5">{{ notification.content }}</p>
-            <p class="text-xs text-white/40 mt-1">{{ formatDate(notification.createdAt) }}</p>
-          </div>
-
-          <UButton
-            v-if="!notification.dismissed"
-            size="xs"
-            variant="ghost"
-            color="neutral"
-            icon="i-lucide-x"
-            :aria-label="`Dismiss notification: ${notification.title}`"
-            @click.stop="askDelete(notification.id, notification.title)"
-          />
-        </button>
+            <UButton
+              v-if="!notification.dismissed"
+              size="xs"
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-x"
+              :aria-label="`Dismiss notification: ${notification.title}`"
+              @click.stop="askDelete(notification.id, notification.title)"
+            />
+          </button>
+        </div>
       </div>
     </section>
-
-    <UModal v-model:open="confirmMarkAllOpen">
-      <template #content>
-        <div class="p-6 flex flex-col gap-4">
-          <div>
-            <h2 class="text-lg font-semibold">Mark all as read?</h2>
-            <p class="text-sm text-white/60 mt-1">
-              This will mark {{ notificationStore.unreadCount }} notifications as read.
-            </p>
-          </div>
-          <div class="flex gap-2 justify-end">
-            <UButton variant="ghost" color="neutral" @click="confirmMarkAllOpen = false"
-              >Cancel</UButton
-            >
-            <UButton color="primary" :loading="busy" @click="confirmMarkAll">Mark all read</UButton>
-          </div>
-        </div>
-      </template>
-    </UModal>
 
     <UModal v-model:open="confirmDeleteOpen">
       <template #content>
@@ -249,9 +321,9 @@ onMounted(() => {
             <p class="text-sm text-white/60 mt-1 truncate">{{ pendingDeleteTitle }}</p>
           </div>
           <div class="flex gap-2 justify-end">
-            <UButton variant="ghost" color="neutral" @click="confirmDeleteOpen = false"
-              >Cancel</UButton
-            >
+            <UButton variant="ghost" color="neutral" @click="confirmDeleteOpen = false">
+              Cancel
+            </UButton>
             <UButton color="error" :loading="busy" @click="confirmDelete">Dismiss</UButton>
           </div>
         </div>

@@ -57,13 +57,10 @@ async function submitDecision() {
   if (!target.value || submitting.value) return
   submitting.value = true
   try {
-    const { error: err } = await apiClient.POST(
-      '/v1/moderation/suspension-appeals/{id}/decide',
-      {
-        params: { path: { id: target.value.id } },
-        body: { decision: decision.value, reason: reason.value.trim() || undefined },
-      },
-    )
+    const { error: err } = await apiClient.POST('/v1/moderation/suspension-appeals/{id}/decide', {
+      params: { path: { id: target.value.id } },
+      body: { decision: decision.value, reason: reason.value.trim() || undefined },
+    })
     if (err) {
       toast.error('Could not record decision', getErrorMessage(err, 'Failed'))
       return

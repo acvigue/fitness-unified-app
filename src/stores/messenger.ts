@@ -7,6 +7,7 @@ import {
   useChatSocket,
   type TypingStartEvent,
   type TypingStopEvent,
+  type MessagesReadEvent,
 } from '@/composables/useChatSocket'
 
 type UserChat = components['schemas']['UserChatResponseDto']
@@ -85,6 +86,7 @@ export const useMessengerStore = defineStore('messenger', () => {
         onNewMessage: handleNewMessage,
         onTypingStart: handleTypingStart,
         onTypingStop: handleTypingStop,
+        onMessagesRead: handleMessagesRead,
         onError: (err) => console.error('Chat socket error:', err.message),
       })
     } catch (err) {
@@ -159,6 +161,23 @@ export const useMessengerStore = defineStore('messenger', () => {
     typingUsers.value.get(event.chatId)?.delete(event.userId)
   }
 
+  function handleMessagesRead(event: MessagesReadEvent) {
+    const list = messages.value.get(event.chatId)
+    if (!list) return
+    let changed = false
+    for (const m of list) {
+      // Per-user receipts aren't yet modeled; flip the boolean for everyone
+      // when *any* member marks the chat read. See backend D notes.
+      if (m.sender.id !== event.readByUserId && !m.read) {
+        m.read = true
+        changed = true
+      }
+    }
+    if (changed) {
+      messages.value.set(event.chatId, [...list])
+    }
+  }
+
   async function createChat(recipientIds: string[], name?: string): Promise<ChatResponse> {
     const { data: chatData, error: chatError } = await apiClient.POST('/v1/chats/create', {
       body: { recipientIds, name },
@@ -211,6 +230,12 @@ export const useMessengerStore = defineStore('messenger', () => {
     }
   }
 
+  async function markChatRead(chatId: string): Promise<void> {
+    await apiClient.POST('/v1/chats/{chatId}/read', {
+      params: { path: { chatId } },
+    })
+  }
+
   function $reset() {
     disconnect()
     conversations.value.clear()
@@ -247,6 +272,7 @@ export const useMessengerStore = defineStore('messenger', () => {
     setActiveChat,
     emitTypingStart,
     emitTypingStop,
+    markChatRead,
     $reset,
   }
 })

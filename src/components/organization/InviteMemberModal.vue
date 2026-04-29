@@ -20,7 +20,7 @@ const emit = defineEmits<{
 const toast = useToastStore()
 const store = useOrganizationMembersStore()
 
-type SelectedUser = { sub: string; name?: string | null; username?: string | null }
+type SelectedUser = { id: string; name?: string; username?: string }
 const selectedUser = ref<SelectedUser | null>(null)
 const role = ref<Role>('MEMBER')
 const submitting = ref(false)
@@ -45,7 +45,7 @@ watch(
   },
 )
 
-function onUserSelected(user: { sub: string; name?: string | null; username?: string | null }) {
+function onUserSelected(user: { id: string; name?: string; username?: string }) {
   selectedUser.value = user
   pickerOpen.value = false
 }
@@ -55,7 +55,7 @@ async function submit() {
   submitting.value = true
   error.value = ''
   try {
-    await store.invite(selectedUser.value.sub, role.value)
+    await store.invite(selectedUser.value.id, role.value)
     toast.success('Invitation sent')
     emit('invited')
     emit('update:open', false)

@@ -111,7 +111,9 @@ function formatDate(iso: string) {
           >
             Close
           </UButton>
-          <UButton :loading="submitting" :disabled="!isValid" @click="submit">Submit appeal</UButton>
+          <UButton :loading="submitting" :disabled="!isValid" @click="submit"
+            >Submit appeal</UButton
+          >
         </div>
 
         <div v-if="appeals.length > 0" class="flex flex-col gap-2">

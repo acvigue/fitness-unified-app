@@ -63,6 +63,8 @@ watch(
           messagesLoading.value = false
         }
       }
+      // Fire-and-forget read receipt — keeps unread counters honest server-side.
+      messengerStore.markChatRead(id).catch(() => undefined)
     }
   },
   { immediate: true },

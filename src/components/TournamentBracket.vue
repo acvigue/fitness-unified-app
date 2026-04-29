@@ -5,16 +5,33 @@ import type { components } from '@/types/api'
 type BracketRound = components['schemas']['BracketRoundDto']
 type TournamentMatch = components['schemas']['TournamentMatchResponseDto']
 
-const props = defineProps<{
-  rounds: BracketRound[]
-  totalRounds: number
-  isOrgManager: boolean
-  format?: 'SINGLE_ELIMINATION' | 'ROUND_ROBIN'
-}>()
+const props = withDefaults(
+  defineProps<{
+    rounds: BracketRound[]
+    totalRounds: number
+    isOrgManager: boolean
+    format?: 'SINGLE_ELIMINATION' | 'ROUND_ROBIN'
+    /** Team IDs the viewer captains. Used to surface report/confirm/dispute. */
+    myCaptainTeamIds?: string[]
+  }>(),
+  { myCaptainTeamIds: () => [] },
+)
 
 const emit = defineEmits<{
   recordResult: [match: TournamentMatch]
+  reportResult: [match: TournamentMatch]
+  confirmResult: [match: TournamentMatch]
+  disputeResult: [match: TournamentMatch]
+  forfeitMatch: [match: TournamentMatch]
 }>()
+
+function isCaptainOfTeam(teamId: string | null | undefined): boolean {
+  return !!teamId && props.myCaptainTeamIds.includes(teamId)
+}
+
+function isMatchParticipant(match: TournamentMatch): boolean {
+  return isCaptainOfTeam(match.team1?.id) || isCaptainOfTeam(match.team2?.id)
+}
 
 function getMatchStatusColor(status: string) {
   switch (status) {
@@ -22,6 +39,10 @@ function getMatchStatusColor(status: string) {
       return 'success'
     case 'PENDING':
       return 'warning'
+    case 'PENDING_CONFIRMATION':
+      return 'info'
+    case 'FORFEIT':
+      return 'error'
     case 'BYE':
       return 'neutral'
     default:
@@ -35,6 +56,10 @@ function getMatchStatusLabel(status: string) {
       return 'Completed'
     case 'PENDING':
       return 'Pending'
+    case 'PENDING_CONFIRMATION':
+      return 'Awaiting confirmation'
+    case 'FORFEIT':
+      return 'Forfeit'
     case 'BYE':
       return 'Bye'
     default:
@@ -42,8 +67,40 @@ function getMatchStatusLabel(status: string) {
   }
 }
 
-function canRecordResult(match: TournamentMatch) {
-  return props.isOrgManager && match.status === 'PENDING' && match.team1 && match.team2
+function canRecordResult(match: TournamentMatch): boolean {
+  return (
+    props.isOrgManager &&
+    (match.status === 'PENDING' || match.status === 'PENDING_CONFIRMATION') &&
+    !!match.team1 &&
+    !!match.team2
+  )
+}
+
+function canCaptainReport(match: TournamentMatch): boolean {
+  return (
+    isMatchParticipant(match) &&
+    (match.status === 'PENDING' || match.status === 'PENDING_CONFIRMATION') &&
+    !!match.team1 &&
+    !!match.team2
+  )
+}
+
+function canCaptainConfirm(match: TournamentMatch): boolean {
+  if (match.status !== 'PENDING_CONFIRMATION') return false
+  if (!match.reportedByTeamId) return false
+  // Confirming captain must own a team in the match that didn't report.
+  if (isCaptainOfTeam(match.team1?.id) && match.team1?.id !== match.reportedByTeamId) return true
+  if (isCaptainOfTeam(match.team2?.id) && match.team2?.id !== match.reportedByTeamId) return true
+  return false
+}
+
+function canForfeit(match: TournamentMatch): boolean {
+  return (
+    props.isOrgManager &&
+    !['COMPLETED', 'BYE', 'FORFEIT'].includes(match.status) &&
+    !!match.team1 &&
+    !!match.team2
+  )
 }
 
 const champion = computed(() => {
@@ -167,7 +224,7 @@ function isDraw(match: TournamentMatch) {
             </span>
           </div>
 
-          <!-- Record Result button -->
+          <!-- Org-manager actions -->
           <div v-if="canRecordResult(match)" class="px-3 py-2 border-t border-white/5">
             <UButton
               size="xs"
@@ -179,6 +236,68 @@ function isDraw(match: TournamentMatch) {
             >
               Record Result
             </UButton>
+          </div>
+          <div v-if="canForfeit(match)" class="px-3 pb-2">
+            <UButton
+              size="xs"
+              color="error"
+              variant="outline"
+              block
+              icon="i-lucide-flag"
+              @click="emit('forfeitMatch', match)"
+            >
+              Record Forfeit
+            </UButton>
+          </div>
+
+          <!-- Captain report (no current pending) -->
+          <div
+            v-if="canCaptainReport(match) && match.status === 'PENDING'"
+            class="px-3 py-2 border-t border-white/5"
+          >
+            <UButton
+              size="xs"
+              variant="soft"
+              block
+              icon="i-lucide-pencil"
+              @click="emit('reportResult', match)"
+            >
+              Report Score
+            </UButton>
+          </div>
+
+          <!-- Captain confirm/dispute (other team reported) -->
+          <div v-if="canCaptainConfirm(match)" class="px-3 py-2 border-t border-white/5 flex gap-2">
+            <UButton
+              size="xs"
+              color="error"
+              variant="outline"
+              icon="i-lucide-x"
+              class="flex-1"
+              @click="emit('disputeResult', match)"
+            >
+              Dispute
+            </UButton>
+            <UButton
+              size="xs"
+              icon="i-lucide-check"
+              class="flex-1"
+              @click="emit('confirmResult', match)"
+            >
+              Confirm
+            </UButton>
+          </div>
+
+          <!-- Reporting captain sees a pending indicator -->
+          <div
+            v-else-if="
+              match.status === 'PENDING_CONFIRMATION' &&
+              isMatchParticipant(match) &&
+              isCaptainOfTeam(match.reportedByTeamId)
+            "
+            class="px-3 py-2 border-t border-white/5"
+          >
+            <p class="text-xs text-white/50 text-center">Awaiting opposing captain.</p>
           </div>
         </div>
       </div>

@@ -92,10 +92,9 @@ export const useOrganizationMembersStore = defineStore('organizationMembers', ()
   }
 
   async function revokeInvitation(invitationId: string): Promise<void> {
-    const { error: err } = await apiClient.DELETE(
-      '/v1/organizations/invitations/{invitationId}',
-      { params: { path: { invitationId } } },
-    )
+    const { error: err } = await apiClient.DELETE('/v1/organizations/invitations/{invitationId}', {
+      params: { path: { invitationId } },
+    })
     if (err) throw err
     invitations.value = invitations.value.filter((i) => i.id !== invitationId)
   }
