@@ -123,9 +123,19 @@ function buildMergedRules(): WeeklyRulePayload[] {
 
 resetGrid(props.modelValue ?? [])
 
+// The grid emits on every cell change, and the parent's v-model pushes the
+// new array back through props.modelValue. Without this guard, that echo
+// re-runs resetGrid, which mutates every cell, which fires the deep watcher
+// again — an infinite loop that freezes the tab.
+let suppressNextPropSync = false
+
 watch(
   () => props.modelValue,
   (next) => {
+    if (suppressNextPropSync) {
+      suppressNextPropSync = false
+      return
+    }
     if (!next) return
     resetGrid(next)
   },
@@ -135,6 +145,7 @@ watch(
 watch(
   scheduleGrid,
   () => {
+    suppressNextPropSync = true
     emit('update:modelValue', buildMergedRules())
   },
   { deep: true },
