@@ -4,6 +4,7 @@ import { useHead } from '@unhead/vue'
 import { useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import SportsPickerModal from '@/components/SportsPickerModal.vue'
+import DateTimePicker from '@/components/datetime/DateTimePicker.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useOrganizationStore } from '@/stores/organization'
 import { useToastStore } from '@/stores/toast'
@@ -139,7 +140,7 @@ async function createTournament() {
         organizationId: org.organizationId,
         format: form.format,
         maxTeams: form.maxTeams,
-        startDate: new Date(form.startDate).toISOString(),
+        startDate: form.startDate,
       },
     })
 
@@ -237,12 +238,10 @@ onMounted(() => {
           </UFormField>
 
           <UFormField label="Start Date" required :error="startDateError">
-            <UInput
+            <DateTimePicker
               v-model="form.startDate"
-              type="datetime-local"
               :disabled="creating"
-              aria-label="Tournament start date and time"
-              @blur="touched.startDate = true"
+              @update:model-value="touched.startDate = true"
             />
           </UFormField>
 

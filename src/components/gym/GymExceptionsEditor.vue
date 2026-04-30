@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import DatePicker from '@/components/datetime/DatePicker.vue'
+import TimePicker from '@/components/datetime/TimePicker.vue'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useToastStore } from '@/stores/toast'
@@ -205,7 +207,7 @@ function formatDate(iso: string) {
           </div>
 
           <UFormField label="Date" required>
-            <UInput v-model="form.date" type="date" icon="i-lucide-calendar" />
+            <DatePicker v-model="form.date" />
           </UFormField>
 
           <div
@@ -220,10 +222,10 @@ function formatDate(iso: string) {
 
           <div v-if="!form.isClosed" class="grid gap-3 sm:grid-cols-2">
             <UFormField label="Open from" required>
-              <UInput v-model="form.startTime" type="time" step="1800" />
+              <TimePicker v-model="form.startTime" aria-label="Open from" />
             </UFormField>
             <UFormField label="Open until" required>
-              <UInput v-model="form.endTime" type="time" step="1800" />
+              <TimePicker v-model="form.endTime" aria-label="Open until" />
             </UFormField>
           </div>
 

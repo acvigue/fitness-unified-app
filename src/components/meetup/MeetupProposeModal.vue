@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
+import DateTimePicker from '@/components/datetime/DateTimePicker.vue'
 import { useMeetupStore } from '@/stores/meetup'
 
 const props = defineProps<{
@@ -53,7 +54,7 @@ async function submit() {
       title: form.title.trim(),
       description: form.description.trim() || undefined,
       location: form.location.trim(),
-      dateTime: new Date(form.dateTime).toISOString(),
+      dateTime: form.dateTime,
     })
     open.value = false
     emit('proposed')
@@ -83,7 +84,7 @@ async function submit() {
         </UFormField>
 
         <UFormField label="Date & time">
-          <UInput v-model="form.dateTime" type="datetime-local" />
+          <DateTimePicker v-model="form.dateTime" />
         </UFormField>
 
         <UFormField label="Description">

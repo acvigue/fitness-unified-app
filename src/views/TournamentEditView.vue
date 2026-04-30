@@ -3,6 +3,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useRoute, useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
+import DateTimePicker from '@/components/datetime/DateTimePicker.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useToastStore } from '@/stores/toast'
 import { apiClient } from '@/lib/api/client'
@@ -124,7 +125,7 @@ async function loadTournament() {
     tournament.value = data
     form.name = data.name
     form.maxTeams = data.maxTeams
-    form.startDate = data.startDate.slice(0, 16)
+    form.startDate = data.startDate
     form.status = data.status
     originalStartDate.value = data.startDate
   } catch (e) {
@@ -155,7 +156,7 @@ async function saveTournament() {
       body: {
         name: form.name.trim(),
         maxTeams: form.maxTeams,
-        startDate: new Date(form.startDate).toISOString(),
+        startDate: form.startDate,
         status: form.status as 'OPEN' | 'CLOSED' | 'UPCOMING' | 'INPROGRESS' | 'COMPLETED',
       },
     })
@@ -274,12 +275,10 @@ onMounted(() => {
           </UFormField>
 
           <UFormField label="Start Date" required :error="startDateError">
-            <UInput
+            <DateTimePicker
               v-model="form.startDate"
-              type="datetime-local"
               :disabled="saving || deleting"
-              aria-label="Tournament start date and time"
-              @blur="touched.startDate = true"
+              @update:model-value="touched.startDate = true"
             />
           </UFormField>
 

@@ -38,6 +38,9 @@ importers:
       '@iconify/vue':
         specifier: ^5.0.0
         version: 5.0.0(vue@3.5.28(typescript@5.9.3))
+      '@internationalized/date':
+        specifier: ^3.12.1
+        version: 3.12.1
       '@mux/upchunk':
         specifier: ^3.5.0
         version: 3.5.0
@@ -59,9 +62,6 @@ importers:
       pinia:
         specifier: ^3.0.4
         version: 3.0.4(typescript@5.9.3)(vue@3.5.28(typescript@5.9.3))
-      shepherd.js:
-        specifier: ^15.2.1
-        version: 15.2.1
       socket.io-client:
         specifier: ^4.8.3
         version: 4.8.3
@@ -80,9 +80,6 @@ importers:
       vue-router:
         specifier: ^4.6.4
         version: 4.6.4(vue@3.5.28(typescript@5.9.3))
-      vue-shepherd:
-        specifier: ^6.0.0
-        version: 6.0.0(vue@3.5.28(typescript@5.9.3))
     devDependencies:
       '@capacitor/assets':
         specifier: ^3.0.5
@@ -703,8 +700,8 @@ packages:
     peerDependencies:
       vue: '>=3'
 
-  '@internationalized/date@3.11.0':
-    resolution: {integrity: sha512-BOx5huLAWhicM9/ZFs84CzP+V3gBW6vlpM02yzsdYC7TGlZJX1OJiEEHcSayF00Z+3jLlm4w79amvSt6RqKN3Q==}
+  '@internationalized/date@3.12.1':
+    resolution: {integrity: sha512-6IedsVWXyq4P9Tj+TxuU8WGWM70hYLl12nbYU8jkikVpa6WXapFazPUcHUMDMoWftIDE2ILDkFFte6W2nFCkRQ==}
 
   '@internationalized/number@3.6.5':
     resolution: {integrity: sha512-6hY4Kl4HPBvtfS62asS/R22JzNNy8vi/Ssev7x6EobfCp+9QIB2hKvI2EtbdJ0VSQacxVNtqhE/NmF/NZ0gm6g==}
@@ -2174,10 +2171,6 @@ packages:
 
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
-
-  deepmerge-ts@7.1.5:
-    resolution: {integrity: sha512-HOJkrhaYsweh+W+e74Yn7YStZOilkoPb6fycpwNLKzSPtruFs48nYis0zy5yJz1+ktUhHxoRDJ27RQAWLIJVJw==}
-    engines: {node: '>=16.0.0'}
 
   default-browser-id@5.0.1:
     resolution: {integrity: sha512-x1VCxdX4t+8wVfd1so/9w+vQ4vx7lKd2Qp5tDRutErwmR85OgmfX7RlLRMWafRMY7hbEiXIbudNrjOAPa/hL8Q==}
@@ -3931,10 +3924,6 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
 
-  shepherd.js@15.2.1:
-    resolution: {integrity: sha512-afzZzj3K7sFfnkuze4TmHT4RuxMzPtpxs4SoXBBOYdJgbVL4dG44E7LEOyk418t1JuBu0Ji3nsYczJbrbv76LQ==}
-    engines: {node: '>= 20'}
-
   signal-exit@3.0.7:
     resolution: {integrity: sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==}
 
@@ -4531,12 +4520,6 @@ packages:
     resolution: {integrity: sha512-Hz9q5sa33Yhduglwz6g9skT8OBPii+4bFn88w6J+J4MfEo4KRRpmiNG/hHHkdbRFlLBOqxN8y8gf2Fb0MTUgVg==}
     peerDependencies:
       vue: ^3.5.0
-
-  vue-shepherd@6.0.0:
-    resolution: {integrity: sha512-vQPr8fp7SgGUu3bfJSD1nm8EQfjnnj92iaMf529HQSQHEPDfdPbeYf8MIa8vEjqsxJvu7NPC0913+HOyxarxbg==}
-    engines: {node: '>= 20'}
-    peerDependencies:
-      vue: '>=3.0.0'
 
   vue-tsc@3.2.4:
     resolution: {integrity: sha512-xj3YCvSLNDKt1iF9OcImWHhmYcihVu9p4b9s4PGR/qp6yhW+tZJaypGxHScRyOrdnHvaOeF+YkZOdKwbgGvp5g==}
@@ -5236,7 +5219,7 @@ snapshots:
       '@iconify/types': 2.0.0
       vue: 3.5.28(typescript@5.9.3)
 
-  '@internationalized/date@3.11.0':
+  '@internationalized/date@3.12.1':
     dependencies:
       '@swc/helpers': 0.5.18
 
@@ -5562,7 +5545,7 @@ snapshots:
     dependencies:
       '@floating-ui/dom': 1.7.5
       '@iconify/vue': 5.0.0(vue@3.5.28(typescript@5.9.3))
-      '@internationalized/date': 3.11.0
+      '@internationalized/date': 3.12.1
       '@internationalized/number': 3.6.5
       '@nuxt/fonts': 0.12.1(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(vite@7.3.1(@types/node@25.3.0)(jiti@2.6.1)(lightningcss@1.31.1))
       '@nuxt/icon': 2.2.1(vite@7.3.1(@types/node@25.3.0)(jiti@2.6.1)(lightningcss@1.31.1))(vue@3.5.28(typescript@5.9.3))
@@ -7019,8 +7002,6 @@ snapshots:
   deep-extend@0.6.0: {}
 
   deep-is@0.1.4: {}
-
-  deepmerge-ts@7.1.5: {}
 
   default-browser-id@5.0.1: {}
 
@@ -8708,7 +8689,7 @@ snapshots:
     dependencies:
       '@floating-ui/dom': 1.7.5
       '@floating-ui/vue': 1.1.10(vue@3.5.28(typescript@5.9.3))
-      '@internationalized/date': 3.11.0
+      '@internationalized/date': 3.12.1
       '@internationalized/number': 3.6.5
       '@tanstack/vue-virtual': 3.13.18(vue@3.5.28(typescript@5.9.3))
       '@vueuse/core': 12.8.2(typescript@5.9.3)
@@ -8848,11 +8829,6 @@ snapshots:
       shebang-regex: 3.0.0
 
   shebang-regex@3.0.0: {}
-
-  shepherd.js@15.2.1:
-    dependencies:
-      '@floating-ui/dom': 1.7.5
-      deepmerge-ts: 7.1.5
 
   signal-exit@3.0.7: {}
 
@@ -9428,11 +9404,6 @@ snapshots:
   vue-router@4.6.4(vue@3.5.28(typescript@5.9.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
-      vue: 3.5.28(typescript@5.9.3)
-
-  vue-shepherd@6.0.0(vue@3.5.28(typescript@5.9.3)):
-    dependencies:
-      shepherd.js: 15.2.1
       vue: 3.5.28(typescript@5.9.3)
 
   vue-tsc@3.2.4(typescript@5.9.3):

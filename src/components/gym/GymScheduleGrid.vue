@@ -7,6 +7,8 @@ import { useGymPermissions } from '@/composables/useGymPermissions'
 import { useMyTeamsStore } from '@/stores/myTeams'
 import ReserveSlotModal from './ReserveSlotModal.vue'
 import CloseSlotModal from './CloseSlotModal.vue'
+import DatePicker from '@/components/datetime/DatePicker.vue'
+import { dateToYmd, ymdToDate } from '@/utils/datetime'
 import type { components } from '@/types/api'
 
 type EffectiveSlot = components['schemas']['EffectiveSlotDto']
@@ -42,30 +44,16 @@ function addDays(d: Date, n: number): Date {
   x.setDate(x.getDate() + n)
   return x
 }
-function ymd(d: Date): string {
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-}
-function fromYmd(s: string): Date {
-  const [y, m, day] = s.split('-').map(Number)
-  const x = new Date()
-  x.setFullYear(y ?? new Date().getFullYear(), (m ?? 1) - 1, day ?? 1)
-  x.setHours(0, 0, 0, 0)
-  return x
-}
+const selectedDate = ref(dateToYmd(new Date()))
 
-const selectedDate = ref(ymd(new Date()))
-
-const windowFrom = computed(() => fromYmd(selectedDate.value))
+const windowFrom = computed(() => ymdToDate(selectedDate.value))
 const windowTo = computed(() => addDays(windowFrom.value, VISIBLE_DAYS))
 
 function shiftDay(delta: number) {
-  selectedDate.value = ymd(addDays(windowFrom.value, delta))
+  selectedDate.value = dateToYmd(addDays(windowFrom.value, delta))
 }
 function goToday() {
-  selectedDate.value = ymd(new Date())
+  selectedDate.value = dateToYmd(new Date())
 }
 
 interface DayBucket {
@@ -371,7 +359,7 @@ function blockTone(seg: EffectiveSlot, mine: boolean): BlockTone {
       </div>
 
       <UFormField label="Date">
-        <UInput v-model="selectedDate" type="date" icon="i-lucide-calendar" />
+        <DatePicker v-model="selectedDate" />
       </UFormField>
 
       <!-- Legend -->

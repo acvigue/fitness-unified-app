@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import DateTimeRangePicker from '@/components/datetime/DateTimeRangePicker.vue'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useToastStore } from '@/stores/toast'
@@ -18,31 +19,16 @@ const emit = defineEmits<{
 
 const toast = useToastStore()
 
-const startsAt = ref('')
-const endsAt = ref('')
+const range = ref({ startsAt: '', endsAt: '' })
 const note = ref('')
 const submitting = ref(false)
 const error = ref('')
-
-const minLocal = computed(() => toLocalInput(props.windowStart))
-const maxLocal = computed(() => toLocalInput(props.windowEnd))
-
-function toLocalInput(iso: string): string {
-  const d = new Date(iso)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-
-function fromLocalInput(local: string): string {
-  return new Date(local).toISOString()
-}
 
 watch(
   () => props.open,
   (v) => {
     if (!v) return
-    startsAt.value = toLocalInput(props.windowStart)
-    endsAt.value = toLocalInput(props.windowEnd)
+    range.value = { startsAt: props.windowStart, endsAt: props.windowEnd }
     note.value = ''
     error.value = ''
   },
@@ -50,8 +36,9 @@ watch(
 )
 
 const isValid = computed(() => {
-  if (!startsAt.value || !endsAt.value) return false
-  return new Date(endsAt.value) > new Date(startsAt.value)
+  const { startsAt, endsAt } = range.value
+  if (!startsAt || !endsAt) return false
+  return new Date(endsAt) > new Date(startsAt)
 })
 
 async function submit() {
@@ -62,8 +49,8 @@ async function submit() {
     const { error: err } = await apiClient.POST('/v1/gyms/{id}/closures', {
       params: { path: { id: props.gymId } },
       body: {
-        startsAt: fromLocalInput(startsAt.value),
-        endsAt: fromLocalInput(endsAt.value),
+        startsAt: range.value.startsAt,
+        endsAt: range.value.endsAt,
         note: note.value.trim() || undefined,
       },
     })
@@ -102,14 +89,12 @@ async function submit() {
           </div>
         </div>
 
-        <div class="grid gap-3 sm:grid-cols-2">
-          <UFormField label="Starts at" required>
-            <UInput v-model="startsAt" type="datetime-local" :min="minLocal" :max="maxLocal" />
-          </UFormField>
-          <UFormField label="Ends at" required>
-            <UInput v-model="endsAt" type="datetime-local" :min="minLocal" :max="maxLocal" />
-          </UFormField>
-        </div>
+        <DateTimeRangePicker
+          v-model="range"
+          :min="props.windowStart"
+          :max="props.windowEnd"
+          :disabled="submitting"
+        />
 
         <UFormField label="Reason">
           <UTextarea v-model="note" :rows="2" placeholder="Optional note for watchers" />

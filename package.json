@@ -28,6 +28,7 @@
     "@capacitor/preferences": "^8.0.0",
     "@iconify-json/lucide": "^1.2.95",
     "@iconify/vue": "^5.0.0",
+    "@internationalized/date": "^3.12.1",
     "@mux/upchunk": "^3.5.0",
     "@nuxt/ui": "^4.3.0",
     "@unhead/vue": "^2.1.1",

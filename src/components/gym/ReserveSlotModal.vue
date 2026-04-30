@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import DateTimeRangePicker from '@/components/datetime/DateTimeRangePicker.vue'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useToastStore } from '@/stores/toast'
@@ -21,34 +22,19 @@ const toast = useToastStore()
 const myTeams = useMyTeamsStore()
 
 const teamId = ref<string>('')
-const startsAt = ref('')
-const endsAt = ref('')
+const range = ref({ startsAt: '', endsAt: '' })
 const note = ref('')
 const submitting = ref(false)
 const error = ref('')
 
 const teamItems = computed(() => myTeams.captainTeams.map((t) => ({ label: t.name, value: t.id })))
 
-const minLocal = computed(() => toLocalInput(props.windowStart))
-const maxLocal = computed(() => toLocalInput(props.windowEnd))
-
-function toLocalInput(iso: string): string {
-  const d = new Date(iso)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-
-function fromLocalInput(local: string): string {
-  return new Date(local).toISOString()
-}
-
 watch(
   () => props.open,
   (v) => {
     if (!v) return
     teamId.value = myTeams.captainTeams[0]?.id ?? ''
-    startsAt.value = toLocalInput(props.windowStart)
-    endsAt.value = toLocalInput(props.windowEnd)
+    range.value = { startsAt: props.windowStart, endsAt: props.windowEnd }
     note.value = ''
     error.value = ''
   },
@@ -57,8 +43,9 @@ watch(
 
 const isValid = computed(() => {
   if (!teamId.value) return false
-  if (!startsAt.value || !endsAt.value) return false
-  return new Date(endsAt.value) > new Date(startsAt.value)
+  const { startsAt, endsAt } = range.value
+  if (!startsAt || !endsAt) return false
+  return new Date(endsAt) > new Date(startsAt)
 })
 
 async function submit() {
@@ -70,8 +57,8 @@ async function submit() {
       params: { path: { id: props.gymId } },
       body: {
         teamId: teamId.value,
-        startsAt: fromLocalInput(startsAt.value),
-        endsAt: fromLocalInput(endsAt.value),
+        startsAt: range.value.startsAt,
+        endsAt: range.value.endsAt,
         note: note.value.trim() || undefined,
       },
     })
@@ -114,14 +101,12 @@ async function submit() {
           <USelect v-model="teamId" :items="teamItems" placeholder="Select team" />
         </UFormField>
 
-        <div class="grid gap-3 sm:grid-cols-2">
-          <UFormField label="Starts at" required>
-            <UInput v-model="startsAt" type="datetime-local" :min="minLocal" :max="maxLocal" />
-          </UFormField>
-          <UFormField label="Ends at" required>
-            <UInput v-model="endsAt" type="datetime-local" :min="minLocal" :max="maxLocal" />
-          </UFormField>
-        </div>
+        <DateTimeRangePicker
+          v-model="range"
+          :min="props.windowStart"
+          :max="props.windowEnd"
+          :disabled="submitting"
+        />
 
         <UFormField label="Note">
           <UTextarea v-model="note" :rows="2" placeholder="Optional note for your team" />
