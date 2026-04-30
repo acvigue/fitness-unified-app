@@ -4,6 +4,7 @@ import { useHead } from '@unhead/vue'
 import { useRoute, useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import SportsPickerModal from '@/components/SportsPickerModal.vue'
+import UserPickerModal from '@/components/user/UserPickerModal.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useAuthStore } from '@/stores/auth/auth'
 import { apiClient } from '@/lib/api/client'
@@ -52,7 +53,7 @@ const userSearchResults = ref<UserLookupItem[]>([])
 const actionLoading = ref(false)
 
 // Remove member
-const removeMemberId = ref('')
+const removeMemberPickerOpen = ref(false)
 
 // Delete
 const deletingTeam = ref(false)
@@ -293,24 +294,22 @@ async function cancelInvitation(invitationId: string) {
   }
 }
 
-async function removeMember() {
-  if (!removeMemberId.value.trim()) {
-    setMessages('', 'User ID is required')
-    return
-  }
-  if (!window.confirm('Remove this member from the team?')) return
+async function removeMember(user: UserLookupItem) {
+  const label = user.name || user.username || user.email || 'this member'
+  if (!window.confirm(`Remove ${label} from the team?`)) return
   actionLoading.value = true
   setMessages()
   try {
     const { error: err } = await apiClient.DELETE('/v1/teams/{id}/members/{userId}', {
-      params: { path: { id: teamId.value, userId: removeMemberId.value.trim() } },
+      params: { path: { id: teamId.value, userId: user.id } },
     })
     if (err) {
       setMessages('', getErrorMessage(err, 'Failed to remove member'))
       return
     }
     setMessages('Member removed')
-    removeMemberId.value = ''
+    removeMemberPickerOpen.value = false
+    await loadTeam()
   } catch (e) {
     setMessages('', e instanceof Error ? e.message : 'Failed to remove member')
   } finally {
@@ -514,18 +513,17 @@ onMounted(async () => {
         <div class="flex flex-col gap-3">
           <div>
             <p class="text-xs uppercase tracking-[0.3em] text-white/60">Remove Member</p>
-            <p class="text-sm text-white/60">
-              Remove a member from the team by their user ID through their profile .
-            </p>
+            <p class="text-sm text-white/60">Search for a member to remove from the team.</p>
           </div>
-          <div class="flex flex-col gap-2 sm:flex-row">
-            <UInput
-              v-model="removeMemberId"
-              class="flex-1"
-              placeholder="User ID from their profile to remove"
-            />
-            <UButton color="error" variant="soft" :loading="actionLoading" @click="removeMember">
-              Remove Member
+          <div>
+            <UButton
+              color="error"
+              variant="soft"
+              icon="i-lucide-user-minus"
+              :disabled="actionLoading"
+              @click="removeMemberPickerOpen = true"
+            >
+              Find Member to Remove
             </UButton>
           </div>
         </div>
@@ -588,6 +586,17 @@ onMounted(async () => {
       v-model:open="editSportsPickerOpen"
       :selected="editSelectedSport ? [editSelectedSport] : []"
       @update="(s: Sport[]) => (editSelectedSport = s[0] ?? null)"
+    />
+
+    <UserPickerModal
+      v-model:open="removeMemberPickerOpen"
+      title="Remove Member"
+      description="Search for the member you want to remove from the team."
+      placeholder="Search by name, username, or email"
+      confirm-label="Remove"
+      :loading="actionLoading"
+      :exclude-user-ids="team?.captainId ? [team.captainId] : []"
+      @select="removeMember"
     />
   </PageLayout>
 </template>

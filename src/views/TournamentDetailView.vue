@@ -7,7 +7,7 @@ import TournamentBracket from '@/components/TournamentBracket.vue'
 import TournamentRecapsSection from '@/components/tournament/TournamentRecapsSection.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useAuthStore } from '@/stores/auth/auth'
-import { useOrganizationStore } from '@/stores/organization'
+import { useTournamentPermissions } from '@/composables/useTournamentPermissions'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useToastStore } from '@/stores/toast'
@@ -24,7 +24,6 @@ const route = useRoute()
 const router = useRouter()
 const { setHeader } = usePageHeader()
 const authStore = useAuthStore()
-const orgStore = useOrganizationStore()
 const toast = useToastStore()
 
 const tournament = ref<Tournament | null>(null)
@@ -62,10 +61,7 @@ const currentUserId = computed(() => {
   return user?.sub || user?.id || ''
 })
 
-const isOrgManager = computed(() => {
-  const membership = orgStore.currentOrganization
-  return membership && (membership.role === 'STAFF' || membership.role === 'ADMIN')
-})
+const { canManage: isOrgManager } = useTournamentPermissions(() => tournament.value?.organizationId)
 
 const myCaptainTeams = computed(() =>
   myTeams.value.filter((t) => t.captainId === currentUserId.value),

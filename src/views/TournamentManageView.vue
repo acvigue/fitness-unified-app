@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useHead } from '@unhead/vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import PageLayout from '@/layouts/PageLayout.vue'
 import { usePageHeader } from '@/composables/usePageHeader'
 import { useToastStore } from '@/stores/toast'
+import { useOrganizationStore } from '@/stores/organization'
+import { useTournamentPermissions } from '@/composables/useTournamentPermissions'
 import { apiClient } from '@/lib/api/client'
 import { getErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/types/api'
@@ -15,11 +17,14 @@ type TournamentInvitation = components['schemas']['TournamentInvitationResponseD
 useHead({ title: 'Manage Tournament' })
 
 const route = useRoute()
+const router = useRouter()
 const { setHeader } = usePageHeader()
 const toast = useToastStore()
+const orgStore = useOrganizationStore()
 
 const tournamentId = computed(() => route.params.id as string)
 const tournament = ref<Tournament | null>(null)
+const { canManage } = useTournamentPermissions(() => tournament.value?.organizationId)
 const invitations = ref<TournamentInvitation[]>([])
 const allTeams = ref<{ id: string; name: string; captainId: string }[]>([])
 const loading = ref(true)
@@ -68,6 +73,7 @@ async function loadData() {
     const [tournamentRes, teamsRes] = await Promise.all([
       apiClient.GET('/v1/tournaments/{id}', { params: { path: { id: tournamentId.value } } }),
       apiClient.GET('/v1/teams'),
+      orgStore.initialized ? Promise.resolve() : orgStore.fetchMemberships(),
     ])
     if (tournamentRes.error) {
       error.value = getErrorMessage(tournamentRes.error, 'Failed to load tournament')
@@ -76,6 +82,7 @@ async function loadData() {
     tournament.value = tournamentRes.data
     allTeams.value = teamsRes.data?.data ?? []
 
+    if (!canManage.value) return
     await loadInvitations()
   } catch (e) {
     error.value = getErrorMessage(e, 'Failed to load')
@@ -230,6 +237,27 @@ onMounted(() => {
         aria-label="Loading tournament"
       />
     </div>
+
+    <section
+      v-else-if="tournament && !canManage"
+      class="flex flex-col items-center gap-4 px-5 py-12 text-center max-w-md mx-auto"
+    >
+      <UIcon name="i-lucide-shield-alert" class="size-10 text-white/40" />
+      <div>
+        <p class="text-lg font-medium">You don't have permission to manage this tournament</p>
+        <p class="mt-1 text-sm text-white/60">
+          Only staff or admins of the hosting organization can manage teams and invitations.
+        </p>
+      </div>
+      <UButton
+        color="neutral"
+        variant="soft"
+        icon="i-lucide-arrow-left"
+        @click="router.push(`/tournaments/${tournamentId}`)"
+      >
+        Back to tournament
+      </UButton>
+    </section>
 
     <section v-else class="flex flex-col gap-5 px-5 py-6">
       <UAlert
