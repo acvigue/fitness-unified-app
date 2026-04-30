@@ -32,6 +32,7 @@ import GymCreateView from '@/views/GymCreateView.vue'
 import BlockedUsersView from '@/views/BlockedUsersView.vue'
 import MyReportsView from '@/views/MyReportsView.vue'
 import ReminderPreferencesView from '@/views/ReminderPreferencesView.vue'
+import PushPreferencesView from '@/views/PushPreferencesView.vue'
 import GymSubscriptionsView from '@/views/GymSubscriptionsView.vue'
 import TeamBroadcastsView from '@/views/TeamBroadcastsView.vue'
 import ModerationMessagesView from '@/views/moderation/ModerationMessagesView.vue'
@@ -234,6 +235,11 @@ const router = createRouter({
       path: '/settings/reminder-preferences',
       name: 'reminder-preferences',
       component: ReminderPreferencesView,
+    },
+    {
+      path: '/settings/push-preferences',
+      name: 'push-preferences',
+      component: PushPreferencesView,
     },
     {
       path: '/settings/gym-subscriptions',

@@ -11,6 +11,8 @@ PODS:
     - OSInAppBrowserLib (~> 2.3.1)
   - CapacitorPreferences (8.0.1):
     - Capacitor
+  - CapacitorPushNotifications (8.0.3):
+    - Capacitor
   - OSInAppBrowserLib (2.3.1)
 
 DEPENDENCIES:
@@ -20,6 +22,7 @@ DEPENDENCIES:
   - "CapacitorCordova (from `../../node_modules/.pnpm/@capacitor+ios@8.1.0_@capacitor+core@8.1.0/node_modules/@capacitor/ios`)"
   - "CapacitorInappbrowser (from `../../node_modules/.pnpm/@capacitor+inappbrowser@3.0.2_@capacitor+core@8.1.0/node_modules/@capacitor/inappbrowser`)"
   - "CapacitorPreferences (from `../../node_modules/.pnpm/@capacitor+preferences@8.0.1_@capacitor+core@8.1.0/node_modules/@capacitor/preferences`)"
+  - "CapacitorPushNotifications (from `../../node_modules/.pnpm/@capacitor+push-notifications@8.0.3_@capacitor+core@8.1.0/node_modules/@capacitor/push-notifications`)"
 
 SPEC REPOS:
   trunk:
@@ -38,6 +41,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/.pnpm/@capacitor+inappbrowser@3.0.2_@capacitor+core@8.1.0/node_modules/@capacitor/inappbrowser"
   CapacitorPreferences:
     :path: "../../node_modules/.pnpm/@capacitor+preferences@8.0.1_@capacitor+core@8.1.0/node_modules/@capacitor/preferences"
+  CapacitorPushNotifications:
+    :path: "../../node_modules/.pnpm/@capacitor+push-notifications@8.0.3_@capacitor+core@8.1.0/node_modules/@capacitor/push-notifications"
 
 SPEC CHECKSUMS:
   Capacitor: 47b825120c6b8b6d6f9f053e9350a8960d436710
@@ -46,8 +51,9 @@ SPEC CHECKSUMS:
   CapacitorCordova: e8b76fd95fc1e157775abc484c59cc0de464095d
   CapacitorInappbrowser: fb46fb96a23af9a62b0c4d0750d3466ccf11f31d
   CapacitorPreferences: cca2021f386efb75947c850334447d9ff22b14f1
+  CapacitorPushNotifications: e4437b4ec1b2070685bf032c210f346432214c5f
   OSInAppBrowserLib: bf7cdcc072394ae827f8cfe3f5f9c807691834c0
 
-PODFILE CHECKSUM: ea632cb9f93bc8e84ff740e64cad45f5fdc02d55
+PODFILE CHECKSUM: 7903e0e5b8a5c2088a404e7e57cf7ca602759697
 
 COCOAPODS: 1.16.2

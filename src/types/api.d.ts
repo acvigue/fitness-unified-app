@@ -124,6 +124,76 @@ export interface paths {
         patch: operations["NotificationController_markRead_v1"];
         trace?: never;
     };
+    "/v1/push/vapid-public-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fetch the VAPID public key for Web Push subscription */
+        get: operations["PushController_getVapidPublicKey_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/push/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the current user's push devices */
+        get: operations["PushController_listDevices_v1"];
+        put?: never;
+        /** Register a push device for the current user */
+        post: operations["PushController_registerDevice_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/push/devices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Unregister a push device */
+        delete: operations["PushController_unregisterDevice_v1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/push/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get push notification type preferences */
+        get: operations["PushController_getPreferences_v1"];
+        /** Update push notification type preferences */
+        put: operations["PushController_updatePreferences_v1"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/teams/{teamId}/broadcasts": {
         parameters: {
             query?: never;
@@ -2401,6 +2471,59 @@ export interface components {
         PaginatedNotificationResponseDto: {
             data: components["schemas"]["NotificationResponseDto"][];
             meta: components["schemas"]["PaginationMetaDto"];
+        };
+        VapidPublicKeyResponseDto: {
+            /** @description Base64url-encoded VAPID public key */
+            publicKey: string;
+        };
+        PushDeviceResponseDto: {
+            id: string;
+            /** @enum {string} */
+            platform: "IOS" | "WEB";
+            /** @description Last 8 chars of the device token (for display only) */
+            tokenHint: string;
+            userAgent?: Record<string, never> | null;
+            /** Format: date-time */
+            lastSeenAt: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        PushSubscriptionKeysDto: {
+            /** @description p256dh key for VAPID encryption */
+            p256dh: string;
+            /** @description auth secret for VAPID encryption */
+            auth: string;
+        };
+        PushSubscriptionDto: {
+            /** @description Push service endpoint URL */
+            endpoint: string;
+            expirationTime?: number | null;
+            keys: components["schemas"]["PushSubscriptionKeysDto"];
+        };
+        RegisterPushDeviceDto: {
+            /**
+             * @description Device platform
+             * @enum {string}
+             */
+            platform: "IOS" | "WEB";
+            /** @description APNs device token (IOS) or unique key derived from endpoint (WEB) */
+            token: string;
+            /** @description User-Agent of the registering device */
+            userAgent?: string;
+            /** @description Full Web Push subscription (required for WEB) */
+            subscription?: components["schemas"]["PushSubscriptionDto"];
+        };
+        PushPreferenceItemDto: {
+            /** @enum {string} */
+            type: "TEAM_INVITE" | "TEAM_INVITE_RESPONSE" | "TEAM_JOIN_REQUEST" | "TEAM_REQUEST_RESPONSE" | "CAPTAIN_ASSIGNED" | "CAPTAIN_TRANSFERRED" | "TEAM_DELETED" | "MEMBER_LEFT" | "REMOVED_FROM_TEAM" | "TEAM_BROADCAST" | "TEAM_CHAT_MESSAGE" | "ORGANIZATION_INVITE" | "ORGANIZATION_INVITE_RESPONSE" | "ORGANIZATION_ROLE_CHANGED" | "ORGANIZATION_MEMBER_REMOVED" | "TOURNAMENT_INVITATION_RECEIVED" | "TOURNAMENT_REMINDER" | "TOURNAMENT_FORFEIT_RECORDED" | "TOURNAMENT_MATCH_RESULT_PENDING" | "TOURNAMENT_MATCH_RESULT_CONFIRMED" | "TOURNAMENT_MATCH_RESULT_DISPUTED" | "MEETUP_PROPOSAL" | "MEETUP_ACCEPTED" | "MEETUP_DECLINED" | "MEETUP_CANCELLED" | "GYM_STATUS_CHANGED" | "ACHIEVEMENT_UNLOCKED" | "MESSAGE_FLAGGED" | "MESSAGE_DELETED" | "ACCOUNT_SUSPENDED" | "ACCOUNT_UNSUSPENDED" | "ACCOUNT_BANNED" | "ACCOUNT_UNBANNED" | "ACCOUNT_RESTRICTED" | "SUSPENSION_APPEAL_SUBMITTED" | "SUSPENSION_APPEAL_DECIDED";
+            /** @description Whether push is enabled for this notification type */
+            enabled: boolean;
+        };
+        PushPreferencesResponseDto: {
+            preferences: components["schemas"]["PushPreferenceItemDto"][];
+        };
+        UpdatePushPreferencesDto: {
+            preferences: components["schemas"]["PushPreferenceItemDto"][];
         };
         CreateBroadcastDto: {
             /**
@@ -4843,6 +4966,227 @@ export interface operations {
             };
             /** @description Resource not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PushController_getVapidPublicKey_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VapidPublicKeyResponseDto"];
+                };
+            };
+        };
+    };
+    PushController_listDevices_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushDeviceResponseDto"][];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PushController_registerDevice_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterPushDeviceDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushDeviceResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PushController_unregisterDevice_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PushController_getPreferences_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushPreferencesResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    PushController_updatePreferences_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePushPreferencesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushPreferencesResponseDto"];
+                };
+            };
+            /** @description Unauthorized - invalid or missing token */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

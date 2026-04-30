@@ -26,6 +26,7 @@
     "@capacitor/inappbrowser": "^3.0.0",
     "@capacitor/ios": "^8.0.0",
     "@capacitor/preferences": "^8.0.0",
+    "@capacitor/push-notifications": "^8.0.3",
     "@iconify-json/lucide": "^1.2.95",
     "@iconify/vue": "^5.0.0",
     "@internationalized/date": "^3.12.1",

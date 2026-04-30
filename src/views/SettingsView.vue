@@ -313,6 +313,17 @@
             <UButton
               variant="ghost"
               color="neutral"
+              icon="i-lucide-bell-ring"
+              trailing-icon="i-lucide-chevron-right"
+              block
+              class="justify-between"
+              :to="{ name: 'push-preferences' }"
+            >
+              Push notifications
+            </UButton>
+            <UButton
+              variant="ghost"
+              color="neutral"
               icon="i-lucide-bell"
               trailing-icon="i-lucide-chevron-right"
               block

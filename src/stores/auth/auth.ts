@@ -193,6 +193,10 @@ export const useAuthStore = defineStore('auth', () => {
    * Log out the user and clear all tokens
    */
   async function logout() {
+    // Unregister push device while we still have a valid access token.
+    // Best-effort — never blocks logout.
+    await unregisterPushDevice()
+
     await persistTokens(undefined, undefined)
     resetOtherStores()
 
@@ -200,6 +204,17 @@ export const useAuthStore = defineStore('auth', () => {
       await KoiosOidcClient.logout()
     } catch (error) {
       console.warn('Remote logout failed', error)
+    }
+  }
+
+  async function unregisterPushDevice() {
+    try {
+      const { value: id } = await Preferences.get({ key: 'push:deviceId' })
+      if (!id) return
+      await Preferences.remove({ key: 'push:deviceId' })
+      await apiClient.DELETE('/v1/push/devices/{id}', { params: { path: { id } } })
+    } catch (error) {
+      console.warn('Push device unregister failed', error)
     }
   }
 
