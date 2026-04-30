@@ -7,7 +7,7 @@ const isDev = import.meta.env.DEV
 export const ENV = {
   /** App URLs */
   appUrl: 'https://fittime-teal.vercel.app',
-  appNativeUrl: 'capacitor://localhost',
+  appNativeUrl: 'https://fittime-teal.vercel.app',
 
   /** API Configuration */
   apiBaseUrl: isDev ? 'http://localhost:3000' : 'https://fittime.api.koiosdigital.net',

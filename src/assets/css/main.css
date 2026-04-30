@@ -22,6 +22,20 @@ body {
   margin: 0;
   padding: 0;
   background-color: #09090b;
+  /* Disable double-tap-to-zoom and the 300ms tap delay on iOS WKWebView */
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* iOS Safari/WKWebView zooms when a focused input has font-size < 16px.
+   Force 16px on touch-only devices so focus never triggers a zoom.
+   !important is required to win against utility classes like `text-sm`. */
+@media (hover: none) and (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 #app {

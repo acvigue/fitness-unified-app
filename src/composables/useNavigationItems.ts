@@ -21,6 +21,7 @@ const ALL_ITEMS: NavigationItem[] = [
   { label: 'Profile', icon: 'i-lucide-user', to: '/profile' },
   { label: 'Videos', icon: 'i-lucide-list-video', to: '/videos' },
   { label: 'Gym', icon: 'i-lucide-dumbbell', to: '/gyms' },
+  { label: 'Settings', icon: 'i-lucide-settings', to: '/settings' },
   { label: 'Moderation', icon: 'i-lucide-shield', to: '/moderation/messages', modOnly: true },
 ]
 

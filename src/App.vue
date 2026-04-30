@@ -4,6 +4,7 @@ import { computed, onMounted } from 'vue'
 
 import AppLayout from './layouts/AppLayout.vue'
 import AppToaster from '@/components/AppToaster.vue'
+import GuideOverlay from '@/components/guide/GuideOverlay.vue'
 import OrganizationSetupModal from '@/components/organization/OrganizationSetupModal.vue'
 import { useAuthStore } from '@/stores/auth/auth'
 import { useOrganizationStore } from '@/stores/organization'
@@ -28,10 +29,7 @@ onMounted(async () => {
 
 useHead({
   titleTemplate: '%s | FitTime',
-  meta: [
-    { name: 'description', content: 'Manage your FitTime' },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-  ],
+  meta: [{ name: 'description', content: 'Manage your FitTime' }],
 })
 </script>
 
@@ -54,4 +52,5 @@ useHead({
   </AppLayout>
   <OrganizationSetupModal v-if="showOrgSetup" />
   <AppToaster />
+  <GuideOverlay />
 </template>

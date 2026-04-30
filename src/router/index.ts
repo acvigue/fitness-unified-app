@@ -27,6 +27,7 @@ import VideosView from '@/views/VideosView.vue'
 import VideoDetailView from '@/views/VideoDetailView.vue'
 import VideoCreateView from '@/views/VideoCreateView.vue'
 import GymView from '@/views/GymView.vue'
+import GymDetailView from '@/views/GymDetailView.vue'
 import GymCreateView from '@/views/GymCreateView.vue'
 import BlockedUsersView from '@/views/BlockedUsersView.vue'
 import MyReportsView from '@/views/MyReportsView.vue'
@@ -208,6 +209,11 @@ const router = createRouter({
       name: 'gym-create',
       component: GymCreateView,
       meta: { requiresOrgStaff: true },
+    },
+    {
+      path: '/gyms/:id',
+      name: 'gym-detail',
+      component: GymDetailView,
     },
     {
       path: '/gyms/:id/manage',

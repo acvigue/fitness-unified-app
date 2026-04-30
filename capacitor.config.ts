@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
     hostname: 'localhost',
     iosScheme: 'https',
     androidScheme: 'https',
-    allowNavigation: ['fitapp.koiosdigital.net'],
+    allowNavigation: ['fittime-teal.vercel.app'],
   },
   ios: {
     contentInset: 'never',

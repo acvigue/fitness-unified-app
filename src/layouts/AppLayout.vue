@@ -32,17 +32,22 @@ const showNavigation = computed(() => {
         <div
           id="main-content"
           class="flex-1 min-h-0 flex flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)]"
-          :class="
+          :class="[
             showNavigation
               ? 'lg:pl-0 pl-[env(safe-area-inset-left)]'
-              : 'pl-[env(safe-area-inset-left)]'
-          "
+              : 'pl-[env(safe-area-inset-left)]',
+            // Bottom tab bar (mobile) provides its own safe-area-inset-bottom.
+            // Pad it here whenever the tab bar isn't covering the bottom.
+            showNavigation
+              ? 'lg:pb-[env(safe-area-inset-bottom)]'
+              : 'pb-[env(safe-area-inset-bottom)]',
+          ]"
         >
           <slot />
         </div>
 
         <!-- Mobile bottom tab bar (below lg) -->
-        <AppBottomTabBar v-if="showNavigation" class="shrink-0 lg:hidden" />
+        <AppBottomTabBar v-if="showNavigation" />
       </div>
     </div>
   </UApp>

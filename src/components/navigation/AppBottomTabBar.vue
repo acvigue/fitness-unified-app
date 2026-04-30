@@ -13,12 +13,18 @@ function navTabClass(active: boolean) {
     active ? 'text-[var(--ui-color-primary-500)]' : 'text-white/50 hover:text-white/80',
   ]
 }
+
+function guideKey(to: string) {
+  if (to === '/') return 'nav-home'
+  return `nav-${to.replace(/^\//, '').split('/')[0]}`
+}
 </script>
 
 <template>
   <nav
     aria-label="Primary"
-    class="flex items-center justify-around bg-[rgba(9,9,11,0.95)] backdrop-blur-xl border-t border-white/10 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-[env(safe-area-inset-left)]"
+    data-guide="bottom-bar"
+    class="flex lg:hidden shrink-0 items-center justify-around bg-[rgba(9,9,11,0.95)] backdrop-blur-xl border-t border-white/10 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-[env(safe-area-inset-left)]"
   >
     <RouterLink
       v-for="item in primaryItems"
@@ -26,6 +32,7 @@ function navTabClass(active: boolean) {
       :to="item.to"
       :aria-label="item.label"
       :aria-current="isActive(item.to) ? 'page' : undefined"
+      :data-guide="guideKey(item.to)"
       :class="navTabClass(isActive(item.to))"
     >
       <UIcon :name="item.icon" class="text-xl" aria-hidden="true" />
@@ -36,6 +43,7 @@ function navTabClass(active: boolean) {
       type="button"
       aria-label="More"
       :aria-expanded="moreOpen"
+      data-guide="nav-more"
       :class="navTabClass(moreActive)"
       @click="moreOpen = true"
     >

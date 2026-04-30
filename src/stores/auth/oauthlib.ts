@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core'
 import { InAppBrowser } from '@capacitor/inappbrowser'
+import { Preferences } from '@capacitor/preferences'
 import {
   UserManager,
   WebStorageStateStore,
@@ -179,8 +180,8 @@ export class KoiosOidcClient {
       const pkce = await generatePKCE()
       const state = generateRandomString(16)
 
-      sessionStorage.setItem(PKCE_VERIFIER_KEY, pkce.verifier)
-      sessionStorage.setItem(OIDC_STATE_KEY, state)
+      await Preferences.set({ key: PKCE_VERIFIER_KEY, value: pkce.verifier })
+      await Preferences.set({ key: OIDC_STATE_KEY, value: state })
 
       // Build authorization URL
       const authUrl = new URL(`${oauth.authority}/protocol/openid-connect/auth`)
@@ -217,20 +218,20 @@ export class KoiosOidcClient {
       const state = url.searchParams.get('state')
 
       // Verify state
-      const storedState = sessionStorage.getItem(OIDC_STATE_KEY)
+      const { value: storedState } = await Preferences.get({ key: OIDC_STATE_KEY })
       if (state !== storedState) {
         throw new Error('Invalid state parameter')
       }
 
       // Get stored PKCE verifier
-      const verifier = sessionStorage.getItem(PKCE_VERIFIER_KEY)
+      const { value: verifier } = await Preferences.get({ key: PKCE_VERIFIER_KEY })
       if (!verifier) {
         throw new Error('PKCE verifier not found')
       }
 
       // Clean up stored values
-      sessionStorage.removeItem(PKCE_VERIFIER_KEY)
-      sessionStorage.removeItem(OIDC_STATE_KEY)
+      await Preferences.remove({ key: PKCE_VERIFIER_KEY })
+      await Preferences.remove({ key: OIDC_STATE_KEY })
 
       if (!code) {
         throw new Error('Authorization code not found in callback')
